@@ -4,6 +4,13 @@ import * as router from "../core/router.js"
 export const NS = "GED";
 
 
+interface State {
+    code: string
+    title: string
+    bg_url: string
+    prompt: string
+}
+let state: State = <State>{};
 let gameid: string = ""
 let isNew = false;
 
@@ -30,7 +37,7 @@ const formTemplate = () => {
 
 const pageTemplate = (form: string) =>{
     return `
-E D I T E U R - ${gameid}
+E D I T E U R - ${state.title}
 ${form}
 `
 }
@@ -40,8 +47,13 @@ ${form}
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "")
     isNew = (gameid == "new")
-    App.prepareRender(NS, "Menu", "game_menu")
-    App.render()
+    App.prepareRender(NS, "Editor", "game_editor")
+    App.GET(`assets/${gameid}.json`)
+        .then((payload: any) =>{
+            state = payload;
+        })
+        .then(App.render)
+        .catch(App.render);
 }
 
 export const render = () => {

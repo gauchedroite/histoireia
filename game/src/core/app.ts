@@ -39,7 +39,7 @@ let renderRoot = "app_root";
 //
 export let state: IState;
 
-let root = new rootMan((<any>window).APP.roots);
+let root = new rootMan((<any>window).APP.roots || []);
 
 
 

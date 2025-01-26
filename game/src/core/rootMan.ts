@@ -3,12 +3,14 @@
 export class rootMan {
     private roots: string[];
     private dedicated = false;
+    private notspecified = true;
     private ix = 0;
     private bumpUntil = 0;
 
     constructor(roots: string[]) {
         this.roots = roots.slice();
-        this.dedicated = (roots.length == 1);
+        this.notspecified = roots.length == 0;
+        this.dedicated = (roots.length == 1) || this.notspecified;
     }
 
     public getDomain = () => {
@@ -17,6 +19,7 @@ export class rootMan {
             this.ix = 0;
             //console.log(`trying root domain`);
         }
+        if (this.notspecified) return "";
         return this.roots[this.ix];
     }
 
