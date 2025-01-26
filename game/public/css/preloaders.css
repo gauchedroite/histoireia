@@ -1,0 +1,61 @@
+.preloader {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  margin: 30px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.preloader .preloader-inner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: auto;
+  margin-top: 10%;
+}
+
+.bounce1,
+.bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: orange;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: gd-bounce 2s infinite ease-in-out;
+}
+
+.bounce2 {
+  animation-delay: -1s;
+}
+
+@keyframes gd-bounce {
+
+  0%,
+  100% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+}
+
+@keyframes color-cycle {
+  0% {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  50% {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  100% {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}

@@ -1,0 +1,101 @@
+@import "./_reset.css";
+@import "./preloaders.css";
+@import "./editor.css";
+
+
+.full-viewport {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+html {
+    /* Disable text selection */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 
+        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+        "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+#gindex {
+
+    #game_index_menu {
+        position: absolute;
+    }
+}
+
+
+
+/* Transition between pages */
+@keyframes js-spinner {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 1;
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes js-fadein {
+    from {
+        opacity: 0.5;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes js-fadeout {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.5;
+    }
+}
+
+@keyframes js-pending-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.js-waiting {
+    .js-waitable {
+        animation: js-fadeout 0.25s 0.2s forwards;
+        pointer-events: none;
+
+        &:before {
+            content: "";
+            box-sizing: border-box;
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            margin-top: -20px;
+            margin-left: -20px;
+            border-radius: 50%;
+            border: 4px solid #ffc958;
+            border-top-color: #dd4b39;
+            animation: js-spinner 0.75s infinite forwards cubic-bezier(0.785, 0.135, 0.15, 0.86);
+            opacity: 0;
+            animation-delay: 0.5s;
+            z-index: 5;
+        }
+    }
+}

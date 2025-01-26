@@ -1,0 +1,22 @@
+html, body, div, span, iframe,
+p, a, img, h1, h2, h3, h4, h5, h6,
+table, tbody, tfoot, thead, tr, th, td,
+canvas, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+body {
+	line-height: 1;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+iframe {
+	/*by default they're [display: inline] and thus have a line-height which renders extra space at the bottom of the iframe*/
+	display: block;
+}
