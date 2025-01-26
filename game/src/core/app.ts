@@ -156,14 +156,12 @@ const setRenderRoot = (id: string) => {
 
     let pages = [...document.querySelectorAll("#app_root > div")]
     pages.forEach(page => {
-        //page.style.opacity = "0";
         (page as HTMLElement).style.display = "none"
     })
 
     setTimeout(() => {
         let element = document.getElementById(id) as HTMLElement;
         element.style.display = "block"
-        //element.style.opacity = "1";
     }, 250);
 }
 

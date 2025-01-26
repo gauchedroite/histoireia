@@ -1,5 +1,6 @@
 @import "./_reset.css";
 @import "./preloaders.css";
+@import "./game.css";
 @import "./editor.css";
 
 
@@ -25,13 +26,6 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 
         "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
         "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-}
-
-#gindex {
-
-    #game_index_menu {
-        position: absolute;
-    }
 }
 
 
