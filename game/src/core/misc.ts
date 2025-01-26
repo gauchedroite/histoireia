@@ -80,6 +80,12 @@ export const convertToPlainText = (html: string) => {
     return plaintext.trim();
 }
 
+export const sanitizeUrlParameters = (url: string) => {
+    if (url == undefined || url.length == 0) return url;
+    const sane = url.replace(/\?/g, "&")
+    return "?" + sane.substring(1)
+}
+
 
 
 export const clone = (state: any, passthrough?: string[]) => {
@@ -249,7 +255,7 @@ export const toInputText = (value: any) => {
     return (value == undefined ? "" : escapeHTML(value.toString()));
 };
 
-export const fromInputText = (id: string, defValue: string = null) => {
+export const fromInputText = (id: string, defValue: string | null = null) => {
     let element = <HTMLInputElement>document.getElementById(id);
     return (element == undefined ? defValue : element.value == "" ? null : element.value);
 };
@@ -257,7 +263,7 @@ export const fromInputText = (id: string, defValue: string = null) => {
 
 
 
-export const fromInputNumber = (id: string, defValue: number = null) => {
+export const fromInputNumber = (id: string, defValue: number | null = null) => {
     let element = <HTMLInputElement>document.getElementById(id);
 
     if (element == undefined)
@@ -280,7 +286,7 @@ export const fromInputNumber = (id: string, defValue: number = null) => {
 
 
 
-export const fromSelectNumber = (id: string, defValue: number = null) => {
+export const fromSelectNumber = (id: string, defValue: number | null = null) => {
     let select = <HTMLSelectElement>document.getElementById(id);
     if (select == undefined || select.selectedIndex == -1)
         return defValue;
@@ -346,10 +352,14 @@ export const toInputDateTime_hhmmssNA = (date: Date) => {
     return `${toInputDate(date)}&nbsp;${time}`;
 };
 
-export const fromInputDate = (id: string, defValue: Date = null) => {
+export const fromInputDate = (id: string, defValue: Date | null = null) => {
     let element = <HTMLInputElement>document.getElementById(id);
     if (element == undefined)
         return defValue;
+
+    if (element.attributes["required"] == undefined && element.value == "")
+        return null;
+
     var parts = element.value.split("-");
 
     if (defValue == null)
@@ -427,15 +437,15 @@ export const toStaticText = (value: any) => {
     return (value == undefined ? "" : value);
 };
 
-export const toStaticTextarea = (value: string) => {
-    return (value == undefined ? "" : value.replace(/\n/g, "<br>"));
+export const toStaticTextarea = (value: string | null | undefined) => {
+    return value?.replace(/\n/g, "<br>");
 };
 
 export const toStaticTextNA = (value: string) => {
     return (value == undefined ? "n/a" : value.replace(/\n/g, "<br>"));
 };
 
-export const toStaticNumber = (value: number) => {
+export const toStaticNumber = (value: number | null) => {
     return (value == undefined ? "" : value.toString());
 };
 
@@ -473,7 +483,7 @@ export const toStaticMoney = (value: number) => {
     return formatter.format(value ?? 0);
 };
 
-export const toStaticDateTime = (date: Date) => {
+export const toStaticDateTime = (date: Date | null) => {
     //return (date != undefined ? date.toLocaleString() : "");
 
     if (date == undefined)
@@ -510,7 +520,7 @@ export const formatHHMMSS24 = (date: Date) => {
     return `${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
 };
 
-export const toInputDateTime_hhmm24 = (date: Date) => {
+export const toInputDateTime_hhmm24 = (date: Date | null) => {
     if (date == undefined)
         return "";
     var hours = date.getHours();
@@ -520,7 +530,7 @@ export const toInputDateTime_hhmm24 = (date: Date) => {
     return `${toInputDate(date)} ${time}`;
 };
 
-export const toInputDateTime_hhmmss24 = (date: Date) => {
+export const toInputDateTime_hhmmss24 = (date: Date | null) => {
     if (date == undefined)
         return "";
     var hours = date.getHours();
@@ -575,7 +585,7 @@ export const dateInRange = (date: Date, rangeStart: Date, rangeEnd: Date) => {
 
 
 
-export const formatBytes = (bytes: number, decimals = 1) => {
+export const formatBytes = (bytes: number | null, decimals = 1) => {
     if (bytes == undefined) return "";
     if (bytes == 0) return "0 Bytes";
 
@@ -595,24 +605,23 @@ export const formatLocaleNumber = (value: number) => {
     return value.toLocaleString()
 }
 
-export const getSize = (bytes: number, unit = "GB", decimals = 1) => {
-    if (bytes == 0) return "0 Bytes";
+export const getSize = (bytes: number, unit = "GB") => {
+    if (bytes == 0) return 0;
 
     const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
     const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
     const i = sizes.indexOf(unit);
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+    return bytes / Math.pow(k, i);
 }
 
-export const filesizeText = (filesize: number) => {
-    if (filesize == 0)
+export const filesizeText = (filesize: number | null) => {
+    if (filesize == undefined || filesize == 0)
         return "";
 
     var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+    var byteUnits = [' KB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
     do {
         filesize = filesize / 1024;
         i++;
@@ -621,6 +630,20 @@ export const filesizeText = (filesize: number) => {
     return Math.max(filesize, 0.1).toFixed(1) + byteUnits[i];
 };
 
+export const formatDuration = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+    if (hours > 0)
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+    return `${formattedMinutes}:${formattedSeconds}`;
+}
 
 
 

@@ -5,8 +5,8 @@ export interface GameList {
 }
 
 export interface Game {
-    code: string
-    title: string
-    bg_url: string
-    prompt: string
+    code: string | null
+    title: string | null
+    bg_url: string | null
+    prompt: string | null
 }
