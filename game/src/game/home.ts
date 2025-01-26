@@ -1,13 +1,10 @@
 import * as App from "../core/app.js"
 import * as router from "../core/router.js"
+import { GameList as State } from "./game-objects.js"
 
 export const NS = "GHOME";
 
 
-interface State {
-    code: string
-    title: string
-}
 let state: State[] = [];
 
 

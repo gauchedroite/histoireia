@@ -1,15 +1,10 @@
 import * as App from "../core/app.js"
 import * as router from "../core/router.js"
+import { Game as State } from "./game-objects.js"
 
 export const NS = "GMENU";
 
 
-interface State {
-    code: string
-    title: string
-    bg_url: string
-    prompt: string
-}
 let state: State = <State>{};
 let gameid = ""
 
@@ -55,4 +50,4 @@ export const render = () => {
 
 export const postRender = () => {
     if (!App.inContext(NS)) return
- }
+}
