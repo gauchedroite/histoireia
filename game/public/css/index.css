@@ -1,4 +1,5 @@
 @import "./_reset.css";
+@import "./bonjour.css";
 @import "./home.css";
 @import "./game.css";
 @import "./editor.css";

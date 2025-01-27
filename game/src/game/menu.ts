@@ -1,21 +1,29 @@
 import * as App from "../core/app.js"
-import * as router from "../core/router.js"
-import { Game as State } from "./game-objects.js"
+import * as Misc from "../core/misc.js"
+import { state, GameDefinition as IState, Message } from "./state.js"
 
 export const NS = "GMENU";
 
 
-let state: State = <State>{};
+let mystate: IState
+let mystate2: Message[]
 let gameid = ""
 
 
 
-const formTemplate = () => {
+const formTemplate = (messages: Message[]) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(`<div class="box item"><a href="#/story/${gameid}">Continuer l'histoire</a></div>`)
-    add(`<div class="box item"><a href="#/story/${gameid}">Recommencer à partir du début</a></div>`)
+    const length = messages.length
+
+    if (length == 0) {
+        add(`<div class="box item"><a href="#/story/${gameid}">Commencer à lire</a></div>`)
+    }
+    else {
+        add(`<div class="box item"><a href="#/story/${gameid}/">Continuer à lire</a></div>`)
+        add(`<div class="box item"><a href="#/story/${gameid}/${length}">Recommencer le livre</a></div>`)
+    }
     add(`<div class="box item"><a href="#/editor/${gameid}">Editeur</a></div>`)
 
     return rows.join("")
@@ -25,8 +33,8 @@ const pageTemplate = (form: string) => {
     return `
 <div>
     <h2>
-        <a href="./"><i class="fa-solid fa-arrow-left"></i></a>
-        <span>${state.title}</span>
+        <a href="#/home"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>${mystate.title}</span>
     </h2>
 </div>
 <div class="form">
@@ -40,9 +48,10 @@ ${form}
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
     App.prepareRender(NS, "Menu", "game_menu")
-    App.GET(`assets/${gameid}.json`)
+    state.fetch_game_definition(gameid)
         .then((payload: any) =>{
-            state = payload;
+            mystate = Misc.clone(payload) as IState
+            mystate2 = state.getMessages()
         })
         .then(App.render)
         .catch(App.render);
@@ -51,7 +60,7 @@ export const fetch = (args: string[] | undefined) => {
 export const render = () => {
     if (!App.inContext(NS)) return "";
 
-    const form = formTemplate()
+    const form = formTemplate(mystate2)
     return pageTemplate(form)
 }
 

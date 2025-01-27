@@ -1,25 +1,26 @@
 import * as App from "../core/app.js"
-import * as router from "../core/router.js"
-import { Game as State } from "./game-objects.js"
+import * as Misc from "../core/misc.js"
+import { state, GameDefinition as IState, Message } from "./state.js"
 
 export const NS = "GSTORY";
 
 
-let state: State = <State>{};
-let gameid: string = ""
+let mystate: IState
+let mystate2: Message[]
+let gameid = ""
 
 
 
-const formTemplate = () => {
+const formTemplate = (messages: Message[]) => {
     return ``
 }
 
-const pageTemplate = (form: string) =>{
+const pageTemplate = (form: string) => {
     return `
 <div>
     <h2>
         <a href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
-        <span>${state.title}</span>
+        <span>${mystate.title}</span>
     </h2>
 </div>
 <div class="form">
@@ -33,9 +34,10 @@ ${form}
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
     App.prepareRender(NS, "Story", "game_story")
-    App.GET(`assets/${gameid}.json`)
+    state.fetch_game_definition(gameid)
         .then((payload: any) =>{
-            state = payload;
+            mystate = Misc.clone(payload) as IState
+            mystate2 = state.getMessages()
         })
         .then(App.render)
         .catch(App.render);
@@ -44,7 +46,7 @@ export const fetch = (args: string[] | undefined) => {
 export const render = () => {
     if (!App.inContext(NS)) return "";
 
-    const form = formTemplate()
+    const form = formTemplate(mystate2)
     return pageTemplate(form)
 }
 

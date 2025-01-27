@@ -137,12 +137,12 @@ export const pauseRender = (pause = true) => {
     rendering = pause;
 }
 
-export const prepareRender = (ns: string, title: string, renderRootId: string) => {
+export const prepareRender = (ns: string, title: string, renderRootId: string | null = null) => {
     transitionUI();
     if (title.length > 0) setPageTitle(title);
     if (ns.length > 0) setContext(ns);
-    setRenderRoot(renderRootId)
-};
+    if (renderRootId != undefined) setRenderRoot(renderRootId)
+}
 
 export const setHardRender = () => {
     hardRender = true;
