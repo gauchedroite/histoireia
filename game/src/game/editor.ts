@@ -2,6 +2,7 @@ import * as App from "../core/app.js"
 import * as router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
+import { left_arrow } from "../core/theme/theme-icon.js"
 import { Game as IState } from "./game-objects.js"
 
 export const NS = "GED";
@@ -19,26 +20,31 @@ const formTemplate = (item: IState) => {
 
     add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true }))
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 25 }))
 
-    add("<ul>")
     if (isNew) {
-        add(`<li><a href="#/editor/billy2">Enregistrer la nouvelle histoire</a> (${gameid})</li>`)
-        add(`<li><a href="./">Index</a></li>`)
+        add(`<button type="button" onclick="location.href='#/menu/${state.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${state.code}</button>`)
     }
     else {
-        add(`<li><a href="#/editor/${gameid}">Enregistrer les changements</a></li>`)
-        add(`<li><a href="#/menu/${gameid}">Retourner au menu</a></li>`)
+        add(`<button type="button" onclick="location.href='#/editor/${gameid}'"><i class="fa-light fa-floppy-disk"></i>&nbsp;Enregistrer les changements</button>`)
     }
-    add("</ul>")
 
     return rows.join("");
 }
 
 const pageTemplate = (form: string) =>{
+    const returnurl = isNew ? `./` : `#/menu/${gameid}`;
+
     return `
-E D I T E U R - ${state.title}
+<div>
+    <h2>
+        <a href="${returnurl}"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>Editeur</span>
+    </h2>
+</div>
+<div class="form">
 ${form}
+</div>
 `
 }
 

@@ -1,17 +1,14 @@
-:root {
-    --ged-border-color: #c0c0c0;
-    --ged-bgc: #f7f7f8;
-    --ged-bgc2: #efeff4;
-    --ged-success: #63c260;
-    --ged-warning: rgb(231, 184, 96);
-    --ged-pw: 260px;
-    --ged-iframeh: 300px;
-}
 
 #ged {
-
     font-family: -apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif;
-    padding: 0;
-    margin: 0;
     line-height: 1.4;
+
+    .form {
+        margin-top: 2rem;
+    }
+
+    & button {
+        width: 100%;
+    }
 }
+

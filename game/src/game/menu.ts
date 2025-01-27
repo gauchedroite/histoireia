@@ -11,20 +11,27 @@ let gameid = ""
 
 
 const formTemplate = () => {
-    return `
-    <li><a href="#/story/${gameid}">Continuer l'histoire</a></li>
-    <li><a href="#/story/${gameid}">Recommencer à partir du début</a></li>
-`
+    const add = (row: string) => rows.push(row);
+    let rows: string[] = [];
+
+    add(`<div class="box item"><a href="#/story/${gameid}">Continuer l'histoire</a></div>`)
+    add(`<div class="box item"><a href="#/story/${gameid}">Recommencer à partir du début</a></div>`)
+    add(`<div class="box item"><a href="#/editor/${gameid}">Editeur</a></div>`)
+
+    return rows.join("")
 }
 
-const pageTemplate = (form: string) =>{
+const pageTemplate = (form: string) => {
     return `
-M E N U - ${state.title}
-<ul>
-    ${form}
-    <li><a href="#/editor/${gameid}">Editeur</a></li>
-    <li><a href="./">Index</a></li>
-</ul>
+<div>
+    <h2>
+        <a href="./"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>${state.title}</span>
+    </h2>
+</div>
+<div class="form">
+${form}
+</div>
 `
 }
 

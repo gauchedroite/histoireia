@@ -182,7 +182,7 @@ export const untransitionUI = () => {
 
 
 export const setPageTitle = (newtitle: string) => {
-    title = `${newtitle} || ${name}`;
+    title = `${newtitle}`;
 };
 
 const setContext = (ns: string) => {

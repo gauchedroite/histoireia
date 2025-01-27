@@ -16,10 +16,15 @@ const formTemplate = () => {
 
 const pageTemplate = (form: string) =>{
     return `
-S T O R Y - ${state.title}
-<ul>
-    <li><a href="#/menu/${gameid}">Retourner au menu</a></li>
-</ul>
+<div>
+    <h2>
+        <a href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>${state.title}</span>
+    </h2>
+</div>
+<div class="form">
+${form}
+</div>
 `
 }
 

@@ -1,5 +1,5 @@
 
-#gmenu {
+#ghome {
     .form {
         margin-top: 2rem;
     }
@@ -19,12 +19,6 @@
         &.item a {
             font-weight: bold;
         }
-    }
-}
-
-#gstory {
-    .form {
-        margin-top: 2rem;
     }
 }
 
