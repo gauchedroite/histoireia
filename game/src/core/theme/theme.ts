@@ -1,7 +1,7 @@
 
 
 //text
-export { IOptText, renderFieldText, renderFieldTextarea, input_Textarea } from "./theme-text.js"
+export { IOptText, renderFieldText, renderFieldTextarea, renderInputText, renderInputTextarea } from "./theme-text.js"
 
 
 export interface IOpt {

@@ -25,7 +25,7 @@ export const renderFieldText = (ns: string, propName: string, value: string | nu
     if (option.readonly ?? false)
         return wrap_field_readonly(label, Misc.toStaticText(value))
 
-    return wrap_field(label, input_Text(ns, propName, value, option))
+    return wrap_field(label, renderInputText(ns, propName, value, option))
 }
 
 export const renderFieldTextarea = (ns: string, propName: string, value: string | null, label: string, option: IOptText) => {
@@ -33,7 +33,7 @@ export const renderFieldTextarea = (ns: string, propName: string, value: string 
     if (option.readonly ?? false)
         return wrap_field_readonly(label, Misc.toStaticText(value))
 
-    return wrap_field(label, input_Textarea(ns, propName, value, option))
+    return wrap_field(label, renderInputTextarea(ns, propName, value, option))
 }
 
 
@@ -62,7 +62,7 @@ const wrap_field_readonly = (label: string, html: string) => {
 
 
 
-const input_Text = (ns: string, propName: string, value: string | null, option: IOptText, filter = false) => {
+export const renderInputText = (ns: string, propName: string, value: string | null, option: IOptText, filter = false) => {
     return `
 <input type="${option.password ? "password" : "text"}"
     class="${option.size || ""} ${option.class || ""}" ${option.style ? `style="${option.style}"` : ""}
@@ -75,11 +75,12 @@ const input_Text = (ns: string, propName: string, value: string | null, option: 
     ${option.datalistname ? `list="${option.datalistname}"` : ""}
     ${option.pattern ? `pattern="${option.pattern}"` : ""}
     ${option.noautocomplete ? option.password ? `autocomplete="new-password"` : "" : ""}
+    ${option.placeholder ? `placeholder="${option.placeholder}"` : ""}
 >
 `;
 }
 
-export const input_Textarea = (ns: string, propName: string, value: string | null, option: IOptText, filter = false) => {
+export const renderInputTextarea = (ns: string, propName: string, value: string | null, option: IOptText, filter = false) => {
     return `
 <textarea
     class="${option.size || ""}" ${option.size ? `style="min-width: initial"` : ""}
@@ -90,5 +91,6 @@ export const input_Textarea = (ns: string, propName: string, value: string | nul
     ${option.required ? "required='required'" : ""} 
     ${option.disabled ? "disabled" : ""}
     ${option.maxlength > 0 ? `maxlength="${option.maxlength}"` : ``}>${Misc.toInputText(value)}</textarea>
+    ${option.placeholder ? `placeholder="${option.placeholder}"` : ""}
 `;
 }

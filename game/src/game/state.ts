@@ -123,7 +123,7 @@ class State {
     //
     async executePrompt(user_prompt: string) {
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
-        await waitAsync(2000)
+        await waitAsync(500)
         return "Réponse de ollama au prompt: " + user_prompt
     }
 }
