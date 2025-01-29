@@ -53,6 +53,7 @@ export const fetch = (args: string[] | undefined) => {
             mystate = Misc.clone(payload) as IState
             mystate2 = state.getMessages()
         })
+        .then(App.untransitionUI)
         .then(App.render)
         .catch(App.render);
 }

@@ -42,16 +42,6 @@ body {
     }
 }
 
-@keyframes js-fadein {
-    from {
-        opacity: 0.5;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
 @keyframes js-fadeout {
     from {
         opacity: 1;
@@ -59,12 +49,6 @@ body {
 
     to {
         opacity: 0.5;
-    }
-}
-
-@keyframes js-pending-spinner {
-    to {
-        transform: rotate(360deg);
     }
 }
 

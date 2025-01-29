@@ -1,4 +1,5 @@
 import * as App from "../core/app.js"
+import { waitAsync } from "../utils.js";
 
 export interface GameList {
     code: string
@@ -114,6 +115,16 @@ class State {
         }
 
         this._gameid = this._game_definition.code!
+    }
+
+
+    //
+    // Interact with ollama
+    //
+    async executePrompt(user_prompt: string) {
+        // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
+        await waitAsync(2000)
+        return "Réponse de ollama au prompt: " + user_prompt
     }
 }
 

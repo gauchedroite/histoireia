@@ -58,13 +58,16 @@ export const fetch = (args: string[] | undefined) => {
             .then(payload => {
                  mystate = Misc.clone(payload) as IState
             })
+            .then(App.untransitionUI)
             .then(App.render)
             .catch(App.render);
     }
     else {
         state.new_game_definition()
         mystate = Misc.clone(state.game_definition) as IState
-        Promise.resolve().then(App.render)
+        Promise.resolve()
+            .then(App.untransitionUI)
+            .then(App.render)
     }
 }
 

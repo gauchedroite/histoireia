@@ -33,6 +33,7 @@ ${form}
 export const fetch = async (args: string[] | undefined) => {
     App.prepareRender(NS, "Home", "game_home")
     state.fetch_index()
+        .then(App.untransitionUI)
         .then(App.render)
         .catch(App.render);
 }

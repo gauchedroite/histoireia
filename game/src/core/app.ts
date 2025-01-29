@@ -62,7 +62,6 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        //let markup = `<div id="${renderRoot}" class="js-fadein ${hasServerError} ${hasFatalError}">${html}</div>`;
         let markup = `<div id="${renderRoot}">${html}</div>`;
 
         if (!hardRender)
@@ -169,13 +168,11 @@ const setRenderRoot = (id: string) => {
 
 export const transitionUI = () => {
     let element = document.getElementById("app_root") as HTMLElement;
-    element.classList.remove("js-fadein");
     element.classList.add("js-waiting");
 };
 
 export const untransitionUI = () => {
     let element = document.getElementById("app_root") as HTMLElement;
-    element.classList.add("js-fadein");
     element.classList.remove("js-waiting");
 };
 
