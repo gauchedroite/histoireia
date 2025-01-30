@@ -16,13 +16,14 @@ const formTemplate = (messages: Message[]) => {
     let rows: string[] = [];
 
     const length = messages.length
+    const lastPage = Math.floor(length / 2)
 
     if (length == 0) {
-        add(`<div class="box item"><a href="#/story/${gameid}">Commencer à lire</a></div>`)
+        add(`<div class="box item"><a href="#/story/${gameid}/new">Commencer à lire</a></div>`)
     }
     else {
-        add(`<div class="box item"><a href="#/story/${gameid}/">Continuer à lire</a></div>`)
-        add(`<div class="box item"><a href="#/story/${gameid}/${length}">Recommencer le livre</a></div>`)
+        add(`<div class="box item"><a href="#/story/${gameid}/${lastPage}">Continuer à lire</a></div>`)
+        add(`<div class="box item"><a href="#/story/${gameid}/new">Recommencer le livre?</a></div>`)
     }
     add(`<div class="box item"><a href="#/editor/${gameid}">Editeur</a></div>`)
 

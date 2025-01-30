@@ -68,23 +68,56 @@ class State {
     //
     // Managing the localStorage
     //
-    private getKey(what: string) {
+    private getKey (what: string) {
         return `${this.username}_${this.gameid}_${what}`
     }
 
-    getMessages = () => {
+    getMessages () {
         const key = this.getKey("messages")
         const json = localStorage.getItem(key) ?? "[]"
         return JSON.parse(json)as Message[]
     }
 
-    appendMessage = (role: string, content: string) => {
-        const msg = this.getMessages()
-        msg.push(<Message>{ role, content })
+    appendUserMessage (content: string) {
+        const msgs = this.getMessages()
+        msgs.push(<Message>{ role: "user", content })
 
         const key = this.getKey("messages")
-        localStorage.setItem(key, JSON.stringify(msg))
+        localStorage.setItem(key, JSON.stringify(msgs))
     }
+
+    appendAssistantMessage (content: string) {
+        const msgs = this.getMessages()
+        msgs.push(<Message>{ role: "assistant", content })
+
+        const key = this.getKey("messages")
+        localStorage.setItem(key, JSON.stringify(msgs))
+    }
+
+    async resetMessages () {
+        return App.GET(`assets/${this.gameid}.json`)
+            .then((payload: any) =>{
+                this._game_definition = payload;
+            })
+            .then(() => {
+                const key = this.getKey("messages")
+                localStorage.removeItem(key);
+
+                this.appendUserMessage(this._game_definition!.prompt!)
+                return this._game_definition
+            })
+    }
+
+    userMessageAtPage (pageno: number) {
+        const msgs = this.getMessages();
+        return msgs[pageno * 2]?.content
+    }
+
+    assistantMessageAtPage (pageno: number) {
+        const msgs = this.getMessages();
+        return msgs[1 + pageno * 2]?.content
+    }
+
 
 
     //
@@ -119,9 +152,13 @@ class State {
 
 
     //
-    // Interact with ollama
+    // Interacting with ollama
     //
-    async executePrompt(user_prompt: string) {
+    // OLLAMA_HOST=0.0.0.0:11434 ollama serve
+    // or
+    // ssh -L 11434:localhost:11434 christian@192.168.50.199
+    //
+    async executePrompt (user_prompt: string) {
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
         await waitAsync(500)
         return "Réponse de ollama au prompt: " + user_prompt
