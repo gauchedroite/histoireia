@@ -1,0 +1,35 @@
+
+:root {
+    --main-bgc: whitesmoke;
+    --header-height: 5rem;
+    --footer-height: 5rem;
+}
+
+
+.ct-header {
+    display: flex;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+
+    background-color: var(--main-bgc);
+    padding: 0.5rem 1rem;
+}
+
+.ct-content {
+    margin-top: var(--header-height);
+    margin-bottom: var(--footer-height);
+}
+
+.ct-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: var(--footer-height);
+
+    background-color: var(--main-bgc);
+    padding: 0.5rem 1rem;
+}

@@ -12,7 +12,7 @@ let gameid = ""
 let pageno = 0
 let isNew = false
 let user_text = "";
-let assistant_text = ""
+let assistant_text: string | null = null
 let next_user_text: string | null = null
 
 
@@ -21,28 +21,41 @@ const formTemplate = () => {
     let rows: string[] = [];
     
     add(`<p>${user_text}</p>`)
-    add(`<p>${assistant_text}</p>`)
+    add(`<p>${assistant_text ?? ""}</p>`)
     add(`<br>`)
 
-    if (assistant_text.length > 0) {
+    if (assistant_text && assistant_text.length > 0) {
         const disabled = (next_user_text == undefined || next_user_text.length == 0)
+        const placeholder = `Qu'est-ce que tu dis ${state.usernameCapitalized} ?`
 
-        add(Theme.renderInputText(NS, "next_user_text", next_user_text, <Theme.IOptText>{ required: true, placeholder: "Qu'est-ce que tu dis?" }))
-        add(`<div style="--d:flex; --jc:flex-end;"><button type="button" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`)
+        add(Theme.renderInputText(NS, "next_user_text", next_user_text, <Theme.IOptText>{ required: true, placeholder }))
+        add(`<div style="--d:flex; --jc:flex-end;"><button type="button" style="--x:125;" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`)
     }
 
     return rows.join("")
 }
 
 const pageTemplate = (form: string) => {
+    let prev_url = `#/story/${gameid}/${pageno - 1}`
+    let prev_disabled = (pageno == 0 ? "disabled" : "")
+
+    let next_url = `#/story/${gameid}/${pageno + 1}`
+    let next_disabled = (pageno == state.lastPageNo() ? "disabled" : "")
+
     return `
 <div class="js-waitable">
-    <h2>
-        <a href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
-        <span>${mystate.title}</span>
-    </h2>
-    <div class="form">
+    <div class="ct-header">
+        <h2>
+            <a href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
+            <span>${mystate.title}</span>
+        </h2>
+    </div>
+    <div class="ct-content form">
         ${form}
+    </div>
+    <div class="ct-footer page-nav">
+        <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev" style="--x:100;"><i class="fa-solid fa-turn-left"></i></button>
+        <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next" style="--x:100;"><i class="fa-solid fa-turn-right"></i></button>
     </div>
 </div>
 `
@@ -69,6 +82,9 @@ export const fetch = (args: string[] | undefined) => {
     isNew = isNaN(pageno)
 
     if (isNew) {
+        assistant_text = null
+        next_user_text = null
+
         state.resetMessages()
         .then(() => {
             Router.goto(`#/story/${gameid}/0`)
@@ -109,5 +125,10 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 export const submit = (input: HTMLInputElement) => {
-    console.log(next_user_text)
+    state.appendUserMessage(next_user_text!, pageno)
+
+    next_user_text = null
+    assistant_text = null
+
+    Router.goto(`#/story/${gameid}/${pageno + 1}`)
 }

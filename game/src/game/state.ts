@@ -1,5 +1,5 @@
 import * as App from "../core/app.js"
-import { waitAsync } from "../utils.js";
+import { waitAsync, capitalize } from "../utils.js";
 
 export interface GameList {
     code: string
@@ -52,6 +52,10 @@ class State {
         return this._username!
     }
 
+    get usernameCapitalized() {
+        return capitalize(this._username!)
+    }
+
     get index() {
         return this._index!
     }
@@ -78,8 +82,12 @@ class State {
         return JSON.parse(json)as Message[]
     }
 
-    appendUserMessage (content: string) {
-        const msgs = this.getMessages()
+    appendUserMessage (content: string, pageno: number) {
+        let msgs = this.getMessages()
+
+        // Truncate the message array so we can restart the story in the middle if we want
+        msgs = msgs.slice(0, (pageno + 1) * 2)
+
         msgs.push(<Message>{ role: "user", content })
 
         const key = this.getKey("messages")
@@ -100,12 +108,16 @@ class State {
                 this._game_definition = payload;
             })
             .then(() => {
-                const key = this.getKey("messages")
-                localStorage.removeItem(key);
-
-                this.appendUserMessage(this._game_definition!.prompt!)
+                this.appendUserMessage(this._game_definition!.prompt!, -1)
                 return this._game_definition
             })
+    }
+
+    lastPageNo() {
+        const msgs = this.getMessages();
+        if (msgs == undefined || msgs.length == 0)
+            return -1
+        return Math.floor((msgs.length - 1) / 2)
     }
 
     userMessageAtPage (pageno: number) {
@@ -160,7 +172,7 @@ class State {
     //
     async executePrompt (user_prompt: string) {
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
-        await waitAsync(500)
+        await waitAsync(1500)
         return "Réponse de ollama au prompt: " + user_prompt
     }
 }

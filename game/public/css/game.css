@@ -1,9 +1,5 @@
 
 #gmenu {
-    .form {
-        margin-top: 2rem;
-    }
-
     .box {
         background-color: white;
         padding: 1.5rem;
@@ -23,8 +19,14 @@
 }
 
 #gstory {
-    .form {
-        margin-top: 2rem;
+    .page-nav {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+
+        & button {
+            width: 50%;
+        }
     }
 }
 

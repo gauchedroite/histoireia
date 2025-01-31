@@ -19,10 +19,10 @@ const formTemplate = (list: GameList[]) => {
 
 const pageTemplate = (form: string) =>{
     return `
-<div style="--d:flex; --jc:center">
+<div class="ct-header" style="--jc:center;">
     <h1>Bibliothèque</h1>
 </div>
-<div class="form">
+<div class="ct-content form">
 ${form}
 </div>
 `

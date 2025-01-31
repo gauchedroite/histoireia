@@ -15,10 +15,9 @@ const formTemplate = (messages: Message[]) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    const length = messages.length
-    const lastPage = Math.floor(length / 2)
+    const lastPage = state.lastPageNo()
 
-    if (length == 0) {
+    if (lastPage == -1) {
         add(`<div class="box item"><a href="#/story/${gameid}/new">Commencer à lire</a></div>`)
     }
     else {
@@ -32,13 +31,13 @@ const formTemplate = (messages: Message[]) => {
 
 const pageTemplate = (form: string) => {
     return `
-<div>
+<div class="ct-header">
     <h2>
         <a href="#/home"><i class="fa-solid fa-arrow-left"></i></a>
         <span>${mystate.title}</span>
     </h2>
 </div>
-<div class="form">
+<div class="ct-content form">
 ${form}
 </div>
 `
