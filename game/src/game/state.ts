@@ -4,6 +4,7 @@ import { waitAsync, capitalize } from "../utils.js";
 export interface GameList {
     code: string
     title: string
+    promptfile: string
 }
 
 export interface GameDefinition {
@@ -27,8 +28,7 @@ interface ILocalState {
 }
 
 
-class State {
-    private _state: IState | undefined
+class State {    private _state: IState | undefined
     private _username: string
     private _localState: ILocalState
     private _index: GameList[] = []
@@ -102,15 +102,9 @@ class State {
         localStorage.setItem(key, JSON.stringify(msgs))
     }
 
-    async resetMessages () {
-        return App.GET(`assets/${this.gameid}.json`)
-            .then((payload: any) =>{
-                this._game_definition = payload;
-            })
-            .then(() => {
-                this.appendUserMessage(this._game_definition!.prompt!, -1)
-                return this._game_definition
-            })
+    resetMessages () {
+        this.appendUserMessage(this._game_definition!.prompt!, -1)
+        return this._game_definition
     }
 
     lastPageNo() {
@@ -142,18 +136,25 @@ class State {
     //
     async fetch_index () {
         return App.GET("assets/_index.json")
-            .then((payload: any) =>{
+            .then((payload: any) => {
                 this._index = payload;
             })
     }
 
     async fetch_game_definition (gameid: string) {
+        await this.fetch_index()
+        const game = this._index.find(one => one.code == gameid)!
+
+        const promptfile = game.promptfile
+        const response2 = await window.fetch(`assets/${promptfile}`)
+        const prompt = await response2.text()
+
+        const response = await window.fetch(`assets/${gameid}.json`)
+        this._game_definition = await response.json()
+
         this._gameid = gameid
-        return App.GET(`assets/${gameid}.json`)
-            .then((payload: any) =>{
-                this._game_definition = payload;
-                return payload
-            })
+        this._game_definition!.prompt = prompt
+        return this._game_definition
     }
 
     new_game_definition () {
@@ -175,10 +176,7 @@ class State {
     // or
     // ssh -L 11434:localhost:11434 christian@192.168.50.199
     //
-    async executePrompt (user_prompt: string) {
-        //await waitAsync(1500)
-        //return "Réponse de ollama au prompt: " + user_prompt
-
+    async executePrompt(user_prompt: string, streamUpdater?: (message: string) => void) {
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
         const messages = this.getMessages()
         messages.push(<Message>{
@@ -190,17 +188,34 @@ class State {
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
-            stream: false
+            stream: true
         }
 
         const response = await window.fetch(endpoint, {
             method: "POST",
             body: JSON.stringify(query)
         })
-        const data = await response.json()
-        console.log(data)
 
-        const answer = data.message.content.trim() as string
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let answer = "";
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            try {
+                const json = decoder.decode(value, { stream: true });
+                const chunk = JSON.parse(json)
+                if (!chunk.done) {
+                    answer += chunk.message.content
+                    if (streamUpdater)
+                        streamUpdater(chunk.message.content)
+                }
+            }
+            catch {}
+        }
+
         return answer
     }
 }

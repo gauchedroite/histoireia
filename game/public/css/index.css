@@ -81,4 +81,9 @@ body {
             z-index: 5;
         }
     }
+
+    .js-waitable-2 {
+        animation: js-fadeout 0.25s 0.2s forwards;
+        pointer-events: none;
+    }
 }

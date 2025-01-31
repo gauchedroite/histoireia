@@ -20,17 +20,18 @@ const formTemplate = () => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
     
-    add(`<p><b>${state.usernameCapitalized}</b>: ${user_text}</p>`)
-    add(`<br>`)
-    add(`<p>${assistant_text ?? ""}</p>`)
-    add(`<br>`)
+    if (pageno > 0)
+        add(`<p><b>${user_text}</b></p>`)
+
+    add(`<p><div id="ct_response">${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div></p>`)
+    add(`<br><br>`)
 
     if (assistant_text && assistant_text.length > 0) {
+        const label = `<b>${state.usernameCapitalized}</b>: Qu'est-ce que tu dis ?`
         const disabled = (next_user_text == undefined || next_user_text.length == 0)
-        const placeholder = `Qu'est-ce que tu dis ${state.usernameCapitalized} ?`
 
-        add(Theme.renderInputText(NS, "next_user_text", next_user_text, <Theme.IOptText>{ required: true, placeholder }))
-        add(`<div style="--d:flex; --jc:flex-end;"><button type="button" style="--x:125;" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`)
+        add(Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, label, <Theme.IOptText>{ required: true, rows: 4 }))
+        add(`<div style="--d:flex; --jc:flex-end;"><button type="submit" style="--x:125;" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`)
     }
 
     return rows.join("")
@@ -44,22 +45,26 @@ const pageTemplate = (form: string) => {
     let next_disabled = (pageno == state.lastPageNo() ? "disabled" : "")
 
     return `
-<div class="js-waitable">
-    <div class="ct-header">
-        <h2>
-            <a href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
-            <span>${mystate.title}</span>
-        </h2>
-    </div>
-    <div class="ct-content form">
-        ${form}
-    </div>
-    <div class="ct-footer page-nav">
-        <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev" style="--x:100;"><i class="fa-solid fa-turn-left"></i></button>
-        <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next" style="--x:100;"><i class="fa-solid fa-turn-right"></i></button>
-    </div>
+<div class="ct-header">
+    <h2>
+        <a class="js-waitable-2" href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
+        <span>${mystate.title}</span>
+    </h2>
+</div>
+<div class="ct-content form">
+    ${form}
+</div>
+<div class="ct-footer page-nav js-waitable-2">
+    <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev" style="--x:100;"><i class="fa-solid fa-turn-left"></i></button>
+    <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next" style="--x:100;"><i class="fa-solid fa-turn-right"></i></button>
 </div>
 `
+}
+
+const streamUpdater = (message: string) => {
+    const span = document.createElement("span");
+    span.innerHTML = message.replace(/\n/g, "<br>");
+    document.getElementById("ct_response")?.appendChild(span);
 }
 
 
@@ -70,7 +75,8 @@ const render_and_fetch_more = async () => {
 
     assistant_text = state.assistantMessageAtPage(pageno)
     if (assistant_text == undefined) {
-        assistant_text = await state.executePrompt(user_text)
+        assistant_text = await state.executePrompt(user_text, streamUpdater)
+        //console.log(assistant_text)
         state.appendAssistantMessage(assistant_text)
     }
 
@@ -87,10 +93,12 @@ export const fetch = (args: string[] | undefined) => {
         assistant_text = null
         next_user_text = null
 
-        state.resetMessages()
-        .then(() => {
-            Router.goto(`#/story/${gameid}/0`)
-        })
+        state.fetch_game_definition(gameid)
+            .then((payload: any) => {
+                mystate = Misc.clone(payload) as GameDefinition
+                state.resetMessages()
+                Router.goto(`#/story/${gameid}/0`, 1)
+            })
     }
     else {
         App.prepareRender(NS, "Story", "game_story")
