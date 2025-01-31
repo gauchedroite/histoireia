@@ -4,10 +4,6 @@ import * as GameMain from "./game/main.js"
 export const NS = "INDEX";
 
 
-declare const FastClick: any;
-FastClick.attach(document.body);
-
-
 // Global reference to the app. Used for some event handlers.
 (window as any)[App.NS] = App;
 

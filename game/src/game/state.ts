@@ -120,9 +120,14 @@ class State {
         return Math.floor((msgs.length - 1) / 2)
     }
 
-    userMessageAtPage (pageno: number) {
+    userMessageOnPage (pageno: number) {
         const msgs = this.getMessages();
         return msgs[pageno * 2]?.content
+    }
+
+    userMessageOnNextPage (pageno: number) {
+        const msgs = this.getMessages();
+        return msgs[(pageno + 1) * 2]?.content
     }
 
     assistantMessageAtPage (pageno: number) {
@@ -164,16 +169,39 @@ class State {
 
 
     //
-    // Interacting with ollama
+    // Interacting with the ollama endpoints
     //
     // OLLAMA_HOST=0.0.0.0:11434 ollama serve
     // or
     // ssh -L 11434:localhost:11434 christian@192.168.50.199
     //
     async executePrompt (user_prompt: string) {
+        //await waitAsync(1500)
+        //return "Réponse de ollama au prompt: " + user_prompt
+
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
-        await waitAsync(1500)
-        return "Réponse de ollama au prompt: " + user_prompt
+        const messages = this.getMessages()
+        messages.push(<Message>{
+            role: "user",
+            content: user_prompt            
+        })
+        
+        const endpoint = "http://192.168.50.199:11434/api/chat"
+        const query = {
+            model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
+            messages,
+            stream: false
+        }
+
+        const response = await window.fetch(endpoint, {
+            method: "POST",
+            body: JSON.stringify(query)
+        })
+        const data = await response.json()
+        console.log(data)
+
+        const answer = data.message.content.trim() as string
+        return answer
     }
 }
 

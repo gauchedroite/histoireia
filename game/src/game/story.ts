@@ -20,7 +20,8 @@ const formTemplate = () => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
     
-    add(`<p>${user_text}</p>`)
+    add(`<p><b>${state.usernameCapitalized}</b>: ${user_text}</p>`)
+    add(`<br>`)
     add(`<p>${assistant_text ?? ""}</p>`)
     add(`<br>`)
 
@@ -63,7 +64,8 @@ const pageTemplate = (form: string) => {
 
 
 const render_and_fetch_more = async () => {
-    user_text = state.userMessageAtPage(pageno)
+    user_text = state.userMessageOnPage(pageno)
+    next_user_text = state.userMessageOnNextPage(pageno)
     App.render()
 
     assistant_text = state.assistantMessageAtPage(pageno)
