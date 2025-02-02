@@ -117,6 +117,7 @@ class State {
         };
         const response = await window.fetch(endpoint, {
             method: "POST",
+            mode: "cors",
             body: JSON.stringify(query)
         });
         const reader = response.body.getReader();

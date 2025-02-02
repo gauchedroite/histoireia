@@ -185,6 +185,7 @@ class State {    private _state: IState | undefined
         })
         
         const endpoint = "https://lebaudy.gauchedroite.com/api/chat"
+        //const endpoint = "http://192.168.50.199:11434/api/chat"
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
@@ -193,6 +194,7 @@ class State {    private _state: IState | undefined
 
         const response = await window.fetch(endpoint, {
             method: "POST",
+            mode: "cors",
             body: JSON.stringify(query)
         })
 
