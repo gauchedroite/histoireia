@@ -21,7 +21,7 @@ const formTemplate = () => {
     let rows: string[] = [];
     
     if (pageno > 0)
-        add(`<p><b>${user_text}</b></p>`)
+        add(`<p><b>${user_text?.replace(/\n/g, "<br>")}</b></p>`)
 
     add(`<p><div id="ct_response">${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div></p>`)
     add(`<br><br>`)

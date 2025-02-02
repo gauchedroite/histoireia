@@ -24,7 +24,7 @@ const formTemplate = (messages: Message[]) => {
         add(`<div class="box item"><a href="#/story/${gameid}/${lastPage}">Continuer à lire</a></div>`)
         add(`<div class="box item"><a href="#/story/${gameid}/new">Recommencer le livre?</a></div>`)
     }
-    add(`<div class="box item"><a href="#/editor/${gameid}">Editeur</a></div>`)
+    add(`<div class="box item"><a href="#/editor/${gameid}">Éditeur</a></div>`)
 
     return rows.join("")
 }
