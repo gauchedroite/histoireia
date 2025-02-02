@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Histoires pour Laura, Auteur: Papi">
+    <title>game/public/index.html</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+    <link rel="shortcut icon" href="#">
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-status-bar-style" content="black">
+    <meta name="mobile-web-app-title" content="Pour Laura!">
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="teller-180x180.png"> -->
+
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="lib/toastify.min.css" defer async>
+    <link rel="stylesheet" href="all.min.css" defer async>
+    <link rel="stylesheet" href="bonsai.min.css" defer async>
+</head>
+<body class="desktop">
+    <div id="app_root">
+        <div id="game_bonjour"></div>
+        <div id="game_home"></div>
+        <div id="game_menu"></div>
+        <div id="game_story"></div>
+        <div id="game_editor"></div>
+    </div>
+
+    <script id="import_main" type="text/javascript">
+        APP = {}
+        APP.admin = true
+    </script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "marked": "./lib/marked.esm.js"
+            }
+        }
+    </script>
+
+    <script src="lib/morphdom-umd.js"></script>
+    <script src="lib/toastify.min.js" defer></script>
+    <script type="module" src="./js/index.js"></script>
+</body>
+</html>

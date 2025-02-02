@@ -1,7 +1,7 @@
 {
-  "name": "historiette",
+  "name": "histoireia",
   "version": "0.1.0",
-  "description": "Historiettes - des histoires avec l'IA",
+  "description": "Histoireia - des histoires avec l'IA",
   "author": "GaucheDroite",
   "license": "MIT",
   "type": "module",
