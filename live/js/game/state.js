@@ -109,7 +109,7 @@ class State {
             role: "user",
             content: user_prompt
         });
-        const endpoint = "https://lebaudy2.gauchedroite.com/api/chat";
+        const endpoint = "https://lebaudy.gauchedroite.com/api/chat";
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
