@@ -184,7 +184,7 @@ class State {    private _state: IState | undefined
             content: user_prompt            
         })
         
-        const endpoint = "https://lebaudy.gauchedroite.com/api/chat"
+        const endpoint = "https://lebaudy2.gauchedroite.com/api/chat"
         //const endpoint = "http://192.168.50.199:11434/api/chat"
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
