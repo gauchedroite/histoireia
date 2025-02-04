@@ -183,42 +183,56 @@ class State {    private _state: IState | undefined
             role: "user",
             content: user_prompt            
         })
-        
+    
         const endpoint = "https://lebaudy.gauchedroite.com/api/chat"
-        //const endpoint = "http://192.168.50.199:11434/api/chat"
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
             stream: true
         }
-
+    
         const response = await window.fetch(endpoint, {
             method: "POST",
-            mode: "cors",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(query)
         })
-
-        const reader = response.body!.getReader();
+    
+        if (!response.body) {
+            throw new Error("No response from LLM endpoint");
+        }
+    
+        const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let answer = "";
-
+        let buffer = "";  // For incomplete JSON fragments
+    
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-
+    
+            buffer += decoder.decode(value, { stream: true });
+    
             try {
-                const json = decoder.decode(value, { stream: true });
-                const chunk = JSON.parse(json)
-                if (!chunk.done) {
-                    answer += chunk.message.content
-                    if (streamUpdater)
-                        streamUpdater(chunk.message.content)
+                const jsonObjects = buffer.split("\n").filter(line => line.trim() !== "");
+                buffer = "";
+    
+                for (const jsonObject of jsonObjects) {
+                    try {
+                        const chunk = JSON.parse(jsonObject);
+                        if (!chunk.done) {
+                            answer += chunk.message.content;
+                            if (streamUpdater) streamUpdater(chunk.message.content);
+                        }
+                    } catch (err) {
+                        buffer = jsonObject;
+                    }
                 }
+            } catch (err) {
+                console.error("Err parsing JSON object in chat response stream", err);
             }
-            catch {}
         }
-
-        return answer
+    
+        return answer;
     }
 }
 

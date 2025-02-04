@@ -117,26 +117,41 @@ class State {
         };
         const response = await window.fetch(endpoint, {
             method: "POST",
-            mode: "cors",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(query)
         });
+        if (!response.body) {
+            throw new Error("Réponse vide du serveur");
+        }
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let answer = "";
+        let buffer = "";
         while (true) {
             const { done, value } = await reader.read();
             if (done)
                 break;
+            buffer += decoder.decode(value, { stream: true });
             try {
-                const json = decoder.decode(value, { stream: true });
-                const chunk = JSON.parse(json);
-                if (!chunk.done) {
-                    answer += chunk.message.content;
-                    if (streamUpdater)
-                        streamUpdater(chunk.message.content);
+                const jsonObjects = buffer.split("\n").filter(line => line.trim() !== "");
+                buffer = "";
+                for (const jsonObject of jsonObjects) {
+                    try {
+                        const chunk = JSON.parse(jsonObject);
+                        if (!chunk.done) {
+                            answer += chunk.message.content;
+                            if (streamUpdater)
+                                streamUpdater(chunk.message.content);
+                        }
+                    }
+                    catch (err) {
+                        buffer = jsonObject;
+                    }
                 }
             }
-            catch (_a) { }
+            catch (err) {
+                console.error("Erreur lors du parsing JSON", err);
+            }
         }
         return answer;
     }
