@@ -7,9 +7,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsc -w",
-    "live": "npm run live:files && npm run live:ts",
+    "live": "npm run live:files && npm run live:ts && npm run live:live",
     "live:files": "rm -rf ../live/* && cp -R ./public/* ../live && rm -rf ../live/js",
-    "live:ts": "tsc --build ./tsconfig.live.json --force"
+    "live:ts": "tsc --build ./tsconfig.live.json --force",
+    "live:live": "scp -r ~/dev-gd/histoireia/live/* christian@192.168.50.199:~/dev/histoireia"
   },
   "devDependencies": {
     "typescript": "^5.1.6"

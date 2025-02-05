@@ -3,10 +3,6 @@
     font-family: -apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif;
     line-height: 1.4;
 
-    .form {
-        margin-top: 2rem;
-    }
-
     & button {
         width: 100%;
     }

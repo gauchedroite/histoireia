@@ -15,7 +15,9 @@ const pageTemplate = (form) => {
     <h1>Bibliothèque</h1>
 </div>
 <div class="ct-content form">
-${form}
+    <div class="ct-list">
+        ${form}
+    </div>
 </div>
 `;
 };

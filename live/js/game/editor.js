@@ -11,7 +11,7 @@ const formTemplate = (item) => {
     let rows = [];
     add(Theme.renderFieldText(NS, "code", item.code, "Code", { maxlength: 10, required: true }));
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", { maxlength: 32, required: true }));
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", { maxlength: 8192, required: true, rows: 25 }));
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", { maxlength: 8192, required: true, rows: 30 }));
     if (isNew) {
         add(`<button type="button" onclick="location.href='#/menu/${item.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${item.code}</button>`);
     }
@@ -23,13 +23,13 @@ const formTemplate = (item) => {
 const pageTemplate = (form) => {
     const returnurl = isNew ? "#/home" : `#/menu/${gameid}`;
     return `
-<div>
-    <h2>
+<div class="ct-header">
+    <h3>
         <a href="${returnurl}"><i class="fa-solid fa-arrow-left"></i></a>
         <span>Editeur</span>
-    </h2>
+    </h3>
 </div>
-<div class="form">
+<div class="ct-content form">
 ${form}
 </div>
 `;

@@ -1,32 +1,60 @@
 
 :root {
+    --xtext-main: black;
+
     --main-bgc: whitesmoke;
-    --header-height: 5rem;
+    --header-height: 4rem;
     --footer-height: 5rem;
+
+    --sait: env(safe-area-inset-top);
+    --sair: env(safe-area-inset-right);
+    --saib: env(safe-area-inset-bottom);
+    --sail: env(safe-area-inset-left);
 }
 
 
 .ct-header {
+    z-index: 1;
     display: flex;
 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--header-height);
+    height: calc(var(--header-height) + var(--sait));
 
     background-color: var(--main-bgc);
-    padding: 0.5rem 1rem;
+
+    padding-top: var(--sait);
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    & h3 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .ct-content {
+    padding-top: 1rem;
     margin-top: var(--header-height);
     margin-bottom: var(--footer-height);
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+    .ct-list-- {
+        margin-top: 1rem;
+    }
+
+    .ct-story {
+        font-size: larger;
+    }
 }
 
 .ct-footer {
     position: fixed;
-    bottom: 0;
+    bottom: var(--saib);
     left: 0;
     height: var(--footer-height);
 

@@ -18,7 +18,7 @@ const formTemplate = (item: IState) => {
 
     add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 25 }))
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 30 }))
 
     if (isNew) {
         add(`<button type="button" onclick="location.href='#/menu/${item.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${item.code}</button>`)
@@ -34,13 +34,13 @@ const pageTemplate = (form: string) =>{
     const returnurl = isNew ? "#/home" : `#/menu/${gameid}`;
 
     return `
-<div>
-    <h2>
+<div class="ct-header">
+    <h3>
         <a href="${returnurl}"><i class="fa-solid fa-arrow-left"></i></a>
         <span>Editeur</span>
-    </h2>
+    </h3>
 </div>
-<div class="form">
+<div class="ct-content form">
 ${form}
 </div>
 `

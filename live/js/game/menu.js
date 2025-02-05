@@ -22,13 +22,15 @@ const formTemplate = (messages) => {
 const pageTemplate = (form) => {
     return `
 <div class="ct-header">
-    <h2>
+    <h3>
         <a href="#/home"><i class="fa-solid fa-arrow-left"></i></a>
         <span>${mystate.title}</span>
-    </h2>
+    </h3>
 </div>
 <div class="ct-content form">
-${form}
+    <div class="ct-list">
+        ${form}
+    </div>
 </div>
 `;
 };

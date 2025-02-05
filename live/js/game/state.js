@@ -121,7 +121,7 @@ class State {
             body: JSON.stringify(query)
         });
         if (!response.body) {
-            throw new Error("Réponse vide du serveur");
+            throw new Error("No response from LLM endpoint");
         }
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
@@ -150,7 +150,7 @@ class State {
                 }
             }
             catch (err) {
-                console.error("Erreur lors du parsing JSON", err);
+                console.error("Err parsing JSON object in chat response stream", err);
             }
         }
         return answer;

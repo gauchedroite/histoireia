@@ -23,7 +23,7 @@ const formTemplate = () => {
         const label = `<b>${state.usernameCapitalized}</b>: Qu'est-ce que tu dis ?`;
         const disabled = (next_user_text == undefined || next_user_text.length == 0);
         add(Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, label, { required: true, rows: 4 }));
-        add(`<div style="--d:flex; --jc:flex-end;"><button type="submit" style="--x:125;" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`);
+        add(`<div style="--d:flex; --jc:flex-end;"><button type="submit" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}>OK!</button></div>`);
     }
     return rows.join("");
 };
@@ -34,13 +34,15 @@ const pageTemplate = (form) => {
     let next_disabled = (pageno == state.lastPageNo() ? "disabled" : "");
     return `
 <div class="ct-header">
-    <h2>
+    <h3>
         <a class="js-waitable-2" href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
         <span>${mystate.title}</span>
-    </h2>
+    </h3>
 </div>
 <div class="ct-content form">
-    ${form}
+    <div class="ct-story">
+        ${form}
+    </div>
 </div>
 <div class="ct-footer page-nav js-waitable-2">
     <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev" style="--x:100;"><i class="fa-solid fa-turn-left"></i></button>
