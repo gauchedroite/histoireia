@@ -12,6 +12,9 @@
     --sail: env(safe-area-inset-left);
 }
 
+body, input, textarea {
+    line-height: 1.25;
+}
 
 .ct-header {
     z-index: 1;
