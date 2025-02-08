@@ -1,9 +1,9 @@
 
 :root {
-    --xtext-main: black;
-
-    --main-bgc: whitesmoke;
-    --header-height: 4rem;
+    --white-bgc: whitesmoke;
+    --accent-bgc: peru;
+    --black-bgc: black;
+    --header-height: 3rem;
     --footer-height: 5rem;
 
     --sait: env(safe-area-inset-top);
@@ -19,6 +19,7 @@ body, input, textarea {
 .ct-header {
     z-index: 1;
     display: flex;
+    align-items: flex-end;
 
     position: fixed;
     top: 0;
@@ -26,13 +27,15 @@ body, input, textarea {
     width: 100%;
     height: calc(var(--header-height) + var(--sait));
 
-    background-color: var(--main-bgc);
+    background-color: var(--accent-bgc);
+    color: white;
 
     padding-top: var(--sait);
     padding-left: 1rem;
     padding-right: 1rem;
+    padding-bottom: 1rem;
 
-    & h3 {
+    & > div {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -40,17 +43,13 @@ body, input, textarea {
 }
 
 .ct-content {
-    padding-top: 1rem;
-    margin-top: var(--header-height);
-    margin-bottom: var(--footer-height);
-    margin-left: 1rem;
-    margin-right: 1rem;
-
-    .ct-list-- {
-        margin-top: 1rem;
-    }
+    padding-top: var(--header-height);
+    padding-bottom: var(--footer-height);
+    min-height: calc(100vh - var(--sait) - var(--saib));
 
     .ct-story {
+        padding-left: 1rem;
+        padding-right: 1rem;
         font-size: larger;
     }
 }
@@ -61,6 +60,6 @@ body, input, textarea {
     left: 0;
     height: var(--footer-height);
 
-    background-color: var(--main-bgc);
+    background-color: var(--white-bgc);
     padding: 0.5rem 1rem;
 }

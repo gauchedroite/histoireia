@@ -5,12 +5,8 @@ canvas, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-size: 100%;
 	font: inherit;
 	vertical-align: baseline;
-}
-body {
-	line-height: 1;
 }
 table {
 	border-collapse: collapse;
@@ -19,4 +15,8 @@ table {
 iframe {
 	/*by default they're [display: inline] and thus have a line-height which renders extra space at the bottom of the iframe*/
 	display: block;
+}
+
+*, :after, :before {
+    box-sizing: border-box;
 }

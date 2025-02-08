@@ -12,7 +12,7 @@ const template = () => {
     <h1>${state.usernameCapitalized}!</h1>
 </div>
 <div class="form">
-    <a href="#/home">Choisis une histoire dans la bibliothèque!</a>
+    <a href="#/home" style="color:white;">Choisis une histoire dans la bibliothèque!</a>
 </div>
 `
 }

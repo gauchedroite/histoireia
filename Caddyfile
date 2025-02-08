@@ -13,6 +13,15 @@ lebaudy.gauchedroite.com {
 		file_server
 	}
 
+	handle_path /src* {
+		root * ./game/src
+		file_server
+	}
+
+	#log {
+	#	output stdout
+	#}
+
 	#
 	# ollama must listen to 0.0.0.0
 	# The reverse proxy must target 192.168.50.199

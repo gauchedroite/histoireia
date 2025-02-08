@@ -1,5 +1,9 @@
 
 #gmenu {
+    .ct-list {
+        background-color: var(--white-bgc);
+    }
+
     .box {
         background-color: white;
         padding: 1.5rem;
@@ -17,16 +21,3 @@
         }
     }
 }
-
-#gstory {
-    .page-nav {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-
-        & button {
-            width: 50%;
-        }
-    }
-}
-
