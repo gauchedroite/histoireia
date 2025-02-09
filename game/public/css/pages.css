@@ -24,8 +24,9 @@ a {
 }
 
 .ct-header {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     height: calc(var(--header-height) + var(--sait));
 
@@ -49,7 +50,9 @@ a {
 }
 
 .ct-content {
-    min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--sait) - var(--saib));
+    min-height: calc(100vh - var(--header-height) - var(--sait) - var(--footer-height) - var(--saib));
+    margin-top: calc(var(--header-height) + var(--sait));
+    padding-bottom: calc(var(--footer-height) + var(--saib));
 
     .ct-story {
         padding-left: 1rem;
@@ -59,8 +62,9 @@ a {
 }
 
 .ct-footer {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
     width: 100%;
     height: calc(var(--footer-height) + var(--saib));
 
