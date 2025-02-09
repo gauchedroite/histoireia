@@ -34,8 +34,8 @@ const onresize = () => {
     document.body.classList.remove("portrait", "landscape");
     document.body.classList.add(portrait ? "portrait" : "landscape");
 };
-addEventListener("resize", onresize);
-onresize();
+//addEventListener("resize", onresize);
+//onresize();
 
 
 // const gameid = (window.location.hash + "/").split("/")[1]

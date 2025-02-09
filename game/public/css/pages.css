@@ -49,7 +49,7 @@ a {
 }
 
 .ct-content {
-    min-height: calc(100vh - var(--sait) - var(--saib));
+    min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--sait) - var(--saib));
 
     .ct-story {
         padding-left: 1rem;
