@@ -49,7 +49,7 @@ const pageTemplate = (form: string) => {
 
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
-    App.prepareRender(NS, "Menu", "game_menu")
+    App.prepareRender(NS, "Menu", "screen_menu")
     state.fetch_game_definition(gameid)
         .then((payload: any) =>{
             mystate = Misc.clone(payload) as IState

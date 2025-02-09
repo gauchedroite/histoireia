@@ -62,7 +62,7 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        let markup = `<div id="${renderRoot}">${html}</div>`;
+        let markup = `<div id="${renderRoot}" class="screen ct-front">${html}</div>`;
 
         if (!hardRender)
             ((<any>window).morphdom)(element, markup, {
@@ -137,6 +137,11 @@ export const pauseRender = (pause = true) => {
 }
 
 export const prepareRender = (ns: string, title: string, renderRootId: string | null = null) => {
+    let pages = [...document.querySelectorAll(".ct-front")]
+    pages.forEach(page => {
+        (page as HTMLElement).classList.remove("ct-front")
+    })
+
     transitionUI();
     if (title.length > 0) setPageTitle(title);
     if (ns.length > 0) setContext(ns);
@@ -151,17 +156,22 @@ const setRenderRoot = (id: string) => {
     if (id == renderRoot)
         return
 
+    if (renderRoot == "app_root")
+        renderRoot = id
+
     renderRoot = id
 
+    /*
     let pages = [...document.querySelectorAll("#app_root > div")]
     pages.forEach(page => {
         (page as HTMLElement).style.display = "none"
     })
 
     setTimeout(() => {
-        let element = document.getElementById(id) as HTMLElement;
+        let element = document.getElementById(renderRoot) as HTMLElement;
         element.style.display = "block"
-    }, 250);
+    }, 10000);
+    */
 }
 
 

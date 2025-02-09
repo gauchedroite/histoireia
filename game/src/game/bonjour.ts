@@ -6,6 +6,13 @@ export const NS = "GBONJOUR";
 
 
 const template = () => {
+    const root = document.documentElement;
+    const styles = getComputedStyle(root);
+    const sait = styles.getPropertyValue('--sait').trim();
+    const saib = styles.getPropertyValue('--saib').trim();
+    const sail = styles.getPropertyValue('--sail').trim();
+    const sair = styles.getPropertyValue('--sair').trim();
+
     return `
 <div class="bonjour">
     <h1>Bonjour</h1>
@@ -13,6 +20,13 @@ const template = () => {
 </div>
 <div class="form">
     <a href="#/home" style="color:white;">Choisis une histoire dans la bibliothèque!</a>
+    <br>
+    <br>
+    <div style="color:white;">
+        sait=${sait}, saib${saib}, sail=${sail}, sair=${sair}
+    </div>
+    <br>
+    <br>
 </div>
 `
 }
@@ -22,7 +36,7 @@ export const fetch = (args: string[] | undefined) => {
     let username = (args != undefined ? args[0] : "");
     username = username.length > 0 ? username : "laura"
     state.username = username
-    App.prepareRender(NS, "Bonjour", "game_bonjour")
+    App.prepareRender(NS, "Bonjour", "screen_bonjour")
     App.renderOnNextTick();
 }
 

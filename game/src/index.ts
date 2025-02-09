@@ -19,7 +19,7 @@ App.initialize(
     }, () => {
         GameMain.postRender();
     }, 
-    "Historiette"
+    "HistoireIA"
 );
 
 
@@ -36,3 +36,9 @@ const onresize = () => {
 };
 addEventListener("resize", onresize);
 onresize();
+
+
+// const gameid = (window.location.hash + "/").split("/")[1]
+// const frontElement = document.getElementById(`screen_${gameid}`)
+// if (frontElement)
+//     frontElement.classList.add("ct-front")

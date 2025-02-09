@@ -103,7 +103,7 @@ export const fetch = (args: string[] | undefined) => {
             })
     }
     else {
-        App.prepareRender(NS, "Story", "game_story")
+        App.prepareRender(NS, "Story", "screen_story")
         state.fetch_game_definition(gameid)
             .then((payload: any) => {
                 mystate = Misc.clone(payload) as GameDefinition

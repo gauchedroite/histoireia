@@ -3,8 +3,10 @@
     --white-bgc: whitesmoke;
     --accent-bgc: peru;
     --black-bgc: black;
+    --color: black;
+
     --header-height: 3rem;
-    --footer-height: 5rem;
+    --footer-height: 2.5rem;
 
     --sait: env(safe-area-inset-top);
     --sair: env(safe-area-inset-right);
@@ -16,19 +18,23 @@ body, input, textarea {
     line-height: 1.25;
 }
 
-.ct-header {
-    z-index: 1;
-    display: flex;
-    align-items: flex-end;
+a {
+    color: var(--color);
+    text-decoration: none;
+}
 
-    position: fixed;
+.ct-header {
+    position: sticky;
     top: 0;
-    left: 0;
     width: 100%;
     height: calc(var(--header-height) + var(--sait));
 
     background-color: var(--accent-bgc);
     color: white;
+
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
 
     padding-top: var(--sait);
     padding-left: 1rem;
@@ -43,8 +49,6 @@ body, input, textarea {
 }
 
 .ct-content {
-    padding-top: var(--header-height);
-    padding-bottom: var(--footer-height);
     min-height: calc(100vh - var(--sait) - var(--saib));
 
     .ct-story {
@@ -55,11 +59,29 @@ body, input, textarea {
 }
 
 .ct-footer {
-    position: fixed;
-    bottom: var(--saib);
-    left: 0;
-    height: var(--footer-height);
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    height: calc(var(--footer-height) + var(--saib));
 
     background-color: var(--white-bgc);
-    padding: 0.5rem 1rem;
+
+    z-index: 1;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 100vw;
+    width: 100vw;
+    background-color: var(--black-bgc);
+
+    &.ct-front {
+        left: 0;
+        transition: left 0.55s;
+    }    
 }

@@ -1,5 +1,8 @@
 
 #gbonjour {
-        text-align: center;
-}
+    text-align: center;
 
+    .bonjour {
+        margin-top: 10rem;
+    }
+}

@@ -51,7 +51,7 @@ ${form}
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "")
     isNew = (gameid == "new")
-    App.prepareRender(NS, "Editor", "game_editor")
+    App.prepareRender(NS, "Editor", "screen_editor")
 
     if (!isNew) {
         state.fetch_game_definition(gameid)
