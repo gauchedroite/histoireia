@@ -14,7 +14,7 @@ const formTemplate = (list: GameList[]) => {
             </div>
         </a>`
     })
-    return games.join("") //+ games.join("") + games.join("") 
+    return games.join("") + games.join("") + games.join("") 
 }
 
 const pageTemplate = (form: string) => {
@@ -36,6 +36,9 @@ const pageTemplate = (form: string) => {
 <div class="ct-footer">
     <a href="#/editor/new">
         <div><i class="fa-solid fa-plus"></i>&nbsp;Ajouter un livre</div>
+    </a>
+    <a href="#" onclick="window.location.back();return false;">
+        <div><i class="fa-solid fa-plus"></i>&nbsp;Bonjour!</div>
     </a>
 </div>
 `

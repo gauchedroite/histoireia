@@ -36,6 +36,7 @@ let pagePostRender: () => void;
 let rendering = false;
 let hardRender = false;
 let renderRoot = "app_root";
+let renderStack: string[] = [];
 //
 export let state: IState;
 
@@ -62,7 +63,7 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        let markup = `<div id="${renderRoot}" class="screen ct-front">${html}</div>`;
+        let markup = `<div id="${renderRoot}" class="screen">${html}</div>`;
 
         if (!hardRender)
             ((<any>window).morphdom)(element, markup, {
@@ -96,6 +97,43 @@ export const render = () => {
 const postRender = () => {
     document.title = title;
     document.body.id = context.toLowerCase().replace("_", "-");
+
+    // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (ct-behind)
+    // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (ct-offscreen)
+
+    //console.log(renderStack, renderRoot)
+
+    if (renderStack.length > 1) {
+        const zeroElement = document.querySelector(".ct-zero")
+        if (zeroElement)
+            zeroElement.classList.remove("ct-zero")
+
+        const rootOnTop = (renderStack[renderStack.length - 1] == renderRoot)
+        if (rootOnTop) {
+            const prevRoot = renderStack[renderStack.length - 2]
+            const prevRootElement = document.getElementById(prevRoot)
+            if (prevRootElement) {
+                prevRootElement.classList.add("ct-behind")
+            }
+        }
+        else {
+            const topRoot = renderStack[renderStack.length - 1]
+            const topRootElement = document.getElementById(topRoot)
+            if (topRootElement) {
+                topRootElement.classList.add("ct-offscreen")
+            }
+            const newRootIndex = renderStack.indexOf(renderRoot) + 1
+            const removeCount = renderStack.length - newRootIndex
+            renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
+        }
+
+        let pages = [...document.querySelectorAll(".ct-front")]
+        pages.forEach(page => { (page as HTMLElement).classList.remove("ct-front") })
+        document.getElementById(renderRoot)?.classList.add("ct-front")
+    }
+    else {
+        document.getElementById(renderRoot)?.classList.add("ct-zero")
+    }
 };
 
 export const renderPartial = (id: string, markup: string) => {
@@ -137,11 +175,6 @@ export const pauseRender = (pause = true) => {
 }
 
 export const prepareRender = (ns: string, title: string, renderRootId: string | null = null) => {
-    let pages = [...document.querySelectorAll(".ct-front")]
-    pages.forEach(page => {
-        (page as HTMLElement).classList.remove("ct-front")
-    })
-
     transitionUI();
     if (title.length > 0) setPageTitle(title);
     if (ns.length > 0) setContext(ns);
@@ -161,17 +194,8 @@ const setRenderRoot = (id: string) => {
 
     renderRoot = id
 
-    /*
-    let pages = [...document.querySelectorAll("#app_root > div")]
-    pages.forEach(page => {
-        (page as HTMLElement).style.display = "none"
-    })
-
-    setTimeout(() => {
-        let element = document.getElementById(renderRoot) as HTMLElement;
-        element.style.display = "block"
-    }, 10000);
-    */
+    if (renderStack.findIndex(one => one == renderRoot) == -1)
+        renderStack.push(renderRoot)
 }
 
 

@@ -1,8 +1,25 @@
 
-#gbonjour {
+#screen_bonjour {
     text-align: center;
 
     .bonjour {
         margin-top: 10rem;
+        margin-bottom: 4rem;
+
+        & h1 {
+            font-size: xxx-large;
+        }
+    }
+
+    .form {
+        background-color: var(--accent-bgc);
+        color: var(--color);
+
+        font-size: x-large;
+
+        & a {
+            display: block;
+            padding: 25%;
+        }
     }
 }

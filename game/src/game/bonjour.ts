@@ -14,12 +14,13 @@ const template = () => {
     const sair = styles.getPropertyValue('--sair').trim();
 
     return `
-<div class="bonjour">
+<div class="bonjour" style="color:var(--accent-bgc);">
     <h1>Bonjour</h1>
     <h1>${state.usernameCapitalized}!</h1>
 </div>
 <div class="form">
-    <a href="#/home" style="color:white;">Choisis une histoire dans la bibliothèque!</a>
+    <a href="#/home" class="start">Choisis une histoire dans la bibliothèque!</a>
+    <!--
     <br>
     <br>
     <div style="color:white;">
@@ -27,6 +28,7 @@ const template = () => {
     </div>
     <br>
     <br>
+    -->
 </div>
 `
 }
