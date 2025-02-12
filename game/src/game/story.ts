@@ -51,7 +51,7 @@ const pageTemplate = (form: string) => {
         <span>${mystate.title}</span>
     </h3>
 </div>
-<div class="ct-content form">
+<div class="ct-content">
     <div class="ct-story">
         ${form}
     </div>

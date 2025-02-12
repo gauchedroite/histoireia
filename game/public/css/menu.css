@@ -1,23 +1,14 @@
 
 #screen_menu {
-    .ct-list {
-        background-color: var(--white-bgc);
+    .ct-content {
+        height: calc(100vh - var(--header-height) - var(--sait));
     }
 
-    .box {
-        background-color: white;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border-radius: 0.5rem;
-
-        font-size: larger;
-
-        a {
-            padding-left: 1rem;
-        }
-
-        &.item a {
-            font-weight: bold;
-        }
+    .title {
+        padding: 20%;
+        text-align: center;
+        background-color: var(--white-bgc);
+        font-size: x-large;
+        font-weight: bold;
     }
 }

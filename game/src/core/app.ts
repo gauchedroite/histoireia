@@ -63,7 +63,7 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        let markup = `<div id="${renderRoot}" class="screen">${html}</div>`;
+        let markup = `<div id="${renderRoot}" class="ct-screen">${html}</div>`;
 
         if (!hardRender)
             ((<any>window).morphdom)(element, markup, {

@@ -2,41 +2,14 @@
 #screen_home {
     .ct-header {
         justify-content: center;
+        text-align: center;
     }
 
-    .ct-title {
+    .title {
         display: flex;
         flex-direction: column;
         align-items: center;
         background-color: var(--white-bgc);
-    }
-
-    .ct-list {
-        padding: 0 1rem;
-        background-color: var(--black-bgc);
-
-        & a {
-            display: block;
-
-            & > div {
-                display: flex;
-                justify-content: end;
-                align-items: center;
-                border-bottom: 1px solid #222;
-
-                color: var(--accent-bgc);
-
-                & div {
-                    padding: 1.5rem;
-                    font-size: larger;
-                    text-align: right;
-                }
-
-                & i {
-                    font-size: x-large;
-                }
-            }
-        }
     }
 
     .ct-footer {

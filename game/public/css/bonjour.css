@@ -1,17 +1,27 @@
 
 #screen_bonjour {
+
+    .ct-header, .ct-footer {
+        display: none;
+    }
+
+    .ct-content {
+        height: 100vh;
+    }
+
     text-align: center;
 
     .bonjour {
-        margin-top: 10rem;
-        margin-bottom: 4rem;
+        color:var(--accent-bgc);
+        padding-top: 5rem;
+        padding-bottom: 4rem;
 
         & h1 {
             font-size: xxx-large;
         }
     }
 
-    .form {
+    .choose {
         background-color: var(--accent-bgc);
         color: var(--color);
 

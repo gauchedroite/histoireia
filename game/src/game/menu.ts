@@ -13,34 +13,40 @@ let gameid = ""
 
 const formTemplate = (messages: Message[]) => {
     const add = (row: string) => rows.push(row);
+    const action = (href: string, text: string) => rows.push(`<a href="${href}"><div><div>${text}</div><i class="fa-regular fa-chevron-right"></i></div></a>`);
     let rows: string[] = [];
 
     const lastPage = state.lastPageNo()
 
+    add(`<div class="title">${mystate.title}</div>`)
+    add(`<div class="ct-list">`)
+
     if (lastPage == -1) {
-        add(`<div class="box item"><a href="#/story/${gameid}/new">Commencer à lire</a></div>`)
+        action(`#/story/${gameid}/new`, "Commencer à lire")
     }
     else {
-        add(`<div class="box item"><a href="#/story/${gameid}/${lastPage}">Continuer à lire</a></div>`)
-        add(`<div class="box item"><a href="#/story/${gameid}/new">Recommencer le livre?</a></div>`)
+        action(`#/story/${gameid}/${lastPage}`, "Continuer à lire")
+        action(`#/story/${gameid}/new`, "Recommencer le livre?")
     }
-    add(`<div class="box item"><a href="#/editor/${gameid}">Éditeur</a></div>`)
+    action(`#/editor/${gameid}`, "Éditeur")
 
+    add("</div>")
     return rows.join("")
 }
 
 const pageTemplate = (form: string) => {
     return `
 <div class="ct-header">
-    <h3>
-        <a href="#/home"><i class="fa-solid fa-arrow-left"></i></a>
-        <span>${mystate.title}</span>
-    </h3>
+    <a href="#/home">
+        <i class="fa-regular fa-chevron-left"></i>&nbsp;Bibliothèque
+    </a>
+    <!--
+    <div>qaz</div>
+    <div>share</div>
+    -->
 </div>
-<div class="ct-content form">
-    <div class="ct-list">
-        ${form}
-    </div>
+<div class="ct-content">
+    ${form}
 </div>
 `
 }

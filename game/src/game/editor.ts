@@ -40,7 +40,7 @@ const pageTemplate = (form: string) =>{
         <span>Editeur</span>
     </h3>
 </div>
-<div class="ct-content form">
+<div class="ct-content">
 ${form}
 </div>
 `

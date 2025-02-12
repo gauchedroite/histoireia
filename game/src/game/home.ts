@@ -14,7 +14,7 @@ const formTemplate = (list: GameList[]) => {
             </div>
         </a>`
     })
-    return games.join("") + games.join("") + games.join("") 
+    return games.join("") + games.join("") + games.join("") + games.join("") 
 }
 
 const pageTemplate = (form: string) => {
@@ -22,8 +22,8 @@ const pageTemplate = (form: string) => {
 <div class="ct-header">
     <div style="text-transform:uppercase; font-weight:bold;">Bibliothèque</div>
 </div>
-<div class="ct-content form">
-    <div class="ct-title">
+<div class="ct-content">
+    <div class="title">
         <img src="images/home.png" style="width:35%; padding-top:2rem;"/>
         <div style="font-size:xxx-large; font-weight:bold;">HistoireIA</div>
         <div style="font-size:larger; line-height:1;"><span style="border-bottom:1px black dotted;"><em>Toutes les histoires imaginables</em></span></div>
