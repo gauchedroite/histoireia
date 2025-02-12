@@ -1,6 +1,6 @@
 
 #screen_home {
-    .ct-header {
+    .app-header {
         justify-content: center;
         text-align: center;
     }
@@ -12,7 +12,7 @@
         background-color: var(--white-bgc);
     }
 
-    .ct-footer {
+    .app-footer {
         font-size: large;
         
         & a {

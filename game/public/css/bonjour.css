@@ -1,11 +1,11 @@
 
 #screen_bonjour {
 
-    .ct-header, .ct-footer {
+    .app-header, .app-footer {
         display: none;
     }
 
-    .ct-content {
+    .app-content {
         height: 100vh;
     }
 

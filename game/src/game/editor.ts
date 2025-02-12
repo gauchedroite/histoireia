@@ -34,13 +34,13 @@ const pageTemplate = (form: string) =>{
     const returnurl = isNew ? "#/home" : `#/menu/${gameid}`;
 
     return `
-<div class="ct-header">
+<div class="app-header">
     <h3>
         <a href="${returnurl}"><i class="fa-solid fa-arrow-left"></i></a>
         <span>Editeur</span>
     </h3>
 </div>
-<div class="ct-content">
+<div class="app-content">
 ${form}
 </div>
 `

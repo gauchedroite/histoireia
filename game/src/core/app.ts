@@ -63,7 +63,7 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        let markup = `<div id="${renderRoot}" class="ct-screen">${html}</div>`;
+        let markup = `<div id="${renderRoot}" class="app-screen">${html}</div>`;
 
         if (!hardRender)
             ((<any>window).morphdom)(element, markup, {
@@ -98,41 +98,41 @@ const postRender = () => {
     document.title = title;
     document.body.id = context.toLowerCase().replace("_", "-");
 
-    // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (ct-behind)
-    // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (ct-offscreen)
+    // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (app-behind)
+    // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (app-offscreen)
 
     //console.log(renderStack, renderRoot)
 
     if (renderStack.length > 1) {
-        const zeroElement = document.querySelector(".ct-zero")
+        const zeroElement = document.querySelector(".app-zero")
         if (zeroElement)
-            zeroElement.classList.remove("ct-zero")
+            zeroElement.classList.remove("app-zero")
 
         const rootOnTop = (renderStack[renderStack.length - 1] == renderRoot)
         if (rootOnTop) {
             const prevRoot = renderStack[renderStack.length - 2]
             const prevRootElement = document.getElementById(prevRoot)
             if (prevRootElement) {
-                prevRootElement.classList.add("ct-behind")
+                prevRootElement.classList.add("app-behind")
             }
         }
         else {
             const topRoot = renderStack[renderStack.length - 1]
             const topRootElement = document.getElementById(topRoot)
             if (topRootElement) {
-                topRootElement.classList.add("ct-offscreen")
+                topRootElement.classList.add("app-offscreen")
             }
             const newRootIndex = renderStack.indexOf(renderRoot) + 1
             const removeCount = renderStack.length - newRootIndex
             renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
         }
 
-        let pages = [...document.querySelectorAll(".ct-front")]
-        pages.forEach(page => { (page as HTMLElement).classList.remove("ct-front") })
-        document.getElementById(renderRoot)?.classList.add("ct-front")
+        let pages = [...document.querySelectorAll(".app-front")]
+        pages.forEach(page => { (page as HTMLElement).classList.remove("app-front") })
+        document.getElementById(renderRoot)?.classList.add("app-front")
     }
     else {
-        document.getElementById(renderRoot)?.classList.add("ct-zero")
+        document.getElementById(renderRoot)?.classList.add("app-zero")
     }
 };
 

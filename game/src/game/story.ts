@@ -45,18 +45,18 @@ const pageTemplate = (form: string) => {
     let next_disabled = (pageno == state.lastPageNo() ? "disabled" : "")
 
     return `
-<div class="ct-header">
+<div class="app-header">
     <h3>
         <a class="js-waitable-2" href="#/menu/${gameid}"><i class="fa-solid fa-arrow-left"></i></a>
         <span>${mystate.title}</span>
     </h3>
 </div>
-<div class="ct-content">
-    <div class="ct-story">
+<div class="app-content">
+    <div class="app-story">
         ${form}
     </div>
 </div>
-<div class="ct-footer page-nav js-waitable-2">
+<div class="app-footer page-nav js-waitable-2">
     <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev" style="--x:100;"><i class="fa-solid fa-turn-left"></i></button>
     <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next" style="--x:100;"><i class="fa-solid fa-turn-right"></i></button>
 </div>

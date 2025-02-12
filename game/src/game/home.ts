@@ -19,21 +19,21 @@ const formTemplate = (list: GameList[]) => {
 
 const pageTemplate = (form: string) => {
     return `
-<div class="ct-header">
+<div class="app-header">
     <div style="text-transform:uppercase; font-weight:bold;">Bibliothèque</div>
 </div>
-<div class="ct-content">
+<div class="app-content">
     <div class="title">
         <img src="images/home.png" style="width:35%; padding-top:2rem;"/>
         <div style="font-size:xxx-large; font-weight:bold;">HistoireIA</div>
         <div style="font-size:larger; line-height:1;"><span style="border-bottom:1px black dotted;"><em>Toutes les histoires imaginables</em></span></div>
         <div style="font-size:smaller;padding:1.5rem 0 3rem;">Studio GaucheDroite</div>
     </div>
-    <div class="ct-list">
+    <div class="app-list">
         ${form}
     </div>
 </div>
-<div class="ct-footer">
+<div class="app-footer">
     <a href="#/editor/new">
         <div><i class="fa-solid fa-plus"></i>&nbsp;Ajouter un livre</div>
     </a>

@@ -19,7 +19,7 @@ const formTemplate = (messages: Message[]) => {
     const lastPage = state.lastPageNo()
 
     add(`<div class="title">${mystate.title}</div>`)
-    add(`<div class="ct-list">`)
+    add(`<div class="app-list">`)
 
     if (lastPage == -1) {
         action(`#/story/${gameid}/new`, "Commencer à lire")
@@ -36,7 +36,7 @@ const formTemplate = (messages: Message[]) => {
 
 const pageTemplate = (form: string) => {
     return `
-<div class="ct-header">
+<div class="app-header">
     <a href="#/home">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;Bibliothèque
     </a>
@@ -45,7 +45,7 @@ const pageTemplate = (form: string) => {
     <div>share</div>
     -->
 </div>
-<div class="ct-content">
+<div class="app-content">
     ${form}
 </div>
 `

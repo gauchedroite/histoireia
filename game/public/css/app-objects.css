@@ -1,5 +1,5 @@
 
-.ct-header {
+.app-header {
     width: 100%;
     height: calc(var(--header-height) + var(--sait));
 
@@ -34,12 +34,14 @@
     }
 }
 
-.ct-content {
+
+.app-content {
     height: calc(100vh - var(--header-height) - var(--sait) - var(--footer-height) - var(--saib));
     overflow-y: scroll;
 }
 
-.ct-footer {
+
+.app-footer {
     width: 100%;
     height: calc(var(--footer-height) + var(--saib));
 
@@ -50,8 +52,7 @@
 }
 
 
-
-.ct-list {
+.app-list {
     padding: 0 1rem;
     background-color: var(--black-bgc);
 
@@ -80,29 +81,28 @@
 }
 
 
-
-.ct-screen {
+.app-screen {
     position: absolute;
     top: 0;
     left: 100vw;
     width: 100vw;
     background-color: var(--black-bgc);
 
-    &.ct-zero {
+    &.app-zero {
         left: 0;
     }
 
-    &.ct-behind {
+    &.app-behind {
         left: -50vw;
         transition: left 0.5s;
     }
 
-    &.ct-front {
+    &.app-front {
         left: 0;
         transition: left 0.5s;
     }
 
-    &.ct-offscreen {
+    &.app-offscreen {
         left: 100vw;
         transition: left 0.5s;
     }
