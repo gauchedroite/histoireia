@@ -4,17 +4,23 @@ import { GameList, state } from "./state.js"
 export const NS = "GHOME";
 
 
+// On touch devices, the `touchstart` event fires earlier than `click`, offering a snappier response:
+//
+// document.getElementById('my-link').addEventListener('touchstart', function(event) {
+//     // Execute your logic here
+// });
+
 
 const formTemplate = (list: GameList[]) => {
     const games = list.map(item => {
         return `<a href="#/menu/${item.code}">
             <div>
                 <div>${item.title}</div>
-                <i class="fa-regular fa-chevron-right"></i>
+                <i class="fa-thin fa-book"></i>
             </div>
         </a>`
     })
-    return games.join("") + games.join("") + games.join("") + games.join("") 
+    return games.join("") //+ games.join("") + games.join("") + games.join("") 
 }
 
 const pageTemplate = (form: string) => {
@@ -38,7 +44,7 @@ const pageTemplate = (form: string) => {
         <div><i class="fa-solid fa-plus"></i>&nbsp;Ajouter un livre</div>
     </a>
     <a href="#" onclick="window.location.back();return false;">
-        <div><i class="fa-solid fa-plus"></i>&nbsp;Bonjour!</div>
+        <div><i class="fa-regular fa-user-alien"></i></i>&nbsp;Bonjour!</div>
     </a>
 </div>
 `

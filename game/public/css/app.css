@@ -4,7 +4,7 @@
     --accent-bgc: peru;
     --black-bgc: black;
     --color: black;
-    --white-text: navajowhite;
+    --light-bgc: floralwhite;
 
     --header-height: 3rem;
     --footer-height: 2.5rem;
@@ -48,6 +48,10 @@ body,
 input,
 textarea {
     line-height: 1.25;
+}
+
+input, textarea {
+    font-size: large;
 }
 
 a {

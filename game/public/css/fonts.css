@@ -7,7 +7,7 @@
     font-weight: 400;
     src: url('../webfonts/klee-one-v7-latin-regular.woff2') format('woff2');
 }
-body, html, button, input {
+body, html, button, input, textarea {
     font-family: "Klee One";
 }
 

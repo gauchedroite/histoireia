@@ -1,12 +1,72 @@
 
 #screen_story {
-    .page-nav {
-        width: 100%;
+    background-color: var(--white-bgc);
+    color: var(--color);
+
+    .app-header {
+        & :nth-child(n + 2) {
+            text-align: right;
+            width: 20%;
+        }
+
+        & a {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .app-content {
+        padding: 1.5rem;
+    }
+
+    .user {
+        font-size: x-large;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    #ct_response {
+        margin: 1rem 0;
+        padding: 1rem 0;
+        margin-left: -0.75rem;
+        padding-left: 0.75rem;
+        border-left: 6px solid #ccc;
+    }
+
+    .ask {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        margin-top: 1rem;
 
         & button {
-            width: 50%;
+            /* background-color: var(--accent-bgc); */
+            font-size: larger;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+
+            border: none;
+            height: 3rem;
+            width: 3rem;
+            box-shadow: 0 2px 4px darkslategray;
+        }
+    }
+
+    .input {
+        width: 100%;
+        & textarea {
+            width: 100%;
+        }
+    }
+
+    .app-footer {        
+        & button {
+            display: block;
+            border: none;
+            font-size: larger;
+            background-color: transparent;
         }
     }
 }

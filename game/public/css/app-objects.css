@@ -17,6 +17,10 @@
     display: flex;
     justify-content: space-between;
 
+    & a {
+        color: white;
+    }
+
     & > * {
         width: 100%;
     }
@@ -27,10 +31,6 @@
 
     & :nth-child(n + 3) {
         text-align: right;
-    }
-
-    & a {
-        color: white;
     }
 }
 
@@ -45,7 +45,7 @@
     width: 100%;
     height: calc(var(--footer-height) + var(--saib));
 
-    background-color: var(--white-bgc);
+    background-color: var(--light-bgc);
 
     display: flex;
     justify-content: space-around;

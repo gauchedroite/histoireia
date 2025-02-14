@@ -101,7 +101,7 @@ const postRender = () => {
     // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (app-behind)
     // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (app-offscreen)
 
-    //console.log(renderStack, renderRoot)
+    console.log(window.location.href, renderStack, renderRoot)
 
     if (renderStack.length > 1) {
         const zeroElement = document.querySelector(".app-zero")
@@ -186,11 +186,9 @@ export const setHardRender = () => {
 }
 
 const setRenderRoot = (id: string) => {
-    if (id == renderRoot)
+    const sameRenderRoot = (id == renderRoot)
+    if (sameRenderRoot)
         return
-
-    if (renderRoot == "app_root")
-        renderRoot = id
 
     renderRoot = id
 

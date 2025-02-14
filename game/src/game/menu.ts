@@ -13,7 +13,7 @@ let gameid = ""
 
 const formTemplate = (messages: Message[]) => {
     const add = (row: string) => rows.push(row);
-    const action = (href: string, text: string) => rows.push(`<a href="${href}"><div><div>${text}</div><i class="fa-regular fa-chevron-right"></i></div></a>`);
+    const action = (href: string, text: string, icon: string) => rows.push(`<a href="${href}"><div><div>${text}</div>${icon}</div></a>`);
     let rows: string[] = [];
 
     const lastPage = state.lastPageNo()
@@ -22,13 +22,13 @@ const formTemplate = (messages: Message[]) => {
     add(`<div class="app-list">`)
 
     if (lastPage == -1) {
-        action(`#/story/${gameid}/new`, "Commencer à lire")
+        action(`#/story/${gameid}/new`, "Commencer à lire", `<i class="fa-thin fa-book-user"></i>`)
     }
     else {
-        action(`#/story/${gameid}/${lastPage}`, "Continuer à lire")
-        action(`#/story/${gameid}/new`, "Recommencer le livre?")
+        action(`#/story/${gameid}/${lastPage}`, "Continuer à lire", `<i class="fa-thin fa-book-open"></i>`)
+        action(`#/story/${gameid}/new`, "Recommencer le livre?", `<i class="fa-thin fa-book-sparkles"></i>`)
     }
-    action(`#/editor/${gameid}`, "Éditeur")
+    action(`#/editor/${gameid}`, "Éditeur", `<i class="fa-thin fa-pen-to-square"></i>`)
 
     add("</div>")
     return rows.join("")
@@ -40,10 +40,6 @@ const pageTemplate = (form: string) => {
     <a href="#/home">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;Bibliothèque
     </a>
-    <!--
-    <div>qaz</div>
-    <div>share</div>
-    -->
 </div>
 <div class="app-content">
     ${form}
