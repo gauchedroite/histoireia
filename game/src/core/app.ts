@@ -37,6 +37,7 @@ let rendering = false;
 let hardRender = false;
 let renderRoot = "app_root";
 let renderStack: string[] = [];
+let sameRenderRoot = false;
 //
 export let state: IState;
 
@@ -63,7 +64,7 @@ export const render = () => {
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
-        let markup = `<div id="${renderRoot}" class="app-screen">${html}</div>`;
+        let markup = `<div id="${renderRoot}" class="app-screen app-front">${html}</div>`;
 
         if (!hardRender)
             ((<any>window).morphdom)(element, markup, {
@@ -101,7 +102,13 @@ const postRender = () => {
     // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (app-behind)
     // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (app-offscreen)
 
-    console.log(window.location.href, renderStack, renderRoot)
+    if (sameRenderRoot) {
+        document.getElementById(renderRoot)?.classList.add("app-front")
+        return
+    }
+
+    if (renderStack.findIndex(one => one == renderRoot) == -1)
+        renderStack.push(renderRoot)
 
     if (renderStack.length > 1) {
         const zeroElement = document.querySelector(".app-zero")
@@ -186,14 +193,8 @@ export const setHardRender = () => {
 }
 
 const setRenderRoot = (id: string) => {
-    const sameRenderRoot = (id == renderRoot)
-    if (sameRenderRoot)
-        return
-
+    sameRenderRoot = (id == renderRoot)
     renderRoot = id
-
-    if (renderStack.findIndex(one => one == renderRoot) == -1)
-        renderStack.push(renderRoot)
 }
 
 

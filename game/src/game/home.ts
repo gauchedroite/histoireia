@@ -26,7 +26,7 @@ const formTemplate = (list: GameList[]) => {
 const pageTemplate = (form: string) => {
     return `
 <div class="app-header">
-    <div style="text-transform:uppercase; font-weight:bold;">Bibliothèque</div>
+    <div style="text-transform:uppercase; font-weight:bold;">Bibliothèque de ${state.usernameCapitalized}</div>
 </div>
 <div class="app-content">
     <div class="title">

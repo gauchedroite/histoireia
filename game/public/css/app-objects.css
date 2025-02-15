@@ -8,14 +8,11 @@
 
     display: flex;
     align-items: flex-end;
-
+    justify-content: space-between;
     padding-top: var(--sait);
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 1rem;
-
-    display: flex;
-    justify-content: space-between;
 
     & a {
         color: white;
@@ -49,6 +46,7 @@
 
     display: flex;
     justify-content: space-around;
+    align-items: flex-start;
 }
 
 
@@ -97,7 +95,7 @@
         transition: left 0.5s;
     }
 
-    &.app-front {
+    &.app-front:not(.app-zero) {
         left: 0;
         transition: left 0.5s;
     }

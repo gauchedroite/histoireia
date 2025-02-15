@@ -1,0 +1,117 @@
+
+.modal-overlay.modal-overlay-visible, .popup-overlay.modal-overlay-visible, .preloader-indicator-overlay.modal-overlay-visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-overlay, .popup-overlay, .preloader-indicator-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.4);
+    z-index: 13000;
+    visibility: hidden;
+    opacity: 0;
+    transition-duration: .4s;
+}
+
+.modal.modal-in {
+    opacity: 1;
+    transition-duration: .4s;
+    transform: translate3d(0,0,0) scale(1);
+}
+
+.modal {
+    width: 270px;
+    position: absolute;
+    z-index: 13500;
+    left: 50%;
+    margin-left: -135px;
+    margin-top: 0;
+    top: 50%;
+    text-align: center;
+    border-radius: 13px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translate3d(0,0,0) scale(1.185);
+    transition-property: transform,opacity;
+    color: #000;
+    display: none;
+}
+
+.modal-inner {
+    padding: 15px;
+    border-radius: 13px 13px 0 0;
+    position: relative;
+    background: rgba(255,255,255,.95);
+}
+
+.modal-inner:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    top: auto;
+    height: 1px;
+    width: 100%;
+    background-color: rgba(0,0,0,.2);
+    display: block;
+    z-index: 15;
+    transform-origin: 50% 100%;
+}
+
+.modal-title+.modal-text {
+    margin-top: 5px;
+}
+
+.modal-buttons {
+    height: 44px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.modal-button {
+    width: 100%;
+    padding: 0 5px;
+    height: 44px;
+    font-size: 17px;
+    line-height: 44px;
+    text-align: center;
+    color: #007aff;
+    display: block;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+    background: rgba(255,255,255,.95);
+}
+
+.modal-button:active {
+    background-color: rgba(230, 230, 230, 0.95);
+}
+
+.modal-button:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    left: auto;
+    bottom: auto;
+    width: 1px;
+    height: 100%;
+    background-color: rgba(0,0,0,.2);
+    display: block;
+    z-index: 15;
+    transform-origin: 100% 50%;
+}
+
+.modal-button.modal-button-bold {
+    font-weight: 500;
+}
+

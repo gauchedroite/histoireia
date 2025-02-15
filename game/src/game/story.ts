@@ -51,14 +51,14 @@ const pageTemplate = (form: string) => {
     <a class="js-waitable-2" href="#/menu/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;${mystate.title}
     </a>
-    <div>${pageno + 1}/${lastPageNo + 1}</div>
 </div>
 <div class="app-content">
     ${form}
 </div>
 <div class="app-footer js-waitable-2">
-    <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev"><i class="fa-solid fa-turn-left"></i></button>
-    <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next"><i class="fa-solid fa-turn-right"></i></button>
+    <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev"><i class="fa-solid fa-left"></i></button>
+    <div>${pageno + 1}/${lastPageNo + 1}</div>
+    <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next"><i class="fa-solid fa-right"></i></button>
 </div>
 `
 }

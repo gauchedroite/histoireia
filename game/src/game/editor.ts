@@ -18,13 +18,14 @@ const formTemplate = (item: IState) => {
 
     add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 30 }))
+
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 18 }))
 
     if (isNew) {
-        add(`<button type="button" onclick="location.href='#/menu/${item.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${item.code}</button>`)
+        add(`<button type="button" class="button" onclick="location.href='#/menu/${item.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${item.code}</button>`)
     }
     else {
-        add(`<button type="button" onclick="location.href='#/editor/${gameid}'"><i class="fa-light fa-floppy-disk"></i>&nbsp;Enregistrer les changements</button>`)
+        add(`<button type="button" class="button" onclick="location.href='#/editor/${gameid}'"><i class="fa-light fa-floppy-disk"></i>&nbsp;Enregistrer les changements</button>`)
     }
 
     return rows.join("");
@@ -35,13 +36,12 @@ const pageTemplate = (form: string) =>{
 
     return `
 <div class="app-header">
-    <h3>
-        <a href="${returnurl}"><i class="fa-solid fa-arrow-left"></i></a>
-        <span>Editeur</span>
-    </h3>
+    <a href="${returnurl}">
+        <i class="fa-regular fa-chevron-left"></i>&nbsp;${mystate.title}
+    </a>
 </div>
 <div class="app-content">
-${form}
+    ${form}
 </div>
 `
 }

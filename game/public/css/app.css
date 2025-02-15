@@ -13,6 +13,9 @@
     --sair: env(safe-area-inset-right);
     --saib: env(safe-area-inset-bottom);
     --sail: env(safe-area-inset-left);
+
+    --border: rgba(0, 0, 0, .2);
+    --border-radius: 4px;
 }
 
 
@@ -57,4 +60,21 @@ input, textarea {
 a {
     color: var(--color);
     text-decoration: none;
+}
+
+input:not([type=checkbox]):not([type=radio]),select {
+    display: block;
+}
+
+input, textarea, select, .button {
+    position: relative;
+    margin: .5rem 0;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    outline: none;
+    appearance: none;
+    font-size: 100%;
 }

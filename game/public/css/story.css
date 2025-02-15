@@ -61,12 +61,16 @@
         }
     }
 
-    .app-footer {        
+    .app-footer {
         & button {
             display: block;
             border: none;
-            font-size: larger;
+            font-size: x-large;
             background-color: transparent;
+        }
+
+        & div {
+            line-height: 2;
         }
     }
 }
