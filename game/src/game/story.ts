@@ -28,7 +28,7 @@ const formTemplate = () => {
     if (assistant_text && assistant_text.length > 0) {
         const disabled = (next_user_text == undefined || next_user_text.length == 0)
         const button = `<button type="submit" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}><i class="fa-light fa-arrow-up"></i></button>`
-        const label = `<div class="ask"><div><b>Qu'est-ce que tu dis ${state.usernameCapitalized} ?</b></div>${button}</div>`
+        const label = `<div class="ask"><div><b>À toi, ${state.usernameCapitalized} :</b></div>${button}</div>`
         const textarea = Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, "", <Theme.IOptText>{ required: true, rows: 4 })
 
         add(label)
@@ -41,9 +41,11 @@ const formTemplate = () => {
 const pageTemplate = (form: string) => {
     const lastPageNo = state.lastPageNo()
     let prev_url = `#/story/${gameid}/${pageno - 1}`
+    let first_url = `#/story/${gameid}/0`
     let prev_disabled = (pageno == 0 ? "disabled" : "")
 
     let next_url = `#/story/${gameid}/${pageno + 1}`
+    let last_url = `#/story/${gameid}/${lastPageNo}`
     let next_disabled = (pageno == lastPageNo ? "disabled" : "")
 
     return `
@@ -56,9 +58,11 @@ const pageTemplate = (form: string) => {
     ${form}
 </div>
 <div class="app-footer js-waitable-2">
+    <button type="button" onclick="window.location='${first_url}'" ${prev_disabled} title="prev"><i class="fa-solid fa-left-to-line"></i></button>
     <button type="button" onclick="window.location='${prev_url}'" ${prev_disabled} title="prev"><i class="fa-solid fa-left"></i></button>
     <div>${pageno + 1}/${lastPageNo + 1}</div>
     <button type="button" onclick="window.location='${next_url}'" ${next_disabled} title="next"><i class="fa-solid fa-right"></i></button>
+    <button type="button" onclick="window.location='${last_url}'" ${next_disabled} title="next"><i class="fa-solid fa-right-to-line"></i></button>
 </div>
 `
 }
