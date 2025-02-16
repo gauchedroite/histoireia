@@ -1,0 +1,37 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+  
+      // Settings for the compiler
+      "rootDir": "src",
+      "outDir": "dist",
+      "sourceMap": true,
+      "target": "ES2024",
+      "module": "ESNext",
+  
+      // Rules for our code
+      "alwaysStrict": true,
+      "strict": true,
+      "noImplicitAny": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitOverride": true,
+      "noEmitOnError": true,
+      "removeComments": false,
+      //
+      "noUnusedParameters": false,
+      "noUnusedLocals": false,
+      "allowJs": false,
+  
+      // Settings for linking source files
+      "moduleResolution": "Node",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
+    },
+      "include": ["src"],
+      "exclude": ["node_modules", "dist"]
+  }
+  
