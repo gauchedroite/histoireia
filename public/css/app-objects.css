@@ -10,8 +10,8 @@
     align-items: flex-end;
     justify-content: space-between;
     padding-top: var(--sait);
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: calc(1rem + var(--sail));
+    padding-right: calc(1rem + var(--sair));
     padding-bottom: 1rem;
 
     & a {
@@ -35,6 +35,7 @@
 .app-content {
     height: calc(100vh - var(--header-height) - var(--sait) - var(--footer-height) - var(--saib));
     overflow-y: scroll;
+    padding: 1.5rem calc(1.5rem + var(--sair)) 1.5rem calc(1.5rem + var(--sail));
 }
 
 
@@ -53,6 +54,7 @@
 .app-list {
     padding: 0 1rem;
     background-color: var(--black-bgc);
+    padding: 0 calc(1rem + var(--sair)) 0 calc(1rem + var(--sail));
 
     & a {
         display: block;
