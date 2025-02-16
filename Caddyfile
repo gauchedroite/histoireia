@@ -1,3 +1,6 @@
+#
+# caddy run --config ./Caddyfile --watch
+#
 lebaudy.gauchedroite.com {
 	#
 	# curl https://lebaudy.gauchedroite.com/histoireia/index.html
