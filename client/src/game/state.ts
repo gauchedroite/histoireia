@@ -181,7 +181,7 @@ class State {    private _state: IState | undefined
             content: user_prompt            
         })
     
-        const endpoint = "https://lebaudy.gauchedroite.com/ollama/api/chat"
+        const endpoint = "https://lebaudy.gauchedroite.com/histoireia/ollama/api/chat"
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
