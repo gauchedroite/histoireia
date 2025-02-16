@@ -6,17 +6,17 @@ lebaudy.gauchedroite.com {
 	# curl https://lebaudy.gauchedroite.com/histoireia/index.html
 	#
 	handle_path /histoireia* {
-		root * ./game/public
+		root * ./public
 		file_server
 	}
 
 	handle_path /webfonts* {
-		root * ./live/webfonts
+		root * ./public/webfonts
 		file_server
 	}
 
 	handle_path /src* {
-		root * ./game/src
+		root * ./client/src
 		file_server
 	}
 
