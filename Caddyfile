@@ -3,7 +3,6 @@ lebaudy.gauchedroite.com {
 	# curl https://lebaudy.gauchedroite.com/histoireia/index.html
 	#
 	handle_path /histoireia* {
-		#root * ./live
 		root * ./game/public
 		file_server
 	}
@@ -18,16 +17,16 @@ lebaudy.gauchedroite.com {
 		file_server
 	}
 
-	#log {
-	#	output stdout
-	#}
-
 	#
 	# ollama must listen to 0.0.0.0
 	# The reverse proxy must target 192.168.50.199
 	# OLLAMA_HOST=0.0.0.0:11434 ollama serve
 	#
 	# curl https://lebaudy.gauchedroite.com/api/tags
-	#
-	reverse_proxy /api* 192.168.50.199:11434
+	# reverse_proxy /api* 192.168.50.199:11434
+
+	handle_path /ollama/api* {
+		rewrite * /api{path}
+		reverse_proxy 192.168.50.199:11434
+	}
 }

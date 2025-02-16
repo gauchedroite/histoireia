@@ -170,13 +170,10 @@ class State {    private _state: IState | undefined
 
 
     //
-    // Interacting with the ollama endpoints
-    //
-    // OLLAMA_HOST=0.0.0.0:11434 ollama serve
-    // or
-    // ssh -L 11434:localhost:11434 christian@192.168.50.199
+    // Interacting with the LLM endpoints
     //
     async executePrompt(user_prompt: string, streamUpdater?: (message: string) => void) {
+
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
         const messages = this.getMessages()
         messages.push(<Message>{
@@ -184,7 +181,7 @@ class State {    private _state: IState | undefined
             content: user_prompt            
         })
     
-        const endpoint = "https://lebaudy.gauchedroite.com/api/chat"
+        const endpoint = "https://lebaudy.gauchedroite.com/ollama/api/chat"
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
