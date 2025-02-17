@@ -2,6 +2,14 @@ import express, { Request, Response, Application, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs-extra';
 import path from 'path';
+import { createFunName } from './funny-name';
+
+interface GameDefinition {
+    code: string
+    title: string
+    bg_url: string | null
+    prompt: string
+}
 
 const app = express();
 const port = 9340;
@@ -54,18 +62,67 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 
 // Define API routes
-app.post('/save-state/:filename', async (req: Request, res: Response) => {
-    const jsonString = JSON.stringify(req.body);
-    const fileName = `${req.params.filename}.json`;
-    const filePath = path.join(dataPath, fileName);
+app.get("/game-index", async (req: Request, res: Response) => {
+    try {
+        const files = await fs.readdir(dataPath);
+        const index = [];
+
+        for (const file of files) {
+            if (path.extname(file) === '.json') {
+                const filePath = path.join(dataPath, file);
+
+                try {
+                    const fileContent = await fs.readFile(filePath, 'utf8');
+                    const data = JSON.parse(fileContent);
+
+                    if (data.code && data.title) {
+                        index.push({
+                            code: data.code,
+                            title: data.title,
+                            promptfile: `${data.code}.txt`
+                        });
+                    }
+                }
+                catch (err) {
+                    console.error(`Error processing file ${file}:`, err);
+                    res.status(500).send(`Error processing file ${file}:` + (err as Error).message);
+                    return;
+                }
+            }
+        }
+
+        res.send(JSON.stringify(index));
+    }
+    catch (err) {
+        console.error('Error scanning directory:', err);
+        res.status(500).send("Error scanning directory: " + (err as Error).message);
+    }
+});
+
+app.post('/save-game-def/:code', async (req: Request, res: Response) => {
+    const { title, bg_url, prompt } = req.body as GameDefinition
+    let code = req.params.code;
+    if (code == "new")
+        code = createFunName()
+
+    const game = <GameDefinition>{ code, title, bg_url }
+    
+    const gameid_json = `${code}.json`;
+    const gameid_jsonPath = path.join(dataPath, gameid_json);
+    
+    const gameid_txt = `${code}.txt`;
+    const gameid_txtPath = path.join(dataPath, gameid_txt);
 
     try {
-        await fs.writeFile(filePath, jsonString);
-        console.log('Successfully wrote file');
-        res.send('Successfully wrote JSON to file.');
-    } catch (error) {
-        console.error('Error writing file', error);
-        res.status(500).send("Failed to save the file: " + (error as Error).message);
+        await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
+        await fs.writeFile(gameid_txtPath, prompt);
+
+        console.log('Successfully wrote game definition');
+        res.send(code);
+    }
+    catch (error) {
+        console.error('Error writing game definition', error);
+        res.status(500).send("Failed to save the game definition: " + (error as Error).message);
     }
 });
 
@@ -81,7 +138,8 @@ app.post('/next-seqno', async (_req: Request, res: Response) => {
 
         res.send({ seqno: state.seqno });
         console.log("Successfully incremented seqno");
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error writing file", error);
         res.status(500).send("Failed to save the file: " + (error as Error).message);
     }
@@ -96,7 +154,8 @@ app.post('/new-face/:filename', async (req: Request, res: Response) => {
         await fs.copyFile(emptyPath, filePath);
         console.log('Successfully copied file');
         res.send('Successfully created new face png.');
-    } catch (error) {
+    }
+    catch (error) {
         console.error('Error copying file', error);
         res.status(500).send("Failed to create new face png: " + (error as Error).message);
     }
@@ -111,7 +170,8 @@ app.post("/upload-face", async (req: Request, res: Response) => {
         await fs.writeFile(filePath, base64Data, "base64");
         console.log('Successfully saved face');
         res.status(200).send("File uploaded and saved as " + fileName);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error saving png file", error);
         res.status(500).send("Failed to upload file: " + (error as Error).message);
     }

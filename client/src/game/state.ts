@@ -28,7 +28,8 @@ interface ILocalState {
 }
 
 
-class State {    private _state: IState | undefined
+class State {
+    private _state: IState | undefined
     private _username: string
     private _localState: ILocalState
     private _index: GameList[] = []
@@ -132,13 +133,14 @@ class State {    private _state: IState | undefined
 
 
     //
-    // Reading content on the server
+    // Operations on the server
     //
     async fetch_index () {
-        return App.GET("assets/_index.json")
-            .then((payload: any) => {
-                this._index = payload;
-            })
+        const response = await window.fetch("game-index");
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        this._index = await response.json()
     }
 
     async fetch_game_definition (gameid: string) {
@@ -166,6 +168,20 @@ class State {    private _state: IState | undefined
         }
 
         this._gameid = this._game_definition.code!
+    }
+
+    async save_game_definition(newstate: any): Promise<string> {
+        const body = JSON.stringify(newstate);
+    
+        const response = await window.fetch(`save-game-def/${this.gameid}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.text();
     }
 
 

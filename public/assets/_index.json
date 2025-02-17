@@ -1,6 +1,0 @@
-[
-    { "code": "billy2", "title": "L'assistant utile", "promptfile": "billy2.txt" },
-    { "code": "billy", "title": "Aventures à Tukuman", "promptfile": "billy.txt" },
-    { "code": "ct01", "title": "Fait divers au concessionnaire", "promptfile": "ct01.txt" },
-    { "code": "ct02", "title": "Samuel de Champlain", "promptfile": "ct02.txt" }
-]

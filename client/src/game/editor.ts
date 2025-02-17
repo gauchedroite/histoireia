@@ -16,16 +16,16 @@ const formTemplate = (item: IState) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
+    //add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
 
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 18 }))
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 22 }))
 
     if (isNew) {
-        add(`<button type="button" class="button" onclick="location.href='#/menu/${item.code}'"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire //${item.code}</button>`)
+        add(`<button type="button" class="button" onclick="${NS}.save_game_definition()"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire</button>`)
     }
     else {
-        add(`<button type="button" class="button" onclick="location.href='#/editor/${gameid}'"><i class="fa-light fa-floppy-disk"></i>&nbsp;Enregistrer les changements</button>`)
+        add(`<button type="button" class="button" onclick="${NS}.save_game_definition()"><i class="fa-light fa-floppy-disk"></i>&nbsp;Enregistrer les changements</button>`)
     }
 
     return rows.join("");
@@ -71,6 +71,17 @@ export const fetch = (args: string[] | undefined) => {
     }
 }
 
+export const refresh = () => {
+    App.transitionUI()
+    state.fetch_game_definition(gameid)
+    .then(payload => {
+         mystate = Misc.clone(payload) as IState
+    })
+    .then(App.untransitionUI)
+    .then(App.render)
+    .catch(App.render);
+}
+
 export const render = () => {
     if (!App.inContext(NS)) return "";
 
@@ -95,4 +106,11 @@ const getFormState = () => {
 export const onchange = (input: HTMLInputElement) => {
     mystate = getFormState();
     App.render();
+}
+
+
+export const save_game_definition = async () => {
+    gameid = await state.save_game_definition(mystate)
+    isNew = false;
+    refresh()
 }
