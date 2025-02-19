@@ -99,31 +99,23 @@ const postRender = () => {
     document.title = title;
     document.body.id = context.toLowerCase().replace("_", "-");
 
+
     const assignZIndex = (lowerid: string, upperid?: string) => {
         let pages = [...document.querySelectorAll(".app-screen")]
-        pages.forEach(element => {
-            (element as HTMLElement).style.zIndex = "unset"
-        })
+        pages.forEach(element => (element as HTMLElement)?.classList.remove("app-z1", "app-z2"))
 
         if (upperid == undefined) {
-            const lowerElement = document.getElementById(lowerid)
-            if (lowerElement)
-                lowerElement.style.zIndex = "2"
+            document.getElementById(lowerid)?.classList.add("app-z2")
         }
         else {
-            const lowerElement = document.getElementById(lowerid)
-            if (lowerElement)
-                lowerElement.style.zIndex = "1"
-    
-            const upperElement = document.getElementById(upperid)
-            if (upperElement)
-                upperElement.style.zIndex = "2"
+            document.getElementById(lowerid)?.classList.add("app-z1")
+            document.getElementById(upperid)?.classList.add("app-z2")
         }
     }
 
     const setFront = (id: string) => {
         let pages = [...document.querySelectorAll(".app-front")]
-        pages.forEach(page => { (page as HTMLElement).classList.remove("app-front") })
+        pages.forEach(page => (page as HTMLElement).classList.remove("app-front"))
 
         document.getElementById(id)?.classList.add("app-front")
     }
@@ -140,14 +132,22 @@ const postRender = () => {
         document.querySelector(".app-zero")?.classList.remove("app-zero")
     }
 
-    const renderStackPush = (id: string) => {
+    const addZero = (id: string) => {
+        document.getElementById(id)?.classList.add("app-zero")
+    }
+
+    const pushRenderStack = (id: string) => {
         renderStack.push(id)
     }
 
-    const renderStackPop = (id: string) => {
+    const popRenderStack = (id: string) => {
         const newRootIndex = renderStack.indexOf(id) + 1
         const removeCount = renderStack.length - newRootIndex
         renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
+    }
+
+    const existsRenderStack = (id: string) => {
+        return renderStack.findIndex(one => one == renderRoot) != -1
     }
 
 
@@ -160,31 +160,31 @@ const postRender = () => {
         return
     }
 
-    if (renderStack.findIndex(one => one == renderRoot) == -1)
-        renderStackPush(renderRoot)
+    if (!existsRenderStack(renderRoot))
+        pushRenderStack(renderRoot)
 
     if (renderStack.length > 1) {
         removeZero()
 
-        const rootOnTop = (renderStack[renderStack.length - 1] == renderRoot)
-        if (rootOnTop) {
+        const topRoot = renderStack[renderStack.length - 1]
+        const prevRoot = renderStack[renderStack.length - 2]
+
+        if (topRoot == renderRoot) {
             // Glissement de la page front vers la gauche
-            const prevRoot = renderStack[renderStack.length - 2]
             assignZIndex(prevRoot, renderRoot)
             setBehind(prevRoot)
             setFront(renderRoot)
         }
         else {
             // Glissement de la page front vers la droite
-            const topRoot = renderStack[renderStack.length - 1]
-            renderStackPop(renderRoot)
+            popRenderStack(renderRoot)
             assignZIndex(renderRoot, topRoot)
             setOffscreen(topRoot)
             setFront(renderRoot)
         }
     }
     else {
-        document.getElementById(renderRoot)?.classList.add("app-zero")
+        addZero(renderRoot)
     }
 };
 

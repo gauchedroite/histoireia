@@ -107,13 +107,13 @@
         transition: left 0.5s;
     }
 
-    &.app-z-unset {
+    &.app-zunset {
         z-index: unset;
     }
-    &.app-z-1 {
+    &.app-z1 {
         z-index: 1;
     }
-    &.app-z-2 {
+    &.app-z2 {
         z-index: 2;
     }
 }
