@@ -99,44 +99,89 @@ const postRender = () => {
     document.title = title;
     document.body.id = context.toLowerCase().replace("_", "-");
 
-    // Si renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (app-behind)
-    // Si renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (app-offscreen)
+    const assignZIndex = (lowerid: string, upperid?: string) => {
+        let pages = [...document.querySelectorAll(".app-screen")]
+        pages.forEach(element => {
+            (element as HTMLElement).style.zIndex = "unset"
+        })
+
+        if (upperid == undefined) {
+            const lowerElement = document.getElementById(lowerid)
+            if (lowerElement)
+                lowerElement.style.zIndex = "2"
+        }
+        else {
+            const lowerElement = document.getElementById(lowerid)
+            if (lowerElement)
+                lowerElement.style.zIndex = "1"
+    
+            const upperElement = document.getElementById(upperid)
+            if (upperElement)
+                upperElement.style.zIndex = "2"
+        }
+    }
+
+    const setFront = (id: string) => {
+        let pages = [...document.querySelectorAll(".app-front")]
+        pages.forEach(page => { (page as HTMLElement).classList.remove("app-front") })
+
+        document.getElementById(id)?.classList.add("app-front")
+    }
+
+    const setBehind = (id: string) => {
+        document.getElementById(id)?.classList.add("app-behind")
+    }
+
+    const setOffscreen = (id: string) => {
+        document.getElementById(id)?.classList.add("app-offscreen")
+    }
+
+    const removeZero = () => {
+        document.querySelector(".app-zero")?.classList.remove("app-zero")
+    }
+
+    const renderStackPush = (id: string) => {
+        renderStack.push(id)
+    }
+
+    const renderStackPop = (id: string) => {
+        const newRootIndex = renderStack.indexOf(id) + 1
+        const removeCount = renderStack.length - newRootIndex
+        renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
+    }
+
+
+    // Si le nouveau renderRoot est sur le dessus de renderStack, la page précédent doit céder sa place (app-behind) -- glissement vers la gauche
+    // Si le nouveau renderRoot n'est pas sur le dessus de renderStack, la page sur le dessus doit céder sa place (app-offscreen) -- glissement vers la droite
 
     if (sameRenderRoot) {
-        document.getElementById(renderRoot)?.classList.add("app-front")
+        assignZIndex(renderRoot)
+        setFront(renderRoot)
         return
     }
 
     if (renderStack.findIndex(one => one == renderRoot) == -1)
-        renderStack.push(renderRoot)
+        renderStackPush(renderRoot)
 
     if (renderStack.length > 1) {
-        const zeroElement = document.querySelector(".app-zero")
-        if (zeroElement)
-            zeroElement.classList.remove("app-zero")
+        removeZero()
 
         const rootOnTop = (renderStack[renderStack.length - 1] == renderRoot)
         if (rootOnTop) {
+            // Glissement de la page front vers la gauche
             const prevRoot = renderStack[renderStack.length - 2]
-            const prevRootElement = document.getElementById(prevRoot)
-            if (prevRootElement) {
-                prevRootElement.classList.add("app-behind")
-            }
+            assignZIndex(prevRoot, renderRoot)
+            setBehind(prevRoot)
+            setFront(renderRoot)
         }
         else {
+            // Glissement de la page front vers la droite
             const topRoot = renderStack[renderStack.length - 1]
-            const topRootElement = document.getElementById(topRoot)
-            if (topRootElement) {
-                topRootElement.classList.add("app-offscreen")
-            }
-            const newRootIndex = renderStack.indexOf(renderRoot) + 1
-            const removeCount = renderStack.length - newRootIndex
-            renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
+            renderStackPop(renderRoot)
+            assignZIndex(renderRoot, topRoot)
+            setOffscreen(topRoot)
+            setFront(renderRoot)
         }
-
-        let pages = [...document.querySelectorAll(".app-front")]
-        pages.forEach(page => { (page as HTMLElement).classList.remove("app-front") })
-        document.getElementById(renderRoot)?.classList.add("app-front")
     }
     else {
         document.getElementById(renderRoot)?.classList.add("app-zero")

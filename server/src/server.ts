@@ -17,8 +17,8 @@ const port = 9340;
 
 // Set paths
 const publicPath = path.join(__dirname, "../../public");
-const srcPath = path.join(__dirname, "../../client/src");
 const dataPath = path.join(__dirname, "../../public/assets");
+//const srcPath = path.join(__dirname, "../../client/src");
 //const webfontsPath = path.join(__dirname, "../../public/webfonts");
 
 
@@ -48,7 +48,7 @@ app.use("/data", noCache);
 app.use("/data", express.static(dataPath));
 
 // Configure access to source files by the browser
-app.use("/client/src", express.static(srcPath));
+//app.use("/client/src", express.static(srcPath));
 
 // Configure access to the webfonts
 //app.use("/webfonts", express.static(webfontsPath));
