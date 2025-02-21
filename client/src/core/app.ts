@@ -1,4 +1,4 @@
-﻿import { reviver, replacer } from "./misc.js"
+﻿import { reviver, replacer, toastFailure } from "./misc.js"
 import { rootMan } from "./rootMan.js";
 
 export const setUID = (uid: number) => state.uid = uid;
@@ -59,8 +59,11 @@ export const render = () => {
     if (!rendering) {
         rendering = true;
         //
-        let hasServerError = (serverError() ? "js-server-error" : "");
-        let hasFatalError = (fatalError() ? "js-fatal-error" : "");
+        //let hasServerError = (serverError() ? "js-server-error" : "");
+        //let hasFatalError = (fatalError() ? "js-fatal-error" : "");
+        if (serverError()) {
+            toastFailure(getErrorMessages()[0])
+        }
         //
         let html = pageRender();
         let element = document.getElementById(renderRoot) as HTMLElement;
@@ -98,7 +101,8 @@ export const render = () => {
 const postRender = () => {
     document.title = title;
     document.body.id = context.toLowerCase().replace("_", "-");
-
+    untransitionUI();
+    clearErrors();
 
     const assignZIndex = (lowerid: string, upperid?: string) => {
         let pages = [...document.querySelectorAll(".app-screen")]

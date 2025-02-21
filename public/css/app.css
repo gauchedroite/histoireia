@@ -78,3 +78,20 @@ input, textarea, select, .button {
     appearance: none;
     font-size: 100%;
 }
+
+.js-toast {
+    z-index: 3;
+    background-color: forestgreen;
+}
+
+.js-toast-bad {
+    z-index: 3;
+    background-color: firebrick;
+    width: 350px;
+    max-width: 350px;
+    padding: 20px;
+
+    .toast-close {
+        float: right;
+    }
+}

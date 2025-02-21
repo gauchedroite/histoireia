@@ -734,7 +734,10 @@ export const toastFailure = (text = "Your last action failed to execute", durati
         position: "center",
         gravity: "top",
         duration: duration,
-        close: true
+        close: true,
+        offset: {
+            y: "calc(1rem + var(--sait))"
+         }
     }).showToast();
 }
 

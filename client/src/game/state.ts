@@ -136,32 +136,26 @@ class State {
     // Operations on the server
     //
     async fetch_index () {
-        const response = await window.fetch("story-index");
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        this._index = await response.json()
+        this._index = await App.GET("stories") as any
     }
 
     async fetch_game_definition (gameid: string) {
-        await this.fetch_index()
-        const game = this._index.find(one => one.code == gameid)!
+        this._index = await App.GET("stories") as any
+
+        this._game_definition = await App.GET(`story/${gameid}/metadata.json`) as any
 
         const response2 = await window.fetch(`story/${gameid}/prompt.txt`)
         const prompt = await response2.text()
-
-        const response = await window.fetch(`story/${gameid}/metadata.json`)
-        this._game_definition = await response.json()
 
         this._gameid = gameid
         this._game_definition!.prompt = prompt
         return this._game_definition
     }
 
-    new_game_definition () {
+    new_story () {
         this._game_definition = <GameDefinition> {
             code: "new",
-            title: "NEW",
+            title: "Nouveau!",
             bg_url: "",
             prompt: "You are an helpful assistant"
         }
@@ -169,28 +163,12 @@ class State {
         this._gameid = this._game_definition.code!
     }
 
-    async save_story(newstate: any): Promise<string> {
-        const body = JSON.stringify(newstate);
-    
-        const response = await window.fetch(`story/${this.gameid}`, {
-            method: "PUT",
-            headers: { 'Content-Type': 'application/json' },
-            body: body
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.text();
+    async save_story(newstate: any) {
+        return App.PUT(`stories/${this.gameid}`, newstate)
     }
 
-    async delete_story(gameid: string): Promise<string> {
-        const response = await window.fetch(`story/${this.gameid}`, {
-            method: "DELETE"
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.text();
+    async delete_story() {
+        return App.DELETE(`stories/${this.gameid}`, {})
     }
 
 

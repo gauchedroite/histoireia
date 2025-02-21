@@ -59,8 +59,8 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 
 
-// Define API routes
-app.get("/story-index", async (req: Request, res: Response) => {
+// List stories
+app.get("/stories", async (req: Request, res: Response) => {
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         const index = [];
@@ -70,7 +70,6 @@ app.get("/story-index", async (req: Request, res: Response) => {
                 const folderPath = path.join(assetsPath, entry.name);
 
                 try {
-                    // Assuming each folder contains a file named 'metadata.json' with `code` and `title`
                     const metadataPath = path.join(folderPath, "metadata.json");
                     const fileContent = await fs.readFile(metadataPath, "utf8");
                     const data = JSON.parse(fileContent);
@@ -84,22 +83,23 @@ app.get("/story-index", async (req: Request, res: Response) => {
                     }
                 }
                 catch (err) {
-                    console.error(`Error processing folder ${entry.name}:`, err);
-                    res.status(500).send(`Error processing folder ${entry.name}:` + (err as Error).message);
+                    console.error(`GET /stories Error: processing folder ${entry.name}`, err);
+                    res.status(500).json({ error: (err as Error).message });
                     return;
                 }
             }
         }
 
-        res.send(JSON.stringify(index));
+        res.json(index);
     }
     catch (err) {
-        console.error("Error scanning directory:", err);
-        res.status(500).send("Error scanning directory: " + (err as Error).message);
+        console.error(`GET /stories Error: scanning directory`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir la liste de livre!" });
     }
 });
 
-app.put("/story/:gameid", async (req: Request, res: Response) => {
+// Update a story
+app.put("/stories/:gameid", async (req: Request, res: Response) => {
     const { title, bg_url, prompt } = req.body as GameDefinition
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
@@ -127,16 +127,17 @@ app.put("/story/:gameid", async (req: Request, res: Response) => {
         await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
         await fs.writeFile(gameid_txtPath, prompt);
 
-        console.log("Successfully wrote story definition");
-        res.send(gameid);
+        console.log(`PUT /stories/${gameid}`);
+        res.json({ gameid });
     }
     catch (err) {
-        console.error("Error writing story definition", err);
-        res.status(500).send("Failed to save the story definition: " + (err as Error).message);
+        console.error(`PUT /stories/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour le livre!" });
     }
 });
 
-app.delete("/story/:gameid", async (req: Request, res: Response) => {
+// Delete a story
+app.delete("/stories/:gameid", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     const gameid_Path = path.join(assetsPath, gameid)
 
@@ -146,21 +147,18 @@ app.delete("/story/:gameid", async (req: Request, res: Response) => {
         // Delete each file in folder
         for (const file of files) {
             const filePath = path.join(gameid_Path, file);
-
             await fs.unlink(filePath);
-            console.log(`Deleted file: ${filePath}`);
         }
 
         // After deleting all files, remove the folder
         await fs.rmdir(gameid_Path);
-        console.log(`Deleted directory: ${gameid_Path}`);
+        console.log(`DELETE /stories/${gameid}`);
+        res.status(204).end();
     }
     catch (err) {
-        console.error(`Error: ${(err as Error).message}`);
-        res.status(500).send((err as Error).message);
+        console.error(`DELETE /stories/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'effacer le livre!" });
     }
-
-    res.status(200).json({ message: `L'histoire ${gameid} a été effacée.` });
 });
 
 

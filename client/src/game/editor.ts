@@ -89,7 +89,7 @@ export const fetch = (args: string[] | undefined) => {
             .catch(App.render);
     }
     else {
-        state.new_game_definition()
+        state.new_story()
         mystate = Misc.clone(state.game_definition) as IState
         Promise.resolve()
             .then(App.untransitionUI)
@@ -147,9 +147,14 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 export const save_story = async () => {
-    gameid = await state.save_story(mystate)
-    isNew = false;
-    refresh()
+    state.save_story(mystate)
+        .then((payload: any) => {
+            gameid = payload.gameid
+            isNew = false;
+            Misc.toastSuccess("Changements sauvegardés")
+            refresh()
+        })
+        .catch(App.render)
 }
 
 
@@ -166,7 +171,10 @@ export const cancelModal = () => {
 
 export const executeModal = async () => {
     modalWhat = null
-    const message = await state.delete_story(gameid)
-    //Misc.toastSuccess(message)
-    Router.goto(`#/home`)
+    state.delete_story()
+        .then(() => {
+            Misc.toastSuccess("Le livre a été effacé!")
+            Router.goto(`#/home`)
+        })
+        .catch(App.render)
 }
