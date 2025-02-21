@@ -4,6 +4,7 @@ import * as Misc from "../core/misc.js"
 import { state, GameDefinition as IState, Message } from "./state.js"
 
 export const NS = "GMENU";
+const ns = NS.toLowerCase()
 
 
 let mystate: IState
@@ -100,10 +101,10 @@ export const postRender = () => {
         return;
 
     setTimeout(() => {
-        const modalOverlay = document.querySelector(".modal") as HTMLElement;
+        const modalOverlay = document.querySelector(`#${ns} .modal`) as HTMLElement;
         if (modalOverlay && !modalOverlay.classList.contains("modal-in"))
             modalOverlay.classList.add("modal-in")
-    }, 10);
+    }, 50);
 }
 
 

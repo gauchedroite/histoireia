@@ -136,7 +136,7 @@ class State {
     // Operations on the server
     //
     async fetch_index () {
-        const response = await window.fetch("game-index");
+        const response = await window.fetch("story-index");
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -147,11 +147,10 @@ class State {
         await this.fetch_index()
         const game = this._index.find(one => one.code == gameid)!
 
-        const promptfile = game.promptfile
-        const response2 = await window.fetch(`assets/${promptfile}`)
+        const response2 = await window.fetch(`story/${gameid}/prompt.txt`)
         const prompt = await response2.text()
 
-        const response = await window.fetch(`assets/${gameid}.json`)
+        const response = await window.fetch(`story/${gameid}/metadata.json`)
         this._game_definition = await response.json()
 
         this._gameid = gameid
@@ -170,13 +169,23 @@ class State {
         this._gameid = this._game_definition.code!
     }
 
-    async save_game_definition(newstate: any): Promise<string> {
+    async save_story(newstate: any): Promise<string> {
         const body = JSON.stringify(newstate);
     
-        const response = await window.fetch(`save-game-def/${this.gameid}`, {
-            method: 'POST',
+        const response = await window.fetch(`story/${this.gameid}`, {
+            method: "PUT",
             headers: { 'Content-Type': 'application/json' },
             body: body
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.text();
+    }
+
+    async delete_story(gameid: string): Promise<string> {
+        const response = await window.fetch(`story/${this.gameid}`, {
+            method: "DELETE"
         });
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);

@@ -17,9 +17,14 @@ const port = 9340;
 
 // Set paths
 const publicPath = path.join(__dirname, "../../public");
-const dataPath = path.join(__dirname, "../../public/assets");
-//const srcPath = path.join(__dirname, "../../client/src");
-//const webfontsPath = path.join(__dirname, "../../public/webfonts");
+const assetsPath = path.join(__dirname, "../../public/assets");
+
+// The src and webfonts folders are served by Caddy because
+// they are referred to as /client/src and /webfonts
+// which are outside /histoireia, our default virtual folder
+//
+//app.use("/client/src", express.static(path.join(__dirname, "../../client/src")));
+//app.use("/webfonts", express.static(path.join(__dirname, "../../public/webfonts")));
 
 
 
@@ -41,17 +46,10 @@ const noCache: express.RequestHandler = (_req, res, next) => {
 
     next();
 };
-app.use("/data", noCache);
-
+//app.use("/story", noCache);
 
 // Configure access to static files
-app.use("/data", express.static(dataPath));
-
-// Configure access to source files by the browser
-//app.use("/client/src", express.static(srcPath));
-
-// Configure access to the webfonts
-//app.use("/webfonts", express.static(webfontsPath));
+app.use("/story", express.static(assetsPath));
 
 // Configure express default virtual folder
 app.use(express.static(publicPath));
@@ -62,17 +60,19 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 
 // Define API routes
-app.get("/game-index", async (req: Request, res: Response) => {
+app.get("/story-index", async (req: Request, res: Response) => {
     try {
-        const files = await fs.readdir(dataPath);
+        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         const index = [];
 
-        for (const file of files) {
-            if (path.extname(file) === '.json') {
-                const filePath = path.join(dataPath, file);
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const folderPath = path.join(assetsPath, entry.name);
 
                 try {
-                    const fileContent = await fs.readFile(filePath, 'utf8');
+                    // Assuming each folder contains a file named 'metadata.json' with `code` and `title`
+                    const metadataPath = path.join(folderPath, "metadata.json");
+                    const fileContent = await fs.readFile(metadataPath, "utf8");
                     const data = JSON.parse(fileContent);
 
                     if (data.code && data.title) {
@@ -84,8 +84,8 @@ app.get("/game-index", async (req: Request, res: Response) => {
                     }
                 }
                 catch (err) {
-                    console.error(`Error processing file ${file}:`, err);
-                    res.status(500).send(`Error processing file ${file}:` + (err as Error).message);
+                    console.error(`Error processing folder ${entry.name}:`, err);
+                    res.status(500).send(`Error processing folder ${entry.name}:` + (err as Error).message);
                     return;
                 }
             }
@@ -94,72 +94,76 @@ app.get("/game-index", async (req: Request, res: Response) => {
         res.send(JSON.stringify(index));
     }
     catch (err) {
-        console.error('Error scanning directory:', err);
+        console.error("Error scanning directory:", err);
         res.status(500).send("Error scanning directory: " + (err as Error).message);
     }
 });
 
-app.post('/save-game-def/:code', async (req: Request, res: Response) => {
+app.put("/story/:gameid", async (req: Request, res: Response) => {
     const { title, bg_url, prompt } = req.body as GameDefinition
-    let code = req.params.code;
-    if (code == "new")
-        code = createFunName()
+    let gameid = req.params.gameid;
+    let gameid_Path = path.join(assetsPath, gameid)
 
-    const game = <GameDefinition>{ code, title, bg_url }
-    
-    const gameid_json = `${code}.json`;
-    const gameid_jsonPath = path.join(dataPath, gameid_json);
-    
-    const gameid_txt = `${code}.txt`;
-    const gameid_txtPath = path.join(dataPath, gameid_txt);
+    if (gameid == "new") {
+        while (true) {
+            gameid = createFunName()
+            gameid_Path = path.join(assetsPath, gameid)
+            
+            if (!fs.existsSync(gameid_Path))
+                break
+
+            await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+
+        await fs.mkdir(gameid_Path)
+    }
 
     try {
+        const game = <GameDefinition>{ code: gameid, title, bg_url }
+    
+        const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
+        const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
+    
         await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
         await fs.writeFile(gameid_txtPath, prompt);
 
-        console.log('Successfully wrote game definition');
-        res.send(code);
+        console.log("Successfully wrote story definition");
+        res.send(gameid);
     }
-    catch (error) {
-        console.error('Error writing game definition', error);
-        res.status(500).send("Failed to save the game definition: " + (error as Error).message);
+    catch (err) {
+        console.error("Error writing story definition", err);
+        res.status(500).send("Failed to save the story definition: " + (err as Error).message);
     }
 });
 
-app.post('/next-seqno', async (_req: Request, res: Response) => {
-    const filePath = path.join(dataPath, "_state.json");
+app.delete("/story/:gameid", async (req: Request, res: Response) => {
+    const gameid = req.params.gameid;
+    const gameid_Path = path.join(assetsPath, gameid)
 
     try {
-        let data = await fs.readFile(filePath, "utf8");
-        let state = JSON.parse(data);
-        state.seqno++;
+        const files = await fs.readdir(gameid_Path);
 
-        await fs.writeFile(filePath, JSON.stringify(state));
+        // Delete each file in folder
+        for (const file of files) {
+            const filePath = path.join(gameid_Path, file);
 
-        res.send({ seqno: state.seqno });
-        console.log("Successfully incremented seqno");
+            await fs.unlink(filePath);
+            console.log(`Deleted file: ${filePath}`);
+        }
+
+        // After deleting all files, remove the folder
+        await fs.rmdir(gameid_Path);
+        console.log(`Deleted directory: ${gameid_Path}`);
     }
-    catch (error) {
-        console.error("Error writing file", error);
-        res.status(500).send("Failed to save the file: " + (error as Error).message);
+    catch (err) {
+        console.error(`Error: ${(err as Error).message}`);
+        res.status(500).send((err as Error).message);
     }
+
+    res.status(200).json({ message: `L'histoire ${gameid} a été effacée.` });
 });
 
-app.post('/new-face/:filename', async (req: Request, res: Response) => {
-    const fileName = req.params.filename;
-    const filePath = path.join(dataPath, fileName);
-    const emptyPath = path.join(dataPath, "_empty.png");
 
-    try {
-        await fs.copyFile(emptyPath, filePath);
-        console.log('Successfully copied file');
-        res.send('Successfully created new face png.');
-    }
-    catch (error) {
-        console.error('Error copying file', error);
-        res.status(500).send("Failed to create new face png: " + (error as Error).message);
-    }
-});
 
 app.post("/upload-face", async (req: Request, res: Response) => {
     const { filename: fileName, image } = req.body;

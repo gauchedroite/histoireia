@@ -11,7 +11,6 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,.4);
-    z-index: 13000;
     visibility: hidden;
     opacity: 0;
     transition-duration: .4s;
@@ -26,7 +25,6 @@
 .modal {
     width: 270px;
     position: absolute;
-    z-index: 13500;
     left: 50%;
     margin-left: -135px;
     margin-top: 0;
@@ -59,7 +57,6 @@
     width: 100%;
     background-color: rgba(0,0,0,.2);
     display: block;
-    z-index: 15;
     transform-origin: 50% 100%;
 }
 
@@ -107,7 +104,6 @@
     height: 100%;
     background-color: rgba(0,0,0,.2);
     display: block;
-    z-index: 15;
     transform-origin: 100% 50%;
 }
 
