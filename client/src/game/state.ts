@@ -168,6 +168,9 @@ class State {
     }
 
     async delete_story() {
+        //const key = this.getKey("messages")
+        //localStorage.removeItem(key)
+
         return App.DELETE(`stories/${this.gameid}`, {})
     }
 

@@ -90,6 +90,8 @@ app.get("/stories", async (req: Request, res: Response) => {
             }
         }
 
+        index.sort((a, b) => (a.title).localeCompare(b.title))
+
         res.json(index);
     }
     catch (err) {
@@ -145,10 +147,10 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
         const files = await fs.readdir(gameid_Path);
 
         // Delete each file in folder
-        for (const file of files) {
-            const filePath = path.join(gameid_Path, file);
-            await fs.unlink(filePath);
-        }
+       for (const file of files) {
+           const filePath = path.join(gameid_Path, file);
+           await fs.unlink(filePath);
+       }
 
         // After deleting all files, remove the folder
         await fs.rmdir(gameid_Path);

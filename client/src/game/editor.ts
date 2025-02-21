@@ -174,6 +174,7 @@ export const executeModal = async () => {
     state.delete_story()
         .then(() => {
             Misc.toastSuccess("Le livre a été effacé!")
+            //App.popRenderStack()
             Router.goto(`#/home`)
         })
         .catch(App.render)

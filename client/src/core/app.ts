@@ -222,6 +222,10 @@ export const renderPartial = (id: string, markup: string) => {
     }
 }
 
+export const popRenderStack = () => {
+    renderStack.pop()
+}
+
 export const renderOnNextTick = () => {
     setTimeout(render, 0);
 };
