@@ -7,6 +7,9 @@
 
     .app-content {
         padding: 0;
+        background-image: url(../images/home.png);
+        background-size: cover;
+        position: relative;
     }
 
     .title {
@@ -24,5 +27,12 @@
             display: block;
             padding-top: 0.7rem;
         }
+    }
+
+    .list {
+        background-color: lime;
+        position: absolute;
+        top: 215px;
+        left: 130px;
     }
 }

@@ -17,9 +17,7 @@
         text-align: center;
         background-color: var(--accent-bgc);
         color: white;
-        & a {
-            color: white;
-        }
+
 
         .bonjour {
             padding: 1rem 0;

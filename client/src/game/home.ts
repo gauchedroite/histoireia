@@ -29,14 +29,18 @@ const pageTemplate = (form: string) => {
     <div style="text-transform:uppercase; font-weight:bold;">Bibliothèque de ${state.usernameCapitalized}</div>
 </div>
 <div class="app-content">
+    <!--
     <div class="title">
         <img src="images/home-old.png" style="width:35%; padding-top:2rem;"/>
         <div style="font-size:xxx-large; font-weight:bold;">HistoireIA</div>
         <div style="font-size:larger; line-height:1;"><span style="border-bottom:1px black dotted;"><em>Toutes les histoires imaginables</em></span></div>
         <div style="font-size:smaller;padding:1.5rem 0 3rem;">Studio GaucheDroite</div>
     </div>
-    <div class="app-list">
-        ${form}
+    -->
+    <div class="list">
+        <div class="app-list">
+            ${form}
+        </div>
     </div>
 </div>
 <div class="app-footer">
