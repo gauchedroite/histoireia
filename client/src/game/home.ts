@@ -30,7 +30,7 @@ const pageTemplate = (form: string) => {
 </div>
 <div class="app-content">
     <div class="title">
-        <img src="images/home.png" style="width:35%; padding-top:2rem;"/>
+        <img src="images/home-old.png" style="width:35%; padding-top:2rem;"/>
         <div style="font-size:xxx-large; font-weight:bold;">HistoireIA</div>
         <div style="font-size:larger; line-height:1;"><span style="border-bottom:1px black dotted;"><em>Toutes les histoires imaginables</em></span></div>
         <div style="font-size:smaller;padding:1.5rem 0 3rem;">Studio GaucheDroite</div>

@@ -18,7 +18,8 @@
 
     .app-footer {
         font-size: large;
-        
+        background-color: var(--accent-bgc);
+
         & a {
             display: block;
             padding-top: 0.7rem;
