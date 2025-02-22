@@ -1,36 +1,44 @@
 
 #screen_bonjour {
 
-    .app-header, .app-footer {
-        display: none;
-    }
-
     .app-content {
         height: 100vh;
         padding: 0;
     }
 
-    text-align: center;
+    .content {
+        padding-top: var(--sait);
+        padding-bottom: var(--saib);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
-    .bonjour {
-        color:var(--accent-bgc);
-        padding-top: 5rem;
-        padding-bottom: 4rem;
-
-        & h1 {
-            font-size: xxx-large;
-        }
-    }
-
-    .choose {
+        text-align: center;
         background-color: var(--accent-bgc);
-        color: var(--color);
-
-        font-size: x-large;
-
+        color: white;
         & a {
+            color: white;
+        }
+
+        .bonjour {
+            padding: 1rem 0;
+            font-size: xx-large;
+            font-weight: 600;
+        }
+    
+        .visual {
+            flex-grow: 1;
+            background-image: url(../images/bonjour.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+    
+        .choose {
+            font-size: x-large;
             display: block;
-            padding: 25%;
+            padding: 1rem 25%;
         }
     }
 }
