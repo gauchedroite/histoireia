@@ -23,10 +23,10 @@ const formTemplate = (messages: Message[]) => {
     const lastPage = state.lastPageNo()
 
     if (mystate.bg_url) {
-        add(`<div class="title image" style="background-image:url(${mystate.bg_url})"><br><div>${mystate.title}</div></div>`)
+        add(`<div class="cover image" style="background-image:url(${mystate.bg_url})"><br><div class="title">${mystate.title}</div></div>`)
     }
     else {
-        add(`<div class="title"><br><div>${mystate.title}</div><br></div>`)
+        add(`<div class="cover"><br><div class="title">${mystate.title}</div><br></div>`)
     }
     add(`<div class="app-list">`)
 

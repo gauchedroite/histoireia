@@ -16,7 +16,7 @@
 
         text-align: center;
         background-color: var(--accent-bgc);
-        color: white;
+        color: var(--color-white);
 
 
         .bonjour {

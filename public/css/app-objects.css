@@ -4,7 +4,7 @@
     height: calc(var(--header-height) + var(--sait));
 
     background-color: var(--accent-bgc);
-    color: white;
+    color: var(--color-white);
 
     display: flex;
     align-items: flex-end;
@@ -15,7 +15,7 @@
     padding-bottom: 1rem;
 
     & a {
-        color: white;
+        color: var(--color-white)white;
     }
 
     & > * {

@@ -5,7 +5,7 @@
         padding: 0;
     }
 
-    .title {
+    .cover {
         text-align: center;
         background-color: goldenrod;
         font-size: xx-large;
@@ -29,6 +29,10 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+        }
+
+        .title {
+            margin-left: calc(2rem + var(--sail));
         }
     }
 
