@@ -20,7 +20,6 @@ const formTemplate = (messages: Message[]) => {
     let rows: string[] = [];
 
     const lastPage = state.lastPageNo()
-    console.log(mystate)
 
     if (mystate.bg_url) {
         add(`<div class="title image" style="background-image:url(${mystate.bg_url})"><br><div>${mystate.title}</div></div>`)
@@ -84,7 +83,7 @@ export const fetch = (args: string[] | undefined) => {
     state.fetch_game_definition(gameid)
         .then((payload: any) =>{
             mystate = Misc.clone(payload) as IState
-            mystate2 = state.getMessages()
+            mystate2 = state.getMessages(gameid)
         })
         .then(App.untransitionUI)
         .then(App.render)

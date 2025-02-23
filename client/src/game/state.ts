@@ -77,7 +77,10 @@ class State {
         return `${this.username}_${this.gameid}_${what}`
     }
 
-    getMessages () {
+    getMessages (gameid?: string) {
+        if (gameid != undefined)
+            this._gameid = gameid
+
         const key = this.getKey("messages")
         const json = localStorage.getItem(key) ?? "[]"
         return JSON.parse(json)as Message[]
@@ -153,7 +156,6 @@ class State {
     }
 
     async fetch_game_definition (gameid: string) {
-        this._index = await App.GET("stories") as any
         this._game_definition = await App.GET(`stories/${gameid}`) as any
         return this._game_definition
     }
