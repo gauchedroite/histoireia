@@ -142,7 +142,7 @@ class State {
             code: "new",
             title: "Nouveau!",
             bg_image: "",
-            prompt: "You are an helpful assistant"
+            prompt: "Tu es un assistant utile."
         }
 
         this._gameid = this._game_definition.code!
