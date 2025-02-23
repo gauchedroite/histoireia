@@ -12,6 +12,7 @@ export interface GameDefinition {
     code: string | null
     title: string | null
     bg_url: string | null
+    bg_image: string | null
     prompt: string | null
 }
 
@@ -140,7 +141,7 @@ class State {
         this._game_definition = <GameDefinition> {
             code: "new",
             title: "Nouveau!",
-            bg_url: "",
+            bg_image: "",
             prompt: "You are an helpful assistant"
         }
 
@@ -148,6 +149,7 @@ class State {
     }
 
     async save_story(newstate: any) {
+        console.log(newstate)
         return App.PUT(`stories/${this.gameid}`, newstate)
     }
 

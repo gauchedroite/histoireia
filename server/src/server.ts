@@ -7,7 +7,8 @@ import { createFunName } from './funny-name';
 interface GameDefinition {
     code: string
     title: string
-    bg_url: string | null
+    bg_url: string
+    bg_image: string | null
     prompt: string
 }
 
@@ -78,7 +79,8 @@ app.get("/stories", async (req: Request, res: Response) => {
                         index.push({
                             code: data.code,
                             title: data.title,
-                            bg_url: (data.bg_url ? `../assets/billy/${data.bg_url}` : ""),
+                            bg_image: data.bg_image,
+                            bg_url: (data.bg_image ? `assets/billy/${data.bg_image}` : ""),
                             promptfile: `${data.code}.txt`
                         });
                     }
@@ -116,7 +118,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const _game_definition: GameDefinition = {
                 code: data.code,
                 title: data.title,
-                bg_url: (data.bg_url ? `assets/billy/${data.bg_url}` : ""),
+                bg_image: data.bg_image,
+                bg_url: (data.bg_image ? `assets/billy/${data.bg_image}` : ""),
                 prompt
         }
 
@@ -131,9 +134,9 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_url, prompt } = req.body as GameDefinition
+    const { title, bg_image, prompt } = req.body as GameDefinition
     let gameid = req.params.gameid;
-    let gameid_Path = path.join(assetsPath)
+    let gameid_Path = path.join(assetsPath, gameid)
 
     if (gameid == "new") {
         while (true) {
@@ -150,7 +153,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
     }
 
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_url }
+        const game = <GameDefinition>{ code: gameid, title, bg_image }
     
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
