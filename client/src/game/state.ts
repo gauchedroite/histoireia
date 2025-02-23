@@ -1,6 +1,7 @@
 import * as App from "../core/app.js"
 import { waitAsync, capitalize } from "../utils.js";
 
+
 export interface GameList {
     code: string
     title: string
@@ -20,24 +21,13 @@ export interface Message {
 }
 
 
-interface IState {
-    username: string
-}
-
-interface ILocalState {
-}
-
-
 class State {
-    private _state: IState | undefined
     private _username: string
-    private _localState: ILocalState
     private _index: GameList[] = []
     private _game_definition: GameDefinition | undefined
     private _gameid: string | undefined
 
     constructor() {
-        this._localState = <ILocalState>{}
         this._username = "laura"
         this.username = localStorage.getItem("username") ?? "laura"
     }
@@ -46,7 +36,6 @@ class State {
         this._username = value
         localStorage.setItem("username", value)
         const json = localStorage.getItem(value)
-        this._localState = JSON.parse(json ?? "{}")
     }
 
     get username() {
@@ -140,19 +129,6 @@ class State {
     //
     async fetch_index () {
         this._index = await App.GET("stories") as any
-    }
-
-    async old_fetch_game_definition (gameid: string) {
-        this._index = await App.GET("stories") as any
-
-        this._game_definition = await App.GET(`story/${gameid}/metadata.json`) as any
-
-        const response2 = await window.fetch(`story/${gameid}/prompt.txt`)
-        const prompt = await response2.text()
-
-        this._gameid = gameid
-        this._game_definition!.prompt = prompt
-        return this._game_definition
     }
 
     async fetch_game_definition (gameid: string) {
