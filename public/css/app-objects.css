@@ -68,7 +68,7 @@
             color: var(--accent-bgc);
 
             & div {
-                padding: 1.5rem;
+                padding: 1rem;
                 font-size: larger;
                 text-align: right;
             }

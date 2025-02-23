@@ -1,33 +1,53 @@
 
 #screen_menu {
     .app-content {
-        height: calc(100vh - var(--header-height) - var(--sait));
+        height: calc(100vh - var(--header-height) - var(--sait) - var(--saib));
         padding: 0;
     }
 
     .title {
-        height: 60%;
         text-align: center;
-        background-color: var(--white-bgc);
+        background-color: goldenrod;
         font-size: xx-large;
         font-weight: bold;
 
         & div {
-            background-color: #add8e6e6;
+            background-color: #faebd7e8;
             padding: 0.5rem;
             max-width: 70%;
             margin-left: 1rem;
             line-height: 1.1;
-            border: 3px solid skyblue;
+            border: 3px solid cadetblue;
             border-radius: 7px;
             transform: rotate(356deg);
-            color: darkslategray;
+            color: steelblue;
+            font-variant: small-caps;
         }
 
         &.image {
+            height: 60%;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+        }
+    }
+
+    .page {
+        font-size: smaller;
+
+        &.page-0 div div {
+            font-variant: small-caps;
+            font-weight: bold;
+        }
+
+        & div {
+            justify-content: space-between;
+            color: khaki;
+
+            & div {
+                padding: 0.5rem;
+                text-align: unset;
+            }
         }
     }
 }

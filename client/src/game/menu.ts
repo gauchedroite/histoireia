@@ -17,6 +17,7 @@ let modalWhat: string | null = null
 const formTemplate = (messages: Message[]) => {
     const add = (row: string) => rows.push(row);
     const action = (href: string, text: string, icon: string) => rows.push(`<a href="${href}"><div><div>${text}</div>${icon}</div></a>`);
+    const page = (index: number, text: string) => rows.push(`<a href="#/story/${gameid}/${index}" class="page ${index == 0 ? "page-0" : ""}"><div><div>${text}</div><span>p.${index+1}</span></div></a>`);
     let rows: string[] = [];
 
     const lastPage = state.lastPageNo()
@@ -25,15 +26,20 @@ const formTemplate = (messages: Message[]) => {
         add(`<div class="title image" style="background-image:url(${mystate.bg_url})"><br><div>${mystate.title}</div></div>`)
     }
     else {
-        add(`<div class="title"><br><div>${mystate.title}</div></div>`)
+        add(`<div class="title"><br><div>${mystate.title}</div><br></div>`)
     }
     add(`<div class="app-list">`)
 
     if (lastPage == -1) {
-        action(`#/story/${gameid}/new`, "Commencer à lire", `<i class="fa-thin fa-book-user"></i>`)
+        action(`#/story/${gameid}/new`, "Commencer la lecture", `<i class="fa-thin fa-book-user"></i>`)
     }
     else {
-        action(`#/story/${gameid}/${lastPage}`, "Continuer à lire", `<i class="fa-thin fa-book-open-reader"></i>`)
+        action(`#/story/${gameid}/${lastPage}`, "Continuer la lecture", `<i class="fa-thin fa-book-open-reader"></i>`)
+
+        mystate2
+            .filter(one => one.role == "user")
+            .forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.content)))
+
         action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer le livre?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
     }
     action(`#/editor/${gameid}`, "Éditeur", `<i class="fa-thin fa-pen-to-square"></i>`)

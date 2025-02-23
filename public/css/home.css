@@ -30,7 +30,7 @@
     }
 
     .list {
-        background-color: lime;
+        font-variant: small-caps;
         position: absolute;
         top: 217px;
         left: 134px;
