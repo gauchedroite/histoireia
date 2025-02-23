@@ -139,7 +139,7 @@ class State {
         this._index = await App.GET("stories") as any
     }
 
-    async fetch_game_definition (gameid: string) {
+    async old_fetch_game_definition (gameid: string) {
         this._index = await App.GET("stories") as any
 
         this._game_definition = await App.GET(`story/${gameid}/metadata.json`) as any
@@ -149,6 +149,12 @@ class State {
 
         this._gameid = gameid
         this._game_definition!.prompt = prompt
+        return this._game_definition
+    }
+
+    async fetch_game_definition (gameid: string) {
+        this._index = await App.GET("stories") as any
+        this._game_definition = await App.GET(`stories/${gameid}`) as any
         return this._game_definition
     }
 
@@ -168,8 +174,8 @@ class State {
     }
 
     async delete_story() {
-        //const key = this.getKey("messages")
-        //localStorage.removeItem(key)
+        const key = this.getKey("messages")
+        localStorage.removeItem(key)
 
         return App.DELETE(`stories/${this.gameid}`, {})
     }

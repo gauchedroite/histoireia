@@ -78,13 +78,14 @@ app.get("/stories", async (req: Request, res: Response) => {
                         index.push({
                             code: data.code,
                             title: data.title,
+                            bg_url: (data.bg_url ? `../assets/billy/${data.bg_url}` : ""),
                             promptfile: `${data.code}.txt`
                         });
                     }
                 }
                 catch (err) {
                     console.error(`GET /stories Error: processing folder ${entry.name}`, err);
-                    res.status(500).json({ error: (err as Error).message });
+                    res.status(500).json({ hasError: true, message: `Impossible de trouver le livre '${entry.name}'` });
                     return;
                 }
             }
@@ -100,11 +101,39 @@ app.get("/stories", async (req: Request, res: Response) => {
     }
 });
 
+app.get("/stories/:gameid", async (req: Request, res: Response) => {
+    let gameid = req.params.gameid;
+    let gameid_Path = path.join(assetsPath, gameid)
+
+    try {
+        const metadataPath = path.join(gameid_Path, "metadata.json");
+        const metaContent = await fs.readFile(metadataPath, "utf8");
+        const data = JSON.parse(metaContent);
+
+        const promptPath = path.join(gameid_Path, "prompt.txt");
+        const prompt = await fs.readFile(promptPath, "utf8");
+
+        const _game_definition: GameDefinition = {
+                code: data.code,
+                title: data.title,
+                bg_url: (data.bg_url ? `assets/billy/${data.bg_url}` : ""),
+                prompt
+        }
+
+        console.log(`GET /stories/${gameid}`, _game_definition)
+        res.json(_game_definition);
+    }
+    catch (err) {
+        console.error(`GET /stories/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'ouvrir le livre!" });
+    }
+});
+
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
     const { title, bg_url, prompt } = req.body as GameDefinition
     let gameid = req.params.gameid;
-    let gameid_Path = path.join(assetsPath, gameid)
+    let gameid_Path = path.join(assetsPath)
 
     if (gameid == "new") {
         while (true) {

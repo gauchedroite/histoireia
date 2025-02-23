@@ -20,7 +20,7 @@ const formTemplate = (list: GameList[]) => {
             </div>
         </a>`
     })
-    return games.join("") //+ games.join("") + games.join("") + games.join("") 
+    return games.join("")
 }
 
 const pageTemplate = (form: string) => {

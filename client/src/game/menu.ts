@@ -20,8 +20,14 @@ const formTemplate = (messages: Message[]) => {
     let rows: string[] = [];
 
     const lastPage = state.lastPageNo()
+    console.log(mystate)
 
-    add(`<div class="title">${mystate.title}</div>`)
+    if (mystate.bg_url) {
+        add(`<div class="title image" style="background-image:url(${mystate.bg_url})"><br><div>${mystate.title}</div></div>`)
+    }
+    else {
+        add(`<div class="title"><br><div>${mystate.title}</div></div>`)
+    }
     add(`<div class="app-list">`)
 
     if (lastPage == -1) {
@@ -87,6 +93,7 @@ export const fetch = (args: string[] | undefined) => {
 
 export const render = () => {
     if (!App.inContext(NS)) return "";
+    if (mystate2 == undefined) return ""
 
     const form = formTemplate(mystate2)
     const modal = layout_Modal()

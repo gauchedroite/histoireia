@@ -19,10 +19,10 @@ const formTemplate = (item: IState) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    //add(Theme.renderFieldText(NS, "code", item.code, "Code", <Theme.IOptText>{ maxlength: 10, required: true }))
     add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
 
     add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 22 }))
+    add(Theme.renderFieldText(NS, "bg_url", item.bg_url, "Image de la page titre", <Theme.IOptText>{ maxlength: 32 }))
 
     if (isNew) {
         add(`<button type="button" class="button" onclick="${NS}.save_story()"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire</button>`)
@@ -136,6 +136,7 @@ const getFormState = () => {
     let clone = Misc.clone(mystate) as IState;
     clone.code = Misc.fromInputText(`${NS}_code`, mystate.code);
     clone.title = Misc.fromInputText(`${NS}_title`, mystate.title);
+    clone.bg_url = Misc.fromInputText(`${NS}_bg_url`, mystate.bg_url);
     clone.prompt = Misc.fromInputText(`${NS}_prompt`, mystate.prompt);
     return clone;
 }

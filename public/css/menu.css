@@ -6,10 +6,28 @@
     }
 
     .title {
-        padding: 20%;
+        height: 60%;
         text-align: center;
         background-color: var(--white-bgc);
         font-size: xx-large;
         font-weight: bold;
+
+        & div {
+            background-color: #add8e6e6;
+            padding: 0.5rem;
+            max-width: 70%;
+            margin-left: 1rem;
+            line-height: 1.1;
+            border: 3px solid skyblue;
+            border-radius: 7px;
+            transform: rotate(356deg);
+            color: darkslategray;
+        }
+
+        &.image {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
     }
 }
