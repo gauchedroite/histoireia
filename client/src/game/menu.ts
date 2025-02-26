@@ -23,10 +23,18 @@ const formTemplate = (messages: Message[]) => {
     const lastPage = state.lastPageNo()
 
     if (mystate.bg_url) {
-        add(`<div class="cover image" style="background-image:url(${mystate.bg_url})"><br><div class="title">${mystate.title}</div></div>`)
+        add(`<a href="#/story/${gameid}/${lastPage}">
+                <div class="cover image" style="background-image:url(${mystate.bg_url})">
+                    <br><div class="title">${mystate.title}</div>
+                </div>
+            </a>`)
     }
     else {
-        add(`<div class="cover"><br><div class="title">${mystate.title}</div><br></div>`)
+        add(`<a href="#/story/${gameid}/${lastPage}">
+                <div class="cover">
+                    <br><div class="title">${mystate.title}</div><br>
+                </div>
+            </a>`)
     }
     add(`<div class="app-list">`)
 
@@ -37,7 +45,7 @@ const formTemplate = (messages: Message[]) => {
         action(`#/story/${gameid}/${lastPage}`, "Continuer la lecture", `<i class="fa-thin fa-book-open-reader"></i>`)
 
         mystate2
-            .filter(one => one.role == "user")
+            .filter(one => one.role != "assistant")
             .forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.content)))
 
         action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer le livre?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)

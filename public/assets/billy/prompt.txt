@@ -62,7 +62,7 @@ All characters have a human-like profession useful in the village (lumberjack, h
 
 The unique abilities of each animal play a crucial role in overcoming challenges, solving puzzles, and navigating the forest's hidden dangers, making every adventure a tailored experience that highlights the strengths of the community.
 
-Parle moi en français.
+Parle au PC en français.
 
 # TITLE
 Aventures à Tukuman

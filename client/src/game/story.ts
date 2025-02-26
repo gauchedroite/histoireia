@@ -51,7 +51,7 @@ const pageTemplate = (form: string) => {
     return `
 <div class="app-header">
     <a class="js-waitable-2" href="#/menu/${gameid}">
-        <i class="fa-regular fa-chevron-left"></i>&nbsp;${mystate.title}
+        <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
 </div>
 <div class="app-content">

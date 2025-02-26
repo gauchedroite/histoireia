@@ -82,7 +82,8 @@ class State {
         // Truncate the message array so we can restart the story in the middle if we want
         msgs = msgs.slice(0, (pageno + 1) * 2)
 
-        msgs.push(<Message>{ role: "user", content })
+        msgs.push(<Message>{ role: (pageno == -1 ? "system" : "user"), content })
+        //msgs.push(<Message>{ role: "user", content })
 
         const key = this.getKey("messages")
         localStorage.setItem(key, JSON.stringify(msgs))
