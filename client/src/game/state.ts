@@ -83,7 +83,6 @@ class State {
         msgs = msgs.slice(0, (pageno + 1) * 2)
 
         msgs.push(<Message>{ role: (pageno == -1 ? "system" : "user"), content })
-        //msgs.push(<Message>{ role: "user", content })
 
         const key = this.getKey("messages")
         localStorage.setItem(key, JSON.stringify(msgs))
@@ -134,6 +133,7 @@ class State {
     }
 
     async fetch_game_definition (gameid: string) {
+        this._gameid = gameid
         this._game_definition = await App.GET(`stories/${gameid}`) as any
         return this._game_definition
     }
@@ -150,7 +150,6 @@ class State {
     }
 
     async save_story(newstate: any) {
-        console.log(newstate)
         return App.PUT(`stories/${this.gameid}`, newstate)
     }
 
@@ -174,11 +173,12 @@ class State {
             content: user_prompt            
         })
     
-        const endpoint = "https://lebaudy.gauchedroite.com/histoireia/ollama/api/chat"
+        const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
         const query = {
             model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
-            stream: true
+            stream: true,
+            api: "ollama"
         }
     
         const response = await window.fetch(endpoint, {

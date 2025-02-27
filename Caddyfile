@@ -38,8 +38,9 @@ lebaudy.gauchedroite.com {
 	# curl https://lebaudy.gauchedroite.com/api/tags
 	# reverse_proxy /api* 192.168.50.199:11434
 
-	handle_path /histoireia/ollama/api* {
-		rewrite * /api{path}
-		reverse_proxy 192.168.50.199:11434
-	}
+	# Not used anymore because only the server talks to ollama now (used to be the web app)
+	#handle_path /histoireia/ollama/api* {
+	#	rewrite * /api{path}
+	#	reverse_proxy 192.168.50.199:11434
+	#}
 }

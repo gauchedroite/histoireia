@@ -1,8 +1,10 @@
 import express, { Request, Response, Application, NextFunction } from 'express';
+import { Readable } from 'stream';
 import bodyParser from 'body-parser';
 import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
+
 
 interface GameDefinition {
     code: string
@@ -10,6 +12,11 @@ interface GameDefinition {
     bg_url: string
     bg_image: string | null
     prompt: string
+}
+
+interface Message {
+    role: string,
+    content: string
 }
 
 const app = express();
@@ -192,6 +199,65 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
     catch (err) {
         console.error(`DELETE /stories/${gameid}`, err);
         res.status(500).json({ hasError: true, message: "Impossible d'effacer le livre!" });
+    }
+});
+
+// Execute story prompt
+app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
+    const gameid = req.params.gameid;
+    try {
+        const query = req.body as any
+        const api = query.api
+        const data = JSON.stringify(query)
+        console.log(api)
+
+        const endpoint = "http://192.168.50.199:11434/api/chat"
+    
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: data
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            console.error(`POST /stories/${gameid}/chat`, error);
+            res.status(response.status).json({ hasError: true, message: "Impossible de poursuivre l'histoire" });
+            return
+        }
+
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        const reader = response.body!.getReader();
+        const stream = new Readable({
+            read() {}
+        });
+
+        (async function processStream() {
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        stream.push(null);
+                        break;
+                    }
+                    stream.push(value);
+                }
+            }
+            catch (error) {
+                console.error(`POST /stories/${gameid}/chat Stream processing error:`, error);
+                stream.destroy(error as any);
+            }
+        })();
+        
+        console.log(`POST /stories/${gameid}/chat`)
+        stream.pipe(res);
+    }
+    catch (error) {
+        console.error(`POST /stories/${gameid}/chat`, error);
+        res.status(500).json({ hasError: true, message: "Erreur interne" });
     }
 });
 
