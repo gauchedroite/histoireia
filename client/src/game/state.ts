@@ -142,6 +142,10 @@ class State {
     }
 
     async fetch_game_definition (gameid: string) {
+        if (this._gameid == gameid) {
+            return this._game_definition
+        }
+
         this._gameid = gameid
         this._game_definition = await App.GET(`stories/${gameid}`) as any
         return this._game_definition
@@ -158,8 +162,9 @@ class State {
         this._gameid = this._game_definition.code!
     }
 
-    async save_story(newstate: any) {
-        return App.PUT(`stories/${this.gameid}`, newstate)
+    async save_story(game_definition: any) {
+        this._game_definition = game_definition
+        return App.PUT(`stories/${this.gameid}`, game_definition)
     }
 
     async delete_story() {

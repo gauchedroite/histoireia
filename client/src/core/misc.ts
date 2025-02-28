@@ -707,6 +707,9 @@ export const toastSuccess = (text: string) => {
         className: "js-toast",
         backgroundColor: bgcolor,
         position: "center",
+        offset: {
+            y: "calc(1rem + var(--sait))"
+         }
     }).showToast();
 }
 

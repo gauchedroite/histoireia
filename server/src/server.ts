@@ -113,6 +113,7 @@ app.get("/stories", async (req: Request, res: Response) => {
     }
 });
 
+// Fetch a story
 app.get("/stories/:gameid", async (req: Request, res: Response) => {
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
@@ -222,7 +223,6 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
         const llmContent = await fs.readFile(llm_Path, "utf8")
         const llmList = JSON.parse(llmContent) as []
         const llm = llmList.find((one: any) => one.id == llmid) as any
-        console.log("LLM **", llm)
         const api = llm.value1
         const model = llm.value2
 
@@ -237,7 +237,6 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
         }
 
         query.model = model
-        console.log("QUERY **", query)
 
         const response = await fetch(endpoint, {
             method: "POST",
@@ -290,6 +289,7 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
                     }
                 }
             }
+            res.write(" ")
             res.end();
         };
     
