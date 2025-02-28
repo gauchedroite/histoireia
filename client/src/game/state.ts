@@ -14,6 +14,8 @@ export interface GameDefinition {
     bg_url: string | null
     bg_image: string | null
     prompt: string | null
+    llmid: number | null
+    llmid_text: string
 }
 
 export interface Message {
@@ -27,6 +29,8 @@ class State {
     private _index: GameList[] = []
     private _game_definition: GameDefinition | undefined
     private _gameid: string | undefined
+    
+    llmid: number | null = null
 
     constructor() {
         this._username = "laura"
@@ -171,8 +175,7 @@ class State {
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
         const query = {
             messages,
-            stream: true,
-            api: "openai"
+            stream: true
         }
     
         const response = await window.fetch(endpoint, {

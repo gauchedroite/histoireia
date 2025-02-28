@@ -3,6 +3,10 @@ export async function waitAsync(msec: number) {
     return new Promise(resolve => setTimeout(resolve, msec));
 }
 
+export async function waitTwoSecondAsync() {
+    return new Promise(resolve => setTimeout(resolve, 2000));
+}
+
 export function emitEvent(name: string, detail?: any) {
     const event = new CustomEvent(name, { detail });
     document.dispatchEvent(event);

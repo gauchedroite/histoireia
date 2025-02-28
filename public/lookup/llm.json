@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "description": "neuraldaredevil",
+        "value1": "ollama",
+        "value2": "lstep/neuraldaredevil-8b-abliterated:q8_0"
+    },
+    {
+        "id": 2,
+        "description": "mistral-small",
+        "value1": "ollama",
+        "value2": "mistral-small:22b"
+    },
+    {
+        "id": 3,
+        "description": "Dark-Champion",
+        "value1": "ollama",
+        "value2": "hf.co/DavidAU/Llama-3.2-8X3B-MOE-Dark-Champion-Instruct-uncensored-abliterated-18.4B-GGUF:latest"
+    },
+    {
+        "id": 4,
+        "description": "llama3.2",
+        "value1": "ollama",
+        "value2": "llama3.2:latest"
+    },
+    {
+        "id": 5,
+        "description": "gpt-4-turbo",
+        "value1": "openai",
+        "value2": "gpt-4-turbo"
+    },
+    {
+        "id": 6,
+        "description": "gpt-4o",
+        "value1": "openai",
+        "value2": "gpt-4o"
+    },
+    {
+        "id": 7,
+        "description": "gpt-4o-mini",
+        "value1": "openai",
+        "value2": "gpt-4o-mini"
+    }
+]

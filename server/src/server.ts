@@ -12,6 +12,7 @@ interface GameDefinition {
     bg_url: string
     bg_image: string | null
     prompt: string
+    llmid: number
 }
 
 interface Message {
@@ -26,6 +27,8 @@ const port = 9340;
 // Set paths
 const publicPath = path.join(__dirname, "../../public");
 const assetsPath = path.join(__dirname, "../../public/assets");
+const lookupPath = path.join(__dirname, "../../public/lookup");
+
 
 // The src and webfonts folders are served by Caddy because
 // they are referred to as /client/src and /webfonts
@@ -127,7 +130,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
                 title: data.title,
                 bg_image: data.bg_image,
                 bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
-                prompt
+                prompt,
+                llmid: data.llmid ?? 1
         }
 
         console.log(`GET /stories/${gameid}`, _game_definition)
@@ -141,7 +145,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt } = req.body as GameDefinition
+    const { title, bg_image, prompt, llmid } = req.body as GameDefinition
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
 
@@ -160,7 +164,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
     }
 
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_image }
+        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1 }
     
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
@@ -207,20 +211,33 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     try {
         const query = req.body as any
-        const api = query.api
+
+        let gameid_Path = path.join(assetsPath, gameid)
+        const metadataPath = path.join(gameid_Path, "metadata.json");
+        const metaContent = await fs.readFile(metadataPath, "utf8");
+        const game = JSON.parse(metaContent);
+
+        const llmid = game.llmid
+        let llm_Path = path.join(lookupPath, "llm.json")
+        const llmContent = await fs.readFile(llm_Path, "utf8")
+        const llmList = JSON.parse(llmContent) as []
+        const llm = llmList.find((one: any) => one.id == llmid) as any
+        console.log("LLM **", llm)
+        const api = llm.value1
+        const model = llm.value2
+
 
         // To switch between ollama and openai
         let endpoint = "http://192.168.50.199:11434/v1/chat/completions"
-        let model = "lstep/neuraldaredevil-8b-abliterated:q8_0"
         let api_key = null
         //
         if (api == "openai") {
             endpoint = "https://api.openai.com/v1/chat/completions"
-            model = "gpt-4o"
             api_key = process.env.OPENAI_API_KEY
         }
+
         query.model = model
-        delete query.api
+        console.log("QUERY **", query)
 
         const response = await fetch(endpoint, {
             method: "POST",
@@ -257,6 +274,9 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
                         const message = line.replace(/^data: /, '');
+                        if (message == "[DONE]")
+                            break;
+
                         try {
                             const parsed = JSON.parse(message);
                             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta.content) {

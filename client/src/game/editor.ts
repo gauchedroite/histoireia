@@ -3,6 +3,8 @@ import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
 import { state, GameDefinition } from "./state.js"
+import { waitTwoSecondAsync } from "../utils.js"
+import * as Lookup from "../lookupdata.js"
 
 export const NS = "GED";
 const ns = NS.toLowerCase();
@@ -15,13 +17,15 @@ let modalWhat: string | null = null
 
 
 
-const formTemplate = (item: GameDefinition) => {
+const formTemplate = (item: GameDefinition, llmid: string) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
     add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
 
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 22 }))
+    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
+    add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
+
     add(Theme.renderFieldText(NS, "bg_image", item.bg_image, "Image de la page titre", <Theme.IOptText>{ maxlength: 32 }))
 
     if (isNew) {
@@ -74,27 +78,33 @@ ${modal}
 
 
 
-export const fetch = (args: string[] | undefined) => {
-    gameid = (args ? args[0] : "")
+const fetchState = () => {
     isNew = (gameid == "new")
-    App.prepareRender(NS, "Editor", "screen_editor")
 
     if (!isNew) {
-        state.fetch_game_definition(gameid)
+        return state.fetch_game_definition(gameid)
             .then(payload => {
                  mystate = Misc.clone(payload) as GameDefinition
             })
+            //.then(waitTwoSecondAsync)
+            .then(Lookup.fetch_llm)
             .then(App.untransitionUI)
-            .then(App.render)
-            .catch(App.render);
     }
     else {
         state.new_story()
         mystate = Misc.clone(state.game_definition) as GameDefinition
-        Promise.resolve()
+        return Promise.resolve()
+            .then(Lookup.fetch_llm)
             .then(App.untransitionUI)
-            .then(App.render)
     }
+}
+
+export const fetch = (args: string[] | undefined) => {
+    gameid = (args ? args[0] : "")
+    App.prepareRender(NS, "Editor", "screen_editor")
+    fetchState()
+        .then(App.render)
+        .catch(App.render);
 }
 
 export const refresh = () => {
@@ -112,7 +122,10 @@ export const refresh = () => {
 export const render = () => {
     if (!App.inContext(NS)) return "";
 
-    const form = formTemplate(mystate);
+    const lookup_llm = Lookup.get_llm();
+    let llmid = Theme.renderOptions(lookup_llm, mystate.llmid, isNew);
+
+    const form = formTemplate(mystate, llmid);
     const modal = layout_Modal()
     return pageTemplate(form, modal)
 }
@@ -138,6 +151,7 @@ const getFormState = () => {
     clone.title = Misc.fromInputText(`${NS}_title`, mystate.title);
     clone.bg_image = Misc.fromInputText(`${NS}_bg_image`, mystate.bg_image);
     clone.prompt = Misc.fromInputText(`${NS}_prompt`, mystate.prompt);
+    clone.llmid = Misc.fromSelectNumber(`${NS}_llmid`, mystate.llmid);
     return clone;
 }
 
