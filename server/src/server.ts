@@ -210,7 +210,7 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
         const api = query.api
 
         // To switch between ollama and openai
-        let endpoint = "http://192.168.50.199:11434/api/chat"
+        let endpoint = "http://192.168.50.199:11434/v1/chat/completions"
         let model = "lstep/neuraldaredevil-8b-abliterated:q8_0"
         let api_key = null
         //
@@ -238,23 +238,45 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
             return
         }
 
-        // res.setHeader("Content-Type", "text/event-stream");
-        // res.setHeader("Cache-Control", "no-cache");
-        // res.setHeader("Connection", "keep-alive");
-        //console.log(response.headers)
-        res.writeHead(response.status, response.headers as any)
+        // Headers for streaming
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
 
         const reader = response.body!.getReader();
-        const decoder = new TextDecoder();
+        const decoder = new TextDecoder('utf-8');
+    
+        const processStream = async () => {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
 
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            res.write(decoder.decode(value));
-        }
+                const dataString = decoder.decode(value, { stream: true });
+                const lines = dataString.split('\n').filter(line => line.trim() !== '');
 
-        console.log(`POST /stories/${gameid}/chat`)
-        res.end();
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const message = line.replace(/^data: /, '');
+                        try {
+                            const parsed = JSON.parse(message);
+                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta.content) {
+                                const content = parsed.choices[0].delta.content;
+                                res.write(content);
+                            }
+                        }
+                        catch (error) {
+                            console.error(`POST /stories/${gameid}/chat Error parsing JSON:`, error);
+                        }
+                    }
+                }
+            }
+            res.end();
+        };
+    
+        processStream().catch(error => {
+            console.error(`POST /stories/${gameid}/chat`, error);
+            res.status(500).json({ hasError: true, message: "Erreur interne en traitant le stream" });
+        });
     }
     catch (error) {
         console.error(`POST /stories/${gameid}/chat`, error);

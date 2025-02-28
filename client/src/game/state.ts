@@ -184,7 +184,7 @@ class State {
         const query = {
             messages,
             stream: true,
-            api: "openai"
+            api: "ollama"
         }
     
         const response = await window.fetch(endpoint, {
@@ -197,42 +197,6 @@ class State {
             throw new Error("No response from LLM endpoint");
         }
     
-        /*
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let answer = "";
-        let buffer = "";  // For incomplete JSON fragments
-    
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-    
-            buffer += decoder.decode(value, { stream: true });
-    
-            try {
-                const jsonObjects = buffer.split("\n").filter(line => line.trim() !== "");
-                buffer = "";
-    
-                for (const jsonObject of jsonObjects) {
-                    console.log(jsonObject)
-                    try {
-                        const chunk = JSON.parse(jsonObject);
-                        if (!chunk.done) {
-                            answer += chunk.message.content;
-                            if (streamUpdater) streamUpdater(chunk.message.content);
-                        }
-                    } catch (err) {
-                        buffer = jsonObject;
-                    }
-                }
-            } catch (err) {
-                console.error("Err parsing JSON object in chat response stream", err);
-            }
-        }
-
-        return answer;
-        */
-
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let answer = "";
@@ -240,17 +204,10 @@ class State {
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
+
             const text = decoder.decode(value, { stream: true })
-
-            console.log("---------------------")
-            console.log(text)
-
-            /*
-            const chunk = JSON.parse(text)
-            const content = chunk.message.content
-            answer += content
-            if (streamUpdater) streamUpdater(content);
-            */
+            answer += text
+            if (streamUpdater) streamUpdater(text);
         }
 
         return answer;
