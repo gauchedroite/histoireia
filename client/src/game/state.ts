@@ -73,7 +73,7 @@ class State {
 
         const key = this.getKey("messages")
         const json = localStorage.getItem(key) ?? "[]"
-        return JSON.parse(json)as Message[]
+        return JSON.parse(json) as Message[]
     }
 
     appendUserMessage (content: string, pageno: number) {
@@ -108,7 +108,12 @@ class State {
         return Math.floor((msgs.length - 1) / 2)
     }
 
-    userMessageOnPage (pageno: number) {
+    userMessageOnPage (pageno: number): string | null {
+        // The user message at page 0 is the "system" message
+        if (pageno == 0) {
+            return null
+        }
+
         const msgs = this.getMessages();
         return msgs[pageno * 2]?.content
     }
@@ -164,21 +169,22 @@ class State {
     //
     // Interacting with the LLM endpoints
     //
-    async executePrompt(user_prompt: string, streamUpdater?: (message: string) => void) {
+    async executePrompt(user_prompt: string | null, streamUpdater?: (message: string) => void) {
 
         // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
         const messages = this.getMessages()
-        messages.push(<Message>{
-            role: "user",
-            content: user_prompt            
-        })
+        if (user_prompt != undefined) {
+            messages.push(<Message>{
+                role: "user",
+                content: user_prompt            
+            })
+        }
     
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
         const query = {
-            model: "lstep/neuraldaredevil-8b-abliterated:q8_0",
             messages,
             stream: true,
-            api: "ollama"
+            api: "openai"
         }
     
         const response = await window.fetch(endpoint, {
@@ -191,6 +197,7 @@ class State {
             throw new Error("No response from LLM endpoint");
         }
     
+        /*
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let answer = "";
@@ -207,6 +214,7 @@ class State {
                 buffer = "";
     
                 for (const jsonObject of jsonObjects) {
+                    console.log(jsonObject)
                     try {
                         const chunk = JSON.parse(jsonObject);
                         if (!chunk.done) {
@@ -221,7 +229,30 @@ class State {
                 console.error("Err parsing JSON object in chat response stream", err);
             }
         }
+
+        return answer;
+        */
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let answer = "";
     
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const text = decoder.decode(value, { stream: true })
+
+            console.log("---------------------")
+            console.log(text)
+
+            /*
+            const chunk = JSON.parse(text)
+            const content = chunk.message.content
+            answer += content
+            if (streamUpdater) streamUpdater(content);
+            */
+        }
+
         return answer;
     }
 }

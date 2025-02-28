@@ -11,7 +11,7 @@ let mystate: GameDefinition
 let gameid = ""
 let pageno = 0
 let isNew = false
-let user_text = "";
+let user_text: string | null = null;
 let assistant_text: string | null = null
 let next_user_text: string | null = null
 

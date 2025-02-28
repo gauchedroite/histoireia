@@ -208,15 +208,27 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
     try {
         const query = req.body as any
         const api = query.api
-        const data = JSON.stringify(query)
-        console.log(api)
 
-        const endpoint = "http://192.168.50.199:11434/api/chat"
-    
+        // To switch between ollama and openai
+        let endpoint = "http://192.168.50.199:11434/api/chat"
+        let model = "lstep/neuraldaredevil-8b-abliterated:q8_0"
+        let api_key = null
+        //
+        if (api == "openai") {
+            endpoint = "https://api.openai.com/v1/chat/completions"
+            model = "gpt-4o"
+            api_key = process.env.OPENAI_API_KEY
+        }
+        query.model = model
+        delete query.api
+
         const response = await fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: data
+            headers: {
+                "Authorization": `Bearer ${api_key}`,
+                "Content-Type": "application/json"
+             },
+            body: JSON.stringify(query) 
         });
 
         if (!response.ok) {
@@ -226,34 +238,23 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
             return
         }
 
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
+        // res.setHeader("Content-Type", "text/event-stream");
+        // res.setHeader("Cache-Control", "no-cache");
+        // res.setHeader("Connection", "keep-alive");
+        //console.log(response.headers)
+        res.writeHead(response.status, response.headers as any)
 
         const reader = response.body!.getReader();
-        const stream = new Readable({
-            read() {}
-        });
+        const decoder = new TextDecoder();
 
-        (async function processStream() {
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        stream.push(null);
-                        break;
-                    }
-                    stream.push(value);
-                }
-            }
-            catch (error) {
-                console.error(`POST /stories/${gameid}/chat Stream processing error:`, error);
-                stream.destroy(error as any);
-            }
-        })();
-        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            res.write(decoder.decode(value));
+        }
+
         console.log(`POST /stories/${gameid}/chat`)
-        stream.pipe(res);
+        res.end();
     }
     catch (error) {
         console.error(`POST /stories/${gameid}/chat`, error);
