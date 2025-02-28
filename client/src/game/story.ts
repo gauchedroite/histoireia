@@ -81,7 +81,7 @@ const render_and_fetch_more = async () => {
     App.render()
 
     if (assistant_text == undefined) {
-        assistant_text = await state.executePrompt(user_text, streamUpdater)
+        assistant_text = await state.chat(streamUpdater)
         state.appendAssistantMessage(assistant_text)
 
         App.untransitionUI()

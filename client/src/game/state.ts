@@ -165,26 +165,14 @@ class State {
         return App.DELETE(`stories/${this.gameid}`, {})
     }
 
-
-    //
-    // Interacting with the LLM endpoints
-    //
-    async executePrompt(user_prompt: string | null, streamUpdater?: (message: string) => void) {
-
-        // Créer le prompt complet à partir de ce qu'il y a dans localStorage + user_prompt
+    async chat(streamUpdater?: (message: string) => void) {
         const messages = this.getMessages()
-        if (user_prompt != undefined) {
-            messages.push(<Message>{
-                role: "user",
-                content: user_prompt            
-            })
-        }
     
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
         const query = {
             messages,
             stream: true,
-            api: "ollama"
+            api: "openai"
         }
     
         const response = await window.fetch(endpoint, {

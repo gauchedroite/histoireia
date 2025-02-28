@@ -2,24 +2,24 @@ import * as App from "../core/app.js"
 import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
-import { state, GameDefinition as IState } from "./state.js"
+import { state, GameDefinition } from "./state.js"
 
 export const NS = "GED";
 const ns = NS.toLowerCase();
 
 
-let mystate: IState = <IState>{};
+let mystate: GameDefinition = <GameDefinition>{};
 let gameid: string = ""
 let isNew = false;
 let modalWhat: string | null = null
 
 
 
-const formTemplate = (item: IState) => {
+const formTemplate = (item: GameDefinition) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(Theme.renderFieldText(NS, "title", item.title, "Titre", <Theme.IOptText>{ maxlength: 32, required: true }))
+    add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
 
     add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 22 }))
     add(Theme.renderFieldText(NS, "bg_image", item.bg_image, "Image de la page titre", <Theme.IOptText>{ maxlength: 32 }))
@@ -82,7 +82,7 @@ export const fetch = (args: string[] | undefined) => {
     if (!isNew) {
         state.fetch_game_definition(gameid)
             .then(payload => {
-                 mystate = Misc.clone(payload) as IState
+                 mystate = Misc.clone(payload) as GameDefinition
             })
             .then(App.untransitionUI)
             .then(App.render)
@@ -90,7 +90,7 @@ export const fetch = (args: string[] | undefined) => {
     }
     else {
         state.new_story()
-        mystate = Misc.clone(state.game_definition) as IState
+        mystate = Misc.clone(state.game_definition) as GameDefinition
         Promise.resolve()
             .then(App.untransitionUI)
             .then(App.render)
@@ -101,7 +101,7 @@ export const refresh = () => {
     App.transitionUI()
     state.fetch_game_definition(gameid)
     .then(payload => {
-         mystate = Misc.clone(payload) as IState
+         mystate = Misc.clone(payload) as GameDefinition
     })
     .then(App.untransitionUI)
     .then(App.render)
@@ -133,7 +133,7 @@ export const postRender = () => {
 
 
 const getFormState = () => {
-    let clone = Misc.clone(mystate) as IState;
+    let clone = Misc.clone(mystate) as GameDefinition;
     clone.code = Misc.fromInputText(`${NS}_code`, mystate.code);
     clone.title = Misc.fromInputText(`${NS}_title`, mystate.title);
     clone.bg_image = Misc.fromInputText(`${NS}_bg_image`, mystate.bg_image);

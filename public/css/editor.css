@@ -14,5 +14,13 @@
         font-family: -apple-system, SF UI Text, Helvetica Neue, Helvetica, Arial, sans-serif;
         line-height: 1.4;
     }
+
+    .code {
+        display: inline;
+        float: right;
+        line-height: 1.5rem;
+        font-size: 75%;
+        opacity: 0.25;
+    }
 }
 
