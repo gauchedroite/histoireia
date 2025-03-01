@@ -2,7 +2,7 @@
 #screen_bonjour {
 
     .app-content {
-        height: 100vh;
+        height: var(--height);
         padding: 0;
     }
 

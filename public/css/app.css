@@ -17,6 +17,22 @@
 
     --border: rgba(0, 0, 0, .2);
     --border-radius: 4px;
+
+    --width: 100vw;
+    --height: 100vh;
+    --top: 0;
+    --left: 0;
+}
+
+
+/* Hide scroll bars for Firefox  */
+* {
+    scrollbar-width: none;
+}
+
+/* Hide scroll bars for Safari, Chrome  */
+*::-webkit-scrollbar {
+    display: none;
 }
 
 

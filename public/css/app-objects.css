@@ -1,4 +1,46 @@
 
+@media (min-width: 400px) {
+    :root {
+        --top: 50px;
+        --width: calc(100vw * 0.45);
+        --height: calc(100vh - 2 * var(--top));
+        --left: calc(100vw - var(--width) - var(--top));
+
+        /*
+        --width: 390px;
+        --height: 751px;
+        --top: calc((100vh - var(--height)) * 0.55);
+        --left: calc((100vw - var(--width)) * 0.75);
+        */
+
+        /*
+        --sait: 0;
+        --sair: 0;
+        --saib: 0;
+        --sail: 0;
+        */
+    }
+
+    body {
+        background-color: white;
+    }
+
+    #app_root {
+        width: var(--width);
+        height: var(--height);
+        overflow: hidden;
+    }
+
+    #app_container {    
+        position: absolute;
+        width: var(--width);
+        height: var(--height);
+        top: var(--top);
+        left: var(--left);
+    }    
+}
+
+
 .app-header {
     width: 100%;
     height: calc(var(--header-height) + var(--sait));
@@ -33,7 +75,7 @@
 
 
 .app-content {
-    height: calc(100vh - var(--header-height) - var(--sait) - var(--footer-height) - var(--saib));
+    height: calc(var(--height) - var(--header-height) - var(--sait) - var(--footer-height) - var(--saib));
     overflow-y: scroll;
     padding: 1.5rem calc(1.5rem + var(--sair)) 1.5rem calc(1.5rem + var(--sail));
 }
@@ -85,7 +127,8 @@
     position: absolute;
     top: 0;
     left: 100vw;
-    width: 100vw;
+    width: var(--width);
+    height: var(--height);
     background-color: var(--black-bgc);
 
     &.app-zero {
@@ -93,7 +136,7 @@
     }
 
     &.app-behind {
-        left: -50vw;
+        left: calc(-1 * var(--width) / 2);
         transition: left 0.5s;
     }
 
@@ -103,7 +146,7 @@
     }
 
     &.app-offscreen {
-        left: 100vw;
+        left: var(--width);
         transition: left 0.5s;
     }
 
