@@ -220,6 +220,28 @@ class State {
 
         return answer;
     }
+
+    async chatExtra() {
+        const messages = this.getMessages()
+    
+        const endpoint = App.apiurl(`stories/${this.gameid}/chat-extra`)
+        const query = {
+            messages
+        }
+    
+        const response = await window.fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(query)
+        })
+    
+        if (!response.body) {
+            throw new Error("No response from LLM endpoint");
+        }
+    
+        const answer = response.body;
+        return answer;
+    }
 }
 
 export const state = new State();

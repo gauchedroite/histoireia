@@ -89,6 +89,11 @@ const render_and_fetch_more = async () => {
         assistant_text = await state.chat(streamUpdater)
         state.appendAssistantMessage(assistant_text)
 
+        if (mystate.extra) {
+            //const extra = await state.chatExtra()
+            //console.log(extra)
+        }
+
         App.untransitionUI()
         App.render()
     }

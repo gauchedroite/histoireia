@@ -132,7 +132,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
                 bg_image: data.bg_image,
                 bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
                 prompt,
-                llmid: data.llmid ?? 1
+                llmid: data.llmid ?? 1,
+                extra: data.extra
         }
 
         console.log(`GET /stories/${gameid}`, _game_definition)
