@@ -16,6 +16,7 @@ export interface GameDefinition {
     prompt: string | null
     llmid: number | null
     llmid_text: string
+    extra: string | null
 }
 
 export interface Message {
@@ -100,6 +101,17 @@ class State {
         localStorage.setItem(key, JSON.stringify(msgs))
     }
 
+    updateAssistantMessageOnPage (pageno: number, content: string) {
+        const msgs = this.getMessages()
+        msgs[1 + pageno * 2] = <Message> {
+            role: "assistant",
+            content
+        }
+
+        const key = this.getKey("messages")
+        localStorage.setItem(key, JSON.stringify(msgs))
+    }
+
     resetMessages () {
         this.appendUserMessage(this._game_definition!.prompt!, -1)
         return this._game_definition
@@ -127,7 +139,7 @@ class State {
         return msgs[(pageno + 1) * 2]?.content
     }
 
-    assistantMessageAtPage (pageno: number) {
+    assistantMessageOnPage (pageno: number) {
         const msgs = this.getMessages();
         return msgs[1 + pageno * 2]?.content
     }

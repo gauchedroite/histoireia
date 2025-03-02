@@ -14,6 +14,8 @@ let isNew = false
 let user_text: string | null = null;
 let assistant_text: string | null = null
 let next_user_text: string | null = null
+let editable = false
+
 
 
 const formTemplate = () => {
@@ -23,7 +25,7 @@ const formTemplate = () => {
     if (pageno > 0)
         add(`<div class="user">${user_text?.replace(/\n/g, "<br>")}</div>`)
 
-    add(`<div id="ct_response">${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div>`)
+    add(`<div id="ct_response" ${editable ? "contentEditable" : ""}>${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div>`)
 
     if (assistant_text && assistant_text.length > 0) {
         const disabled = (next_user_text == undefined || next_user_text.length == 0)
@@ -53,6 +55,9 @@ const pageTemplate = (form: string) => {
     <a class="js-waitable-2" href="#/menu/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
+    <a class="js-waitable-2" href="#" onclick="${NS}.toggleEditable();return false;">
+        <i class="fa-thin ${editable ? "fa-pen-slash" : "fa-pen-to-square"}"></i>
+    </a>
 </div>
 <div class="app-content">
     ${form}
@@ -77,7 +82,7 @@ const streamUpdater = (message: string) => {
 const render_and_fetch_more = async () => {
     user_text = state.userMessageOnPage(pageno)
     next_user_text = state.userMessageOnNextPage(pageno)
-    assistant_text = state.assistantMessageAtPage(pageno)
+    assistant_text = state.assistantMessageOnPage(pageno)
     App.render()
 
     if (assistant_text == undefined) {
@@ -96,6 +101,7 @@ export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
     pageno = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
     isNew = isNaN(pageno)
+    editable = false
 
     if (isNew) {
         assistant_text = null
@@ -149,4 +155,16 @@ export const submit = (input: HTMLInputElement) => {
     assistant_text = null
 
     Router.goto(`#/story/${gameid}/${pageno + 1}`)
+}
+
+export const toggleEditable = () => {
+    if (editable) {
+        const element = document.getElementById("ct_response")
+        if (element) {
+            assistant_text = element.innerText
+            state.updateAssistantMessageOnPage(pageno, assistant_text)
+        }
+    }
+    editable = !editable
+    App.render()
 }

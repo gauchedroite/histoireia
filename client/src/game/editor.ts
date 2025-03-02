@@ -24,6 +24,7 @@ const formTemplate = (item: GameDefinition, llmid: string) => {
     add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
 
     add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
+    add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
     add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
 
     add(Theme.renderFieldText(NS, "bg_image", item.bg_image, "Image de la page titre", <Theme.IOptText>{ maxlength: 32 }))
@@ -152,6 +153,7 @@ const getFormState = () => {
     clone.bg_image = Misc.fromInputText(`${NS}_bg_image`, mystate.bg_image);
     clone.prompt = Misc.fromInputText(`${NS}_prompt`, mystate.prompt);
     clone.llmid = Misc.fromSelectNumber(`${NS}_llmid`, mystate.llmid);
+    clone.extra = Misc.fromInputText(`${NS}_extra`, mystate.extra);
     return clone;
 }
 

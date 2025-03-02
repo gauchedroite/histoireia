@@ -1,5 +1,4 @@
 import express, { Request, Response, Application, NextFunction } from 'express';
-import { Readable } from 'stream';
 import bodyParser from 'body-parser';
 import fs from 'fs-extra';
 import path from 'path';
@@ -13,6 +12,7 @@ interface GameDefinition {
     bg_image: string | null
     prompt: string
     llmid: number
+    extra?: string | null
 }
 
 interface Message {
@@ -146,7 +146,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid } = req.body as GameDefinition
+    const { title, bg_image, prompt, llmid, extra: extra } = req.body as GameDefinition
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
 
@@ -165,7 +165,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
     }
 
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1 }
+        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra: extra }
     
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
