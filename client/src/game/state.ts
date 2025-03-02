@@ -19,9 +19,21 @@ export interface GameDefinition {
     extra: string | null
 }
 
-export interface Message {
-    role: string,
+
+export interface IChat {
+    role: string
     content: string
+}
+
+export interface IPage {
+    assistant: string
+    user: string
+    extra?: IExtra
+}
+
+export interface IExtra {
+    choices: string[]
+    mood: string
 }
 
 
@@ -72,76 +84,79 @@ class State {
         return `${this.username}_${this.gameid}_${what}`
     }
 
-    getMessages (gameid?: string) {
+    getPages (gameid?: string) {
         if (gameid != undefined)
             this._gameid = gameid
 
-        const key = this.getKey("messages")
+        const key = this.getKey("pages")
         const json = localStorage.getItem(key) ?? "[]"
-        return JSON.parse(json) as Message[]
+        return JSON.parse(json) as IPage[]
     }
 
-    appendUserMessage (content: string, pageno: number) {
-        let msgs = this.getMessages()
+    addUserMessage (content: string, pageno: number) {
+        let pages = this.getPages()
 
-        // Truncate the message array so we can restart the story in the middle if we want
-        msgs = msgs.slice(0, (pageno + 1) * 2)
+        // Truncate the page array so we can restart the story in the middle if we want
+        pages = pages.slice(0, pageno + 1)
+        pages.push(<IPage> { user: content })
 
-        msgs.push(<Message>{ role: (pageno == -1 ? "system" : "user"), content })
-
-        const key = this.getKey("messages")
-        localStorage.setItem(key, JSON.stringify(msgs))
+        const key = this.getKey("pages")
+        localStorage.setItem(key, JSON.stringify(pages))
     }
 
-    appendAssistantMessage (content: string) {
-        const msgs = this.getMessages()
-        msgs.push(<Message>{ role: "assistant", content })
+    setAssistantMessage (content: string, pageno: number) {
+        const pages = this.getPages()
+        pages[pageno].assistant = content;
 
-        const key = this.getKey("messages")
-        localStorage.setItem(key, JSON.stringify(msgs))
-    }
-
-    updateAssistantMessageOnPage (pageno: number, content: string) {
-        const msgs = this.getMessages()
-        msgs[1 + pageno * 2] = <Message> {
-            role: "assistant",
-            content
-        }
-
-        const key = this.getKey("messages")
-        localStorage.setItem(key, JSON.stringify(msgs))
+        const key = this.getKey("pages")
+        localStorage.setItem(key, JSON.stringify(pages))
     }
 
     resetMessages () {
-        this.appendUserMessage(this._game_definition!.prompt!, -1)
+        this.addUserMessage(this._game_definition!.prompt!, -1)
         return this._game_definition
     }
 
     lastPageNo() {
-        const msgs = this.getMessages();
-        if (msgs == undefined || msgs.length == 0)
+        const pages = this.getPages();
+        if (pages == undefined || pages.length == 0)
             return -1
-        return Math.floor((msgs.length - 1) / 2)
+        return (pages.length - 1)
     }
 
     userMessageOnPage (pageno: number): string | null {
-        // The user message at page 0 is the "system" message
-        if (pageno == 0) {
-            return null
-        }
-
-        const msgs = this.getMessages();
-        return msgs[pageno * 2]?.content
+        const pages = this.getPages();
+        return pages[pageno]?.user
     }
 
     userMessageOnNextPage (pageno: number) {
-        const msgs = this.getMessages();
-        return msgs[(pageno + 1) * 2]?.content
+        const pages = this.getPages();
+        return pages[pageno + 1]?.user
     }
 
     assistantMessageOnPage (pageno: number) {
-        const msgs = this.getMessages();
-        return msgs[1 + pageno * 2]?.content
+        const msgs = this.getPages();
+        return msgs[pageno]?.assistant
+    }
+
+    pagesToMessages () {
+        const pages = this.getPages()
+        const messages: IChat[] = []
+        pages.forEach((one, index) => {
+
+            messages.push(<IChat> {
+                role: (index == 0 ? "system" : "user"),
+                content: one.user
+            })
+
+            if (one.assistant) {
+                messages.push(<IChat> {
+                    role: "assistant",
+                    content: one.assistant
+                })
+            }
+        })
+        return messages
     }
 
 
@@ -187,9 +202,9 @@ class State {
     }
 
     async chat(streamUpdater?: (message: string) => void) {
-        const messages = this.getMessages()
-    
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
+        const messages = this.pagesToMessages()
+        
         const query = {
             messages,
             stream: true
@@ -222,7 +237,7 @@ class State {
     }
 
     async chatExtra() {
-        const messages = this.getMessages()
+        const messages = this.getPages()
     
         const endpoint = App.apiurl(`stories/${this.gameid}/chat-extra`)
         const query = {

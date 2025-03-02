@@ -1,20 +1,20 @@
 import * as App from "../core/app.js"
 import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
-import { state, GameDefinition as IState, Message } from "./state.js"
+import { state, GameDefinition, IPage } from "./state.js"
 
 export const NS = "GMENU";
 const ns = NS.toLowerCase()
 
 
-let mystate: IState
-let mystate2: Message[]
+let mystate: GameDefinition
+let mystate2: IPage[]
 let gameid = ""
 let modalWhat: string | null = null
 
 
 
-const formTemplate = (messages: Message[]) => {
+const formTemplate = () => {
     const add = (row: string) => rows.push(row);
     const action = (href: string, text: string, icon: string) => rows.push(`<a href="${href}"><div><div>${text}</div>${icon}</div></a>`);
     const page = (index: number, text: string) => rows.push(`<a href="#/story/${gameid}/${index}" class="page ${index == 0 ? "page-0" : ""}"><div><div>${text}</div><span>p.${index+1}</span></div></a>`);
@@ -44,9 +44,7 @@ const formTemplate = (messages: Message[]) => {
     else {
         action(`#/story/${gameid}/${lastPage}`, "Continuer la lecture", `<i class="fa-thin fa-book-open-reader"></i>`)
 
-        mystate2
-            .filter(one => one.role != "assistant")
-            .forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.content)))
+        mystate2.forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.user)))
 
         action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer le livre?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
     }
@@ -96,8 +94,8 @@ export const fetch = (args: string[] | undefined) => {
     App.prepareRender(NS, "Menu", "screen_menu")
     state.fetch_game_definition(gameid)
         .then((payload: any) =>{
-            mystate = Misc.clone(payload) as IState
-            mystate2 = state.getMessages(gameid)
+            mystate = Misc.clone(payload) as GameDefinition
+            mystate2 = state.getPages(gameid)
         })
         .then(App.untransitionUI)
         .then(App.render)
@@ -108,7 +106,7 @@ export const render = () => {
     if (!App.inContext(NS)) return "";
     if (mystate2 == undefined) return ""
 
-    const form = formTemplate(mystate2)
+    const form = formTemplate()
     const modal = layout_Modal()
 
     return pageTemplate(form, modal)

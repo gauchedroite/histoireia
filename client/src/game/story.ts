@@ -2,7 +2,7 @@ import * as App from "../core/app.js"
 import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
-import { state, GameDefinition, Message } from "./state.js"
+import { state, GameDefinition } from "./state.js"
 
 export const NS = "GSTORY";
 
@@ -87,12 +87,12 @@ const render_and_fetch_more = async () => {
 
     if (assistant_text == undefined) {
         assistant_text = await state.chat(streamUpdater)
-        state.appendAssistantMessage(assistant_text)
+        state.setAssistantMessage(assistant_text, pageno)
 
-        if (mystate.extra) {
-            //const extra = await state.chatExtra()
-            //console.log(extra)
-        }
+        // if (mystate.extra) {
+        //     const extra = await state.chatExtra()
+        //     console.log(extra)
+        // }
 
         App.untransitionUI()
         App.render()
@@ -154,7 +154,7 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 export const submit = (input: HTMLInputElement) => {
-    state.appendUserMessage(next_user_text!, pageno)
+    state.addUserMessage(next_user_text!, pageno)
 
     next_user_text = null
     assistant_text = null
@@ -167,7 +167,7 @@ export const toggleEditable = () => {
         const element = document.getElementById("ct_response")
         if (element) {
             assistant_text = element.innerText
-            state.updateAssistantMessageOnPage(pageno, assistant_text)
+            state.setAssistantMessage(assistant_text,pageno)
         }
     }
     editable = !editable
