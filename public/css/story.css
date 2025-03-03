@@ -61,6 +61,15 @@
         }
     }
 
+    .choices div {
+        background-color: white;
+        margin: 0.5rem 0;
+
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+    }
+
     .app-footer {
         & button {
             display: block;

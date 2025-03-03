@@ -36,6 +36,11 @@ export interface IExtra {
     mood: string
 }
 
+export interface IChoice {
+    description: string
+    participants: string[]
+}
+
 
 class State {
     private _username: string
@@ -205,15 +210,10 @@ class State {
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
         const messages = this.pagesToMessages()
         
-        const query = {
-            messages,
-            stream: true
-        }
-    
         const response = await window.fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(query)
+            body: JSON.stringify(messages)
         })
     
         if (!response.body) {
@@ -236,26 +236,21 @@ class State {
         return answer;
     }
 
-    async chatExtra() {
-        const messages = this.getPages()
-    
-        const endpoint = App.apiurl(`stories/${this.gameid}/chat-extra`)
-        const query = {
-            messages
-        }
-    
+    async chatExtra(extra: string) {
+        const endpoint = App.apiurl(`stories/${this.gameid}/chat-extra/${extra}`)
+        const messages = this.pagesToMessages()
+
         const response = await window.fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(query)
+            body: JSON.stringify(messages)
         })
     
         if (!response.body) {
             throw new Error("No response from LLM endpoint");
         }
     
-        const answer = response.body;
-        return answer;
+        return await response.json();
     }
 }
 

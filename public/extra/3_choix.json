@@ -1,0 +1,45 @@
+{
+"prompt": "Propose 3 choix - pas plus de 20 mots par choix. Formule les options de mon point de vue.",
+"json_schema":
+{
+  "name": "3_choix",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "choices": {
+        "type": "array",
+        "description": "Différentes strategies pour poursuivre l'histoire.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Une description détaillée de la stratégie."
+            },
+            "participants": {
+              "type": "array",
+              "description": "Personnes impliquées dans la stratégie, si applicable.",
+              "items": {
+                "type": "string",
+                "description": "Nom de la personne."
+              }
+            }
+          },
+          "required": [
+            "description",
+            "participants"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "choices"
+    ],
+    "additionalProperties": false,
+    "$defs": {}
+  }
+}
+
+}

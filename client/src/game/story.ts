@@ -2,7 +2,7 @@ import * as App from "../core/app.js"
 import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
-import { state, GameDefinition } from "./state.js"
+import { state, GameDefinition, IChoice } from "./state.js"
 
 export const NS = "GSTORY";
 
@@ -15,6 +15,9 @@ let user_text: string | null = null;
 let assistant_text: string | null = null
 let next_user_text: string | null = null
 let editable = false
+let helping = false
+let helping_choices: string[] = []
+let choices: IChoice[];
 
 
 
@@ -28,13 +31,28 @@ const formTemplate = () => {
     add(`<div id="ct_response" ${editable ? "contentEditable" : ""}>${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div>`)
 
     if (assistant_text && assistant_text.length > 0) {
-        const disabled = (next_user_text == undefined || next_user_text.length == 0)
-        const button = `<button type="submit" onclick="${NS}.submit()" ${disabled ? "disabled" : ""}><i class="fa-light fa-arrow-up"></i></button>`
-        const label = `<div class="ask"><div><b>À toi, ${state.usernameCapitalized} :</b></div>${button}</div>`
-        const textarea = Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, "", <Theme.IOptText>{ required: true, rows: 4 })
+        const submitDisabled = (next_user_text == undefined || next_user_text.length == 0)
+        const helpDisabled = false
 
+        let help = `<button type="button" onclick="${NS}.help(true)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-question"></i></button>`
+        if (helping)
+            help = `<button type="button" onclick="${NS}.help(false)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-rotate-left"></i></button>`
+
+        const submit = `<button type="submit" onclick="${NS}.submit()" ${submitDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-up"></i></button>`
+        const label = `<div class="ask">
+                <div><b>À toi, ${state.usernameCapitalized} :</b></div>
+                <div>${help} ${submit}</div>
+            </div>`
         add(label)
-        add(`<div class="input">${textarea}</div>`)
+
+        if (!helping) {
+            const textarea = Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, "", <Theme.IOptText>{ required: true, rows: 4 })
+            add(`<div class="input">${textarea}</div>`)
+        }
+        else {
+            const divs = choices.map((one, index) => `<div onclick="${NS}.selectChoice(${index})">${one.description}</div>`)
+            add(`<div class="choices">${divs.join("")}</div>`)
+        }
     }
 
     return rows.join("")
@@ -59,7 +77,7 @@ const pageTemplate = (form: string) => {
         <i class="fa-thin ${editable ? "fa-pen-slash" : "fa-pen-to-square"}"></i>
     </a>
 </div>
-<div class="app-content">
+<div class="app-content js-waitable-2">
     ${form}
 </div>
 <div class="app-footer js-waitable-2">
@@ -89,11 +107,6 @@ const render_and_fetch_more = async () => {
         assistant_text = await state.chat(streamUpdater)
         state.setAssistantMessage(assistant_text, pageno)
 
-        // if (mystate.extra) {
-        //     const extra = await state.chatExtra()
-        //     console.log(extra)
-        // }
-
         App.untransitionUI()
         App.render()
     }
@@ -107,6 +120,7 @@ export const fetch = (args: string[] | undefined) => {
     pageno = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
     isNew = isNaN(pageno)
     editable = false
+    helping = false
 
     if (isNew) {
         assistant_text = null
@@ -160,6 +174,25 @@ export const submit = (input: HTMLInputElement) => {
     assistant_text = null
 
     Router.goto(`#/story/${gameid}/${pageno + 1}`)
+}
+
+export const help = async (yesno: boolean) => {
+    App.transitionUI()
+    
+    helping = yesno
+    if (helping) {
+        const extra = await state.chatExtra("3_choix")
+        choices = extra.choices
+    }
+
+    App.untransitionUI()
+    App.render()
+}
+
+export const selectChoice = (index: number) => {
+    helping = false
+    next_user_text = choices[index].description
+    App.render()
 }
 
 export const toggleEditable = () => {
