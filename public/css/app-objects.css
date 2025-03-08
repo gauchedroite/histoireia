@@ -37,7 +37,10 @@
         height: var(--height);
         top: var(--top);
         left: var(--left);
-    }    
+
+        outline: 2px dotted coral;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
 }
 
 

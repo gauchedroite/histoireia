@@ -695,7 +695,7 @@ export const isValidCreditCard = (cardnumber: number, cardname: string) => {
 
 export const toastSuccess = (text: string) => {
     let div = document.createElement("div");
-    div.classList.add("js-toast");
+    div.classList.add("ct-toast");
     div.style.display = "none";
     document.body.appendChild(div);
     let style = getComputedStyle(div);
@@ -704,7 +704,7 @@ export const toastSuccess = (text: string) => {
 
     Toastify({
         text: text,
-        className: "js-toast",
+        className: "ct-toast",
         backgroundColor: bgcolor,
         position: "center",
         offset: {
@@ -723,7 +723,7 @@ export const toastSuccessUpload = (filename = "File") => {
 
 export const toastFailure = (text = "Your last action failed to execute", duration = 15000) => {
     let div = document.createElement("div");
-    div.classList.add("js-toast-bad");
+    div.classList.add("ct-toast-bad");
     div.style.display = "none";
     document.body.appendChild(div);
     let style = getComputedStyle(div);
@@ -732,7 +732,7 @@ export const toastFailure = (text = "Your last action failed to execute", durati
 
     Toastify({
         text: text,
-        className: "js-toast-bad",
+        className: "ct-toast-bad",
         backgroundColor: bgcolor,
         position: "center",
         gravity: "top",

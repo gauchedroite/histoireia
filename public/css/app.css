@@ -96,12 +96,14 @@ input, textarea, select, .button {
     font-size: 100%;
 }
 
-.js-toast {
+
+
+.ct-toast {
     z-index: 3;
     background-color: forestgreen;
 }
 
-.js-toast-bad {
+.ct-toast-bad {
     z-index: 3;
     background-color: firebrick;
     width: 350px;
@@ -111,4 +113,10 @@ input, textarea, select, .button {
     .toast-close {
         float: right;
     }
+}
+
+.ct-full {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
 }

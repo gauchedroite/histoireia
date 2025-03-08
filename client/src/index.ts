@@ -1,5 +1,6 @@
 import * as App from "./core/app.js"
 import * as GameMain from "./game/main.js"
+import WebglRunner from "./game/webgl-runner.js";
 import * as Reloader from "./reloader.js"
 
 export const NS = "INDEX";
@@ -36,3 +37,13 @@ const onresize = () => {
 };
 //addEventListener("resize", onresize);
 //onresize();
+
+
+// Background shader
+const runner = new WebglRunner()
+setTimeout(async () => {
+    const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
+    const fragmentShader = await (await window.fetch("./assets_app/default_fs.txt")).text()
+    const vertexShader = await (await window.fetch("./assets_app/default_vs.txt")).text()
+    runner.run(canvas, fragmentShader, vertexShader)
+}, 0);

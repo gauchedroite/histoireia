@@ -40,5 +40,11 @@
         "description": "gpt-4o-mini",
         "value1": "openai",
         "value2": "gpt-4o-mini"
+    },
+    {
+        "id": 8,
+        "description": "deepseek-r1",
+        "value1": "ollama",
+        "value2": "deepseek-r1:8b"
     }
 ]

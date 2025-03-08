@@ -1,0 +1,5 @@
+
+attribute vec3 a_square;
+void main() {
+    gl_Position = vec4(a_square, 1.0);
+}

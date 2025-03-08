@@ -270,6 +270,14 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
 
         const reader = response.body!.getReader();
         const decoder = new TextDecoder('utf-8');
+
+        function stringToHex(str: string) {
+            let hex = "";
+            for (let i = 0; i < str.length; i++) {
+                hex += str.charCodeAt(i).toString(16).padStart(2, "0") + " ";
+            }
+            return hex;
+        }
     
         const processStream = async () => {
             while (true) {
@@ -290,6 +298,8 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
                             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta.content) {
                                 const content = parsed.choices[0].delta.content;
                                 res.write(content);
+
+                                //console.log(stringToHex(content), content);
                             }
                         }
                         catch (error) {
