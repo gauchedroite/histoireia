@@ -46,5 +46,17 @@ setTimeout(async () => {
     const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
     const vertexShader = await (await window.fetch(`./assets_app/_default_vertex_shader.glsl`)).text()
     const fragmentShader = await (await window.fetch(`./assets_app/${shader_name}.glsl`)).text()
-    runner.run(canvas, fragmentShader, vertexShader); //, "./images/stars-512x512.jpg")
+    runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
 }, 0);
+
+// Pause the shader if were not on the login or the home pages
+window.addEventListener("hashchange", () => {
+    let hash = window.location.hash;
+    if (hash.length == 0)
+        hash = `#/`;
+
+    if (hash.startsWith("#/editor") || hash.startsWith("#/story"))
+        runner?.pause()
+    else
+        runner?.resume()
+})
