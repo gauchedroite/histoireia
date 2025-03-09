@@ -96,6 +96,9 @@ input, textarea, select, .button {
     font-size: 100%;
 }
 
+think {
+    font-style: italic;
+}
 
 
 .ct-toast {

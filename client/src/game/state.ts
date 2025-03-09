@@ -1,5 +1,5 @@
 import * as App from "../core/app.js"
-import { waitAsync, capitalize } from "../utils.js";
+import { waitAsync, capitalize } from "../common/utils.js";
 
 
 export interface GameList {

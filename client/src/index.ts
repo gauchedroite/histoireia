@@ -1,7 +1,7 @@
 import * as App from "./core/app.js"
 import * as GameMain from "./game/main.js"
-import WebglRunner from "./game/webgl-runner.js";
-import * as Reloader from "./reloader.js"
+import WebglRunner from "./common/webgl-runner.js";
+import * as Reloader from "./common/reloader.js"
 
 export const NS = "INDEX";
 
@@ -46,7 +46,7 @@ setTimeout(async () => {
     const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
     const vertexShader = await (await window.fetch(`./assets_app/_default_vertex_shader.glsl`)).text()
     const fragmentShader = await (await window.fetch(`./assets_app/${shader_name}.glsl`)).text()
-    runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
+    //runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
 }, 0);
 
 // Pause the shader if were not on the login or the home pages

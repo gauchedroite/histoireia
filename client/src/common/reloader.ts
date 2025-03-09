@@ -1,4 +1,4 @@
-import * as App from "./core/app.js"
+import * as App from "../core/app.js"
 
 export const NS = "RELOADER";
 
