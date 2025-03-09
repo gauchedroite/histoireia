@@ -42,8 +42,9 @@ const onresize = () => {
 // Background shader
 const runner = new WebglRunner()
 setTimeout(async () => {
+    const shader_name = "star_nest_retro"
     const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
-    const fragmentShader = await (await window.fetch("./assets_app/default_fs.txt")).text()
-    const vertexShader = await (await window.fetch("./assets_app/default_vs.txt")).text()
-    runner.run(canvas, fragmentShader, vertexShader)
+    const vertexShader = await (await window.fetch(`./assets_app/_default_vertex_shader.glsl`)).text()
+    const fragmentShader = await (await window.fetch(`./assets_app/${shader_name}.glsl`)).text()
+    runner.run(canvas, fragmentShader, vertexShader); //, "./images/stars-512x512.jpg")
 }, 0);

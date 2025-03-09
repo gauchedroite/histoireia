@@ -3,10 +3,9 @@
 //
 
 precision highp float;
-
-uniform float time;
-uniform vec2 mouse;
-uniform vec2 resolution;
+uniform float iTime;
+uniform vec2 iMouse;
+uniform vec2 iResolution;
 
 // hash without sine: https://www.shadertoy.com/view/4djSRW
 vec3 hash32(vec2 p) {
@@ -47,9 +46,9 @@ float Fractal(vec2 p, vec2 off, float l, float L) {
 }
 
 void main( void ) {
-    vec2 res = resolution.xy;
+    vec2 res = iResolution.xy;
     vec2 p = (gl_FragCoord.xy-res/2.) / res.y;
-    float t = .05 * time;
+    float t = .05 * iTime;
     
     // shift everything down a tad
     p.y += .1;
@@ -58,7 +57,7 @@ void main( void ) {
     vec2 op = p;
     
     // shift camera
-    vec2 offs = vec2(.33 * t, .3+.2*sin(.178*t)) + (mouse.xy-.5); // panning
+    vec2 offs = vec2(.33 * t, .3+.2*sin(.178*t)) + (iMouse.xy-.5); // panning
     
     // sun pos
     vec2 spos = vec2(.67, 0.)-p;

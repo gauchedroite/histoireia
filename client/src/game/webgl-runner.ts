@@ -1,4 +1,17 @@
+/*
+Note: to convert ShaderToy shaders to WebglRunner
 
+Add at the top:
+    precision highp float;
+    uniform float iTime;
+    uniform vec2 iMouse;
+    uniform vec2 iResolution;
+
+Add at the end:
+    void main(void) {
+        mainImage(gl_FragColor, gl_FragCoord.xy);
+    }
+*/
 export default class WebglRunner {
     _pause = false;
     _paused = 0;
@@ -21,11 +34,16 @@ export default class WebglRunner {
         }
     }
     
-    run = (canvas: HTMLCanvasElement, fstext: string, vstext: string) => {
+    run = (canvas: HTMLCanvasElement, fstext: string, vstext: string, imagepath?: string) => {
         // Get context
-        var gl = <WebGLRenderingContext>canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });
+        var gl = <WebGLRenderingContext>canvas.getContext("webgl", { preserveDrawingBuffer: true });
         if (!gl)
             return alert("Your web browser does not support WebGL");
+
+        // Some ShaderToy shaders require the following directive at the top of the shader
+        // and the getExtension() call in js
+        // #extension GL_OES_standard_derivatives : enable
+        gl.getExtension('OES_standard_derivatives');
 
         // Create the program
         var prog = gl.createProgram()!;
@@ -53,9 +71,17 @@ export default class WebglRunner {
         gl.useProgram(prog);
 
         // Lookup uniforms
-        var u_resolution = gl.getUniformLocation(prog, "resolution");
-        var u_time = gl.getUniformLocation(prog, "time");
-        var u_mouse = gl.getUniformLocation(prog, "mouse");
+        var u_resolution = gl.getUniformLocation(prog, "iResolution");
+        var u_time = gl.getUniformLocation(prog, "iTime");
+        var u_mouse = gl.getUniformLocation(prog, "iMouse");
+        var u_channel0: WebGLUniformLocation | null;
+
+        let texture: WebGLTexture | undefined;
+        if (imagepath) {
+            texture = this.initializeTexture(gl, imagepath)
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            u_channel0 = gl.getUniformLocation(prog, "iChannel0");
+        }
 
         // Populate the geometry in the buffer
         var arr = [
@@ -104,10 +130,53 @@ export default class WebglRunner {
             gl.uniform1f(u_time, (now - me._paused) * 0.001);
             gl.uniform2f(u_mouse, 0, 0.95);
 
+            // Set the texture uniform
+            if (texture != undefined) {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(u_channel0, 0);
+            }
+
             // Draw the geometry
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
             requestAnimationFrame(drawScene);
         };
+    }
+
+    private initializeTexture = (gl: WebGLRenderingContext, imageUrl: string) => {
+        // Create a texture object
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+    
+        // Fill the texture with a single blue pixel as placeholder
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const width = 1;
+        const height = 1;
+        const border = 0;
+        const srcFormat = gl.RGBA;
+        const srcType = gl.UNSIGNED_BYTE;
+        const pixel = new Uint8Array([0, 0, 255, 255]);  // Opaque blue placeholder
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                      width, height, border, srcFormat, srcType,
+                      pixel);
+    
+        // Load the actual image
+        const image = new Image();
+        image.src = imageUrl;
+        image.onload = function() {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        };
+    
+        // Set texture parameters
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    
+        return texture;  // Return the texture object to be used later
     }
 }
