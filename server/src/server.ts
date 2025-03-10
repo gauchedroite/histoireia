@@ -32,8 +32,8 @@ const port = 9340;
 // Set paths
 const publicPath = path.join(__dirname, "../../public");
 const assetsPath = path.join(__dirname, "../../public/assets");
-const lookupPath = path.join(__dirname, "../../public/lookup");
-const extraPath = path.join(__dirname, "../../public/extra");
+const lookupPath = path.join(__dirname, "../../public/data/lookup");
+const extraPath = path.join(__dirname, "../../public/data/chat-extra");
 
 
 // The src and webfonts folders are served by Caddy because

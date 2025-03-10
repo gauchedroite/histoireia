@@ -9,6 +9,6 @@ export const invalidate_llm = () => (llm as any) = null;
 export const fetch_llm = async () => {
     if (llm != undefined && llm.length > 0)
         return;
-    llm = await App.GET(`lookup/llm.json`) as any;
+    llm = await App.GET(`data/lookup/llm.json`) as any;
 }
 export const get_llm = () => llm;

@@ -60,12 +60,12 @@ const layout_Modal = () => {
 
 const pageTemplate = (form: string, modal: string) =>{
     const returnurl = isNew ? "#/home" : `#/menu/${gameid}`;
-    const trash = !isNew ? `<a href="#" onclick="${NS}.openModal('sitid');return false;"><i class="fa-regular fa-trash-can"></i></a>` : ""
+    const trash = !isNew ? `<a href="#" onclick="${NS}.openModal('sitid');return false;"><i class="fa-thin fa-trash-can"></i></a>` : ""
 
     return `
 <div class="app-header">
     <a href="${returnurl}">
-        <i class="fa-regular fa-chevron-left"></i>&nbsp;${mystate.title}
+        <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
     ${trash}
     

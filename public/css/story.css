@@ -4,6 +4,8 @@
     color: var(--color);
 
     .app-header {
+        font-size: large;
+        
         & :nth-child(n + 2) {
             text-align: right;
             width: 20%;

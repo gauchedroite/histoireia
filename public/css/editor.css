@@ -2,8 +2,14 @@
 #screen_editor {
 
     .app-header {
+        font-size: large;
+        
         & > * {
             width: unset;
+        }
+
+        & span {
+            font-variant: small-caps;
         }
     }
 
