@@ -90,6 +90,12 @@ class State {
             this._gameid = gameid
 
         this._pages = await App.GET(`users/${this.username}/${this.gameid}`) as any
+
+        return App.GET(`users/${this.username}/${this.gameid}`)
+            .then(payload => {
+                this._pages = payload as any;
+                return this._pages
+            })
     }
 
     async addUserMessageAsync (content: string, pageno: number) {
@@ -100,7 +106,7 @@ class State {
         this._pages.push(<IPage> { user: content })
 
         await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
-        this.fetchStorySoFarAsync()
+        return this.fetchStorySoFarAsync()
     }
 
     async setAssistantMessageAsync (content: string, pageno: number) {
@@ -109,11 +115,15 @@ class State {
         this._pages[pageno].assistant = content;
 
         await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
-        this.fetchStorySoFarAsync()
+        return this.fetchStorySoFarAsync()
     }
 
     async resetMessagesAsync () {
-        return this.addUserMessageAsync(this._game_definition!.prompt!, -1)
+        this._pages = [];
+        this._pages.push(<IPage> { user: this._game_definition!.prompt! })
+
+        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        return this.fetchStorySoFarAsync()
     }
 
     pages() {
