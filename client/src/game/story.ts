@@ -98,16 +98,16 @@ const streamUpdater = (message: string) => {
 
 
 const render_and_fetch_more = async () => {
-    user_text = await state.userMessageOnPage(pageno)
-    next_user_text = await state.userMessageOnNextPage(pageno)
-    assistant_text = await state.assistantMessageOnPage(pageno)
+    user_text = state.userMessageOnPage(pageno)
+    next_user_text = state.userMessageOnNextPage(pageno)
+    assistant_text = state.assistantMessageOnPage(pageno)
     lastPageNo = state.lastPageNo()
 
     App.render()
 
     if (assistant_text == undefined) {
-        assistant_text = await state.chat(streamUpdater)
-        await state.setAssistantMessage(assistant_text, pageno)
+        assistant_text = await state.chatAsync(streamUpdater)
+        await state.setAssistantMessageAsync(assistant_text, pageno)
 
         App.untransitionUI()
         App.render()
@@ -128,18 +128,27 @@ export const fetch = (args: string[] | undefined) => {
         assistant_text = null
         next_user_text = null
 
-        state.fetch_game_definition(gameid)
-            .then((payload: any) => {
-                mystate = Misc.clone(payload) as GameDefinition
+        Promise.all
+            ([
+                state.fetchGameDefinitionAsync(gameid),
+                state.fetchStorySoFarAsync(gameid)
+            ])
+            .then((payloads: any) => {
+                mystate = Misc.clone(payloads[0]) as GameDefinition
             })
-            .then(() => { state.resetMessages() })
+            //.then(() => { state.resetMessagesAsync() })
+            .then(state.resetMessagesAsync)
             .then(() => { Router.goto(`#/story/${gameid}/0`, 1) })
     }
     else {
         App.prepareRender(NS, "Story", "screen_story")
-        state.fetch_game_definition(gameid)
-            .then((payload: any) => {
-                mystate = Misc.clone(payload) as GameDefinition
+        Promise.all
+            ([
+                state.fetchGameDefinitionAsync(gameid),
+                state.fetchStorySoFarAsync(gameid)
+            ])
+            .then((payloads: any) => {
+                mystate = Misc.clone(payloads[0]) as GameDefinition
             })
             .then(render_and_fetch_more)
             .catch(render_and_fetch_more)
@@ -170,7 +179,7 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 export const submit = async (input: HTMLInputElement) => {
-    await state.addUserMessage(next_user_text!, pageno)
+    await state.addUserMessageAsync(next_user_text!, pageno)
 
     next_user_text = null
     assistant_text = null
@@ -183,7 +192,7 @@ export const help = async (yesno: boolean) => {
     
     helping = yesno
     if (helping) {
-        const extra = await state.chatExtra("3_choix")
+        const extra = await state.chatExtraAsync("3_choix")
         choices = extra.choices
     }
 
@@ -197,12 +206,12 @@ export const selectChoice = (index: number) => {
     App.render()
 }
 
-export const toggleEditable = () => {
+export const toggleEditable = async () => {
     if (editable) {
         const element = document.getElementById("ct_response")
         if (element) {
             assistant_text = element.innerText
-            state.setAssistantMessage(assistant_text,pageno)
+            await state.setAssistantMessageAsync(assistant_text, pageno)
         }
     }
     editable = !editable

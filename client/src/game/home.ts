@@ -50,7 +50,7 @@ const pageTemplate = (form: string) => {
 
 export const fetch = async (args: string[] | undefined) => {
     App.prepareRender(NS, "Home", "screen_home")
-    state.fetch_index()
+    state.fetchIndexAsync()
         .then(App.untransitionUI)
         .then(App.render)
         .catch(App.render);

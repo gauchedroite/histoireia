@@ -83,7 +83,7 @@ const fetchState = () => {
     isNew = (gameid == "new")
 
     if (!isNew) {
-        return state.fetch_game_definition(gameid)
+        return state.fetchGameDefinitionAsync(gameid)
             .then(payload => {
                  mystate = Misc.clone(payload) as GameDefinition
             })
@@ -92,7 +92,7 @@ const fetchState = () => {
             .then(App.untransitionUI)
     }
     else {
-        state.new_story()
+        state.newStory()
         mystate = Misc.clone(state.game_definition) as GameDefinition
         return Promise.resolve()
             .then(Lookup.fetch_llm)
@@ -110,7 +110,7 @@ export const fetch = (args: string[] | undefined) => {
 
 export const refresh = () => {
     App.transitionUI()
-    state.fetch_game_definition(gameid)
+    state.fetchGameDefinitionAsync(gameid)
     .then(payload => {
          mystate = Misc.clone(payload) as GameDefinition
     })
@@ -164,7 +164,7 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 export const save_story = async () => {
-    state.save_story(mystate)
+    state.saveStoryAsync(mystate)
         .then((payload: any) => {
             gameid = payload.gameid
             isNew = false;
@@ -188,7 +188,7 @@ export const cancelModal = () => {
 
 export const executeModal = async () => {
     modalWhat = null
-    state.delete_story()
+    state.deleteStoryAsync()
         .then(() => {
             Misc.toastSuccess("Le livre a été effacé!")
             //App.popRenderStack()

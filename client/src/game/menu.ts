@@ -8,7 +8,6 @@ const ns = NS.toLowerCase()
 
 
 let mystate: GameDefinition
-let mystate2: IPage[]
 let gameid = ""
 let lastPage = 0;
 let modalWhat: string | null = null
@@ -43,7 +42,7 @@ const formTemplate = () => {
     else {
         action(`#/story/${gameid}/${lastPage}`, "Continuer la lecture", `<i class="fa-thin fa-book-open-reader"></i>`)
 
-        mystate2.forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.user)))
+        state.pages().forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.user)))
 
         action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer le livre?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
     }
@@ -94,12 +93,11 @@ export const fetch = (args: string[] | undefined) => {
 
     Promise.all
         ([
-            state.fetch_game_definition(gameid),
-            state.fetchStorySoFar(gameid)
+            state.fetchGameDefinitionAsync(gameid),
+            state.fetchStorySoFarAsync(gameid)
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition
-            mystate2 = payloads[1] as IPage[]
             lastPage = state.lastPageNo()
         })
         .then(App.untransitionUI)
@@ -109,7 +107,7 @@ export const fetch = (args: string[] | undefined) => {
 
 export const render = () => {
     if (!App.inContext(NS)) return "";
-    if (mystate2 == undefined) return ""
+    if (state.pages() == undefined) return ""
 
     const form = formTemplate()
     const modal = layout_Modal()

@@ -47,6 +47,7 @@ class State {
     private _index: GameList[] = []
     private _game_definition: GameDefinition | undefined
     private _gameid: string | undefined
+    private _pages: IPage[] = []
     
     llmid: number | null = null
 
@@ -58,7 +59,6 @@ class State {
     set username(value: string) {
         this._username = value
         localStorage.setItem("username", value)
-        const json = localStorage.getItem(value)
     }
 
     get username() {
@@ -83,82 +83,65 @@ class State {
 
 
     //
-    // Managing the localStorage
+    // Managing the state
     //
-    private getKey (what: string) {
-        return `${this.username}_${this.gameid}_${what}`
-    }
-
-    async fetchStorySoFar (gameid?: string) {
+    async fetchStorySoFarAsync (gameid?: string) {
         if (gameid != undefined)
             this._gameid = gameid
 
-        const key = this.getKey("pages")
-        const json = localStorage.getItem(key) ?? "[]"
-        
-        const json2 = await App.GET(`users/${this.username}/${this.gameid}`) as any
-        console.log(json2)
-
-        return JSON.parse(json) as IPage[]
+        this._pages = await App.GET(`users/${this.username}/${this.gameid}`) as any
     }
 
-    async addUserMessage (content: string, pageno: number) {
-        let pages = await this.fetchStorySoFar()
+    async addUserMessageAsync (content: string, pageno: number) {
+        await this.fetchStorySoFarAsync()
 
-        // Truncate the page array so we can restart the story in the middle if we want
-        pages = pages.slice(0, pageno + 1)
-        pages.push(<IPage> { user: content })
+        // Truncate the page array so we can restart the story in the middle if we want to
+        this._pages = this._pages.slice(0, pageno + 1)
+        this._pages.push(<IPage> { user: content })
 
-        const key = this.getKey("pages")
-        localStorage.setItem(key, JSON.stringify(pages))
-
-        return App.PUT(`users/${this.username}/${this.gameid}`, pages)
+        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        this.fetchStorySoFarAsync()
     }
 
-    async setAssistantMessage (content: string, pageno: number) {
-        const pages = await this.fetchStorySoFar()
-        pages[pageno].assistant = content;
+    async setAssistantMessageAsync (content: string, pageno: number) {
+        await this.fetchStorySoFarAsync()
 
-        const key = this.getKey("pages")
-        localStorage.setItem(key, JSON.stringify(pages))
+        this._pages[pageno].assistant = content;
 
-        return App.PUT(`users/${this.username}/${this.gameid}`, pages)
+        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        this.fetchStorySoFarAsync()
     }
 
-    resetMessages () {
-        return this.addUserMessage(this._game_definition!.prompt!, -1)
+    async resetMessagesAsync () {
+        return this.addUserMessageAsync(this._game_definition!.prompt!, -1)
+    }
+
+    pages() {
+        return this._pages;
     }
 
     lastPageNo() {
-        const key = this.getKey("pages")
-        const json = localStorage.getItem(key) ?? "[]"
-
-        const pages = JSON.parse(json) as IPage[]
-        if (pages == undefined || pages.length == 0)
+        if (this._pages == undefined || this._pages.length == 0)
             return -1
         
-        return (pages.length - 1)
+        return (this._pages.length - 1)
     }
 
-    async userMessageOnPage (pageno: number) {
-        const pages = await this.fetchStorySoFar();
-        return pages[pageno]?.user
+    userMessageOnPage (pageno: number) {
+        return this._pages[pageno]?.user
     }
 
-    async userMessageOnNextPage (pageno: number) {
-        const pages = await this.fetchStorySoFar();
-        return pages[pageno + 1]?.user
+    userMessageOnNextPage (pageno: number) {
+        return this._pages[pageno + 1]?.user
     }
 
-    async assistantMessageOnPage (pageno: number) {
-        const msgs = await this.fetchStorySoFar();
-        return msgs[pageno]?.assistant
+    assistantMessageOnPage (pageno: number) {
+        return this._pages[pageno]?.assistant
     }
 
-    async pagesToMessages () {
-        const pages = await this.fetchStorySoFar()
+    pagesToMessages () {
         const messages: IChat[] = []
-        pages.forEach((one, index) => {
+        this._pages.forEach((one, index) => {
 
             messages.push(<IChat> {
                 role: (index == 0 ? "system" : "user"),
@@ -180,11 +163,11 @@ class State {
     //
     // Operations on the server
     //
-    async fetch_index () {
+    async fetchIndexAsync () {
         this._index = await App.GET("stories") as any
     }
 
-    async fetch_game_definition (gameid: string) {
+    async fetchGameDefinitionAsync (gameid: string) {
         if (this._gameid == gameid) {
             return this._game_definition
         }
@@ -194,7 +177,7 @@ class State {
         return this._game_definition
     }
 
-    new_story () {
+    newStory () {
         this._game_definition = <GameDefinition> {
             code: "new",
             title: "Nouveau!",
@@ -205,21 +188,18 @@ class State {
         this._gameid = this._game_definition.code!
     }
 
-    async save_story(game_definition: any) {
+    async saveStoryAsync(game_definition: any) {
         this._game_definition = game_definition
         return App.PUT(`stories/${this.gameid}`, game_definition)
     }
 
-    async delete_story() {
-        const key = this.getKey("messages")
-        localStorage.removeItem(key)
-
+    async deleteStoryAsync() {
         return App.DELETE(`stories/${this.gameid}`, {})
     }
 
-    async chat(streamUpdater?: (message: string) => void) {
-        const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
-        const messages = await this.pagesToMessages()
+    async chatAsync(streamUpdater?: (message: string) => void) {
+        const endpoint = App.apiurl(`chat/${this.gameid}`)
+        const messages = this.pagesToMessages()
         
         const response = await window.fetch(endpoint, {
             method: "POST",
@@ -247,8 +227,8 @@ class State {
         return answer;
     }
 
-    async chatExtra(extra: string) {
-        const endpoint = App.apiurl(`stories/${this.gameid}/chat-extra/${extra}`)
+    async chatExtraAsync(extra: string) {
+        const endpoint = App.apiurl(`chat/${this.gameid}/${extra}`)
         const messages = this.pagesToMessages()
 
         const response = await window.fetch(endpoint, {

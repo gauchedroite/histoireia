@@ -215,8 +215,53 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
+
+
+// Fetch story state of user
+app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
+    let username = req.params.username;
+    let gameid = req.params.gameid;
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+
+    try {
+        let pagesContent: string;
+        if (!fs.existsSync(pages_Path))
+            pagesContent = "[]";
+        else
+            pagesContent = await fs.readFile(pages_Path, "utf8");
+
+        const pages = JSON.parse(pagesContent);
+
+        console.log(`GET /stories/${gameid}/${username}`)
+        res.json(pages);
+    }
+    catch (err) {
+        console.error(`GET /stories/${gameid}/${username}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de lire l'histoire du joueur" });
+    }
+});
+
+app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
+    let username = req.params.username.toLowerCase();
+    let gameid = req.params.gameid.toLowerCase();
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+
+    try {
+        await fs.writeFile(pages_Path, JSON.stringify(req.body));
+
+        console.log(`PUT /users/${username}/${gameid}`);
+        res.status(204).end();
+    }
+    catch (err) {
+        console.error(`PUT /users/${username}/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour l'histoire du joueur" });
+    }
+});
+
+
+
 // Execute story prompt
-app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
+app.post("/chat/:gameid", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     try {
         const messages = req.body as any
@@ -259,7 +304,7 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
 
         if (!response.ok) {
             const error = await response.text();
-            console.error(`POST /stories/${gameid}/chat`, error);
+            console.error(`POST /chat/${gameid}`, error);
             res.status(response.status).json({ hasError: true, message: "Impossible de poursuivre l'histoire" });
             return
         }
@@ -304,7 +349,7 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
                             }
                         }
                         catch (error) {
-                            console.error(`POST /stories/${gameid}/chat Error parsing JSON:`, error);
+                            console.error(`POST /chat/${gameid} Error parsing JSON:`, error);
                         }
                     }
                 }
@@ -314,18 +359,18 @@ app.post("/stories/:gameid/chat", async (req: Request, res: Response) => {
         };
     
         processStream().catch(error => {
-            console.error(`POST /stories/${gameid}/chat`, error);
+            console.error(`POST /chat/${gameid}`, error);
             res.status(500).json({ hasError: true, message: "Erreur interne en traitant le stream" });
         });
     }
     catch (error) {
-        console.error(`POST /stories/${gameid}/chat`, error);
+        console.error(`POST /chat/${gameid}`, error);
         res.status(500).json({ hasError: true, message: "Erreur interne" });
     }
 });
 
 // Execute story extra
-app.post("/stories/:gameid/chat-extra/:extraid", async (req: Request, res: Response) => {
+app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     const extraid = req.params.extraid;
     try {
@@ -382,7 +427,7 @@ app.post("/stories/:gameid/chat-extra/:extraid", async (req: Request, res: Respo
 
         if (!response.ok) {
             const error = await response.text();
-            console.error(`POST /stories/${gameid}/chat/${extra}`, error);
+            console.error(`POST /chat/${gameid}/${extra}`, error);
             res.status(response.status).json({ hasError: true, message: "Impossible de poursuivre l'histoire" });
             return
         }
@@ -391,55 +436,12 @@ app.post("/stories/:gameid/chat-extra/:extraid", async (req: Request, res: Respo
         const content = json.choices[0]?.message?.content || "{}";
         const completion = JSON.parse(content)
 
-        console.log(`POST /stories/${gameid}/chat/${extraid}`);
+        console.log(`POST /chat/${gameid}/${extraid}`);
         res.json(completion);
     }
     catch (error) {
-        console.error(`POST /stories/${gameid}/chat/${extraid}`, error);
+        console.error(`POST /chat/${gameid}/${extraid}`, error);
         res.status(500).json({ hasError: true, message: "Erreur interne" });
-    }
-});
-
-
-
-// User state management
-app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
-    let username = req.params.username;
-    let gameid = req.params.gameid;
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
-
-    try {
-        let pagesContent: string;
-        if (!fs.existsSync(pages_Path))
-            pagesContent = "[]";
-        else
-            pagesContent = await fs.readFile(pages_Path, "utf8");
-
-        const pages = JSON.parse(pagesContent);
-
-        console.log(`GET /users/${username}/${gameid}`)
-        res.json(pages);
-    }
-    catch (err) {
-        console.error(`GET /users/${username}/${gameid}`, err);
-        res.status(500).json({ hasError: true, message: "Impossible de lire l'histoire du joueur" });
-    }
-});
-
-app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
-    let username = req.params.username;
-    let gameid = req.params.gameid;
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
-
-    try {
-        await fs.writeFile(pages_Path, JSON.stringify(req.body));
-
-        console.log(`PUT /users/${username}/${gameid}`);
-        res.status(204).end();
-    }
-    catch (err) {
-        console.error(`PUT /users/${username}/${gameid}`, err);
-        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour l'histoire du joueur" });
     }
 });
 
