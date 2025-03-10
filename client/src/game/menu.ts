@@ -10,6 +10,7 @@ const ns = NS.toLowerCase()
 let mystate: GameDefinition
 let mystate2: IPage[]
 let gameid = ""
+let lastPage = 0;
 let modalWhat: string | null = null
 
 
@@ -19,8 +20,6 @@ const formTemplate = () => {
     const action = (href: string, text: string, icon: string) => rows.push(`<a href="${href}"><div><div>${text}</div>${icon}</div></a>`);
     const page = (index: number, text: string) => rows.push(`<a href="#/story/${gameid}/${index}" class="page ${index == 0 ? "page-0" : ""}"><div><div>${text}</div><span>p.${index+1}</span></div></a>`);
     let rows: string[] = [];
-
-    const lastPage = state.lastPageNo()
 
     if (mystate.bg_url) {
         add(`<a href="#/story/${gameid}/${lastPage}">
@@ -92,10 +91,16 @@ ${modal}
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
     App.prepareRender(NS, "Menu", "screen_menu")
-    state.fetch_game_definition(gameid)
-        .then((payload: any) =>{
-            mystate = Misc.clone(payload) as GameDefinition
-            mystate2 = state.getPages(gameid)
+
+    Promise.all
+        ([
+            state.fetch_game_definition(gameid),
+            state.fetchStorySoFar(gameid)
+        ])
+        .then(payloads => {
+            mystate = Misc.clone(payloads[0]) as GameDefinition
+            mystate2 = payloads[1] as IPage[]
+            lastPage = state.lastPageNo()
         })
         .then(App.untransitionUI)
         .then(App.render)

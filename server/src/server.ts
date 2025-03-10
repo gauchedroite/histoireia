@@ -34,6 +34,7 @@ const publicPath = path.join(__dirname, "../../public");
 const assetsPath = path.join(__dirname, "../../public/assets");
 const lookupPath = path.join(__dirname, "../../public/data/lookup");
 const extraPath = path.join(__dirname, "../../public/data/chat-extra");
+const usersPath = path.join(__dirname, "../../public/data/users");
 
 
 // The src and webfonts folders are served by Caddy because
@@ -51,7 +52,7 @@ app.use((req, res, next) => {
     next();
 });
 
-  
+
 // Middleware to configure cache settings for /data endpoint
 const noCache: express.RequestHandler = (_req, res, next) => {
     console.log(`Accessing /data endpoint at ${new Date().toISOString()}`);
@@ -401,6 +402,51 @@ app.post("/stories/:gameid/chat-extra/:extraid", async (req: Request, res: Respo
 
 
 
+// User state management
+app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
+    let username = req.params.username;
+    let gameid = req.params.gameid;
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+
+    try {
+        let pagesContent: string;
+        if (!fs.existsSync(pages_Path))
+            pagesContent = "[]";
+        else
+            pagesContent = await fs.readFile(pages_Path, "utf8");
+
+        const pages = JSON.parse(pagesContent);
+
+        console.log(`GET /users/${username}/${gameid}`)
+        res.json(pages);
+    }
+    catch (err) {
+        console.error(`GET /users/${username}/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de lire l'histoire du joueur" });
+    }
+});
+
+app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
+    let username = req.params.username;
+    let gameid = req.params.gameid;
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+
+    try {
+        await fs.writeFile(pages_Path, JSON.stringify(req.body));
+
+        console.log(`PUT /users/${username}/${gameid}`);
+        res.status(204).end();
+    }
+    catch (err) {
+        console.error(`PUT /users/${username}/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour l'histoire du joueur" });
+    }
+});
+
+
+
+
+// For later...
 app.post("/upload-face", async (req: Request, res: Response) => {
     const { filename: fileName, image } = req.body;
     const filePath = path.join(publicPath, fileName);

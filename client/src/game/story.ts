@@ -10,6 +10,7 @@ export const NS = "GSTORY";
 let mystate: GameDefinition
 let gameid = ""
 let pageno = 0
+let lastPageNo = 0
 let isNew = false
 let user_text: string | null = null;
 let assistant_text: string | null = null
@@ -59,7 +60,6 @@ const formTemplate = () => {
 }
 
 const pageTemplate = (form: string) => {
-    const lastPageNo = state.lastPageNo()
     let prev_url = `#/story/${gameid}/${pageno - 1}`
     let first_url = `#/story/${gameid}/0`
     let prev_disabled = (pageno == 0 ? "disabled" : "")
@@ -98,14 +98,16 @@ const streamUpdater = (message: string) => {
 
 
 const render_and_fetch_more = async () => {
-    user_text = state.userMessageOnPage(pageno)
-    next_user_text = state.userMessageOnNextPage(pageno)
-    assistant_text = state.assistantMessageOnPage(pageno)
+    user_text = await state.userMessageOnPage(pageno)
+    next_user_text = await state.userMessageOnNextPage(pageno)
+    assistant_text = await state.assistantMessageOnPage(pageno)
+    lastPageNo = state.lastPageNo()
+
     App.render()
 
     if (assistant_text == undefined) {
         assistant_text = await state.chat(streamUpdater)
-        state.setAssistantMessage(assistant_text, pageno)
+        await state.setAssistantMessage(assistant_text, pageno)
 
         App.untransitionUI()
         App.render()
@@ -129,9 +131,9 @@ export const fetch = (args: string[] | undefined) => {
         state.fetch_game_definition(gameid)
             .then((payload: any) => {
                 mystate = Misc.clone(payload) as GameDefinition
-                state.resetMessages()
-                Router.goto(`#/story/${gameid}/0`, 1)
             })
+            .then(() => { state.resetMessages() })
+            .then(() => { Router.goto(`#/story/${gameid}/0`, 1) })
     }
     else {
         App.prepareRender(NS, "Story", "screen_story")
@@ -167,8 +169,8 @@ export const onchange = (input: HTMLInputElement) => {
 
 
 
-export const submit = (input: HTMLInputElement) => {
-    state.addUserMessage(next_user_text!, pageno)
+export const submit = async (input: HTMLInputElement) => {
+    await state.addUserMessage(next_user_text!, pageno)
 
     next_user_text = null
     assistant_text = null

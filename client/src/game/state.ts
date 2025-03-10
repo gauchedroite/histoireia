@@ -89,17 +89,21 @@ class State {
         return `${this.username}_${this.gameid}_${what}`
     }
 
-    getPages (gameid?: string) {
+    async fetchStorySoFar (gameid?: string) {
         if (gameid != undefined)
             this._gameid = gameid
 
         const key = this.getKey("pages")
         const json = localStorage.getItem(key) ?? "[]"
+        
+        const json2 = await App.GET(`users/${this.username}/${this.gameid}`) as any
+        console.log(json2)
+
         return JSON.parse(json) as IPage[]
     }
 
-    addUserMessage (content: string, pageno: number) {
-        let pages = this.getPages()
+    async addUserMessage (content: string, pageno: number) {
+        let pages = await this.fetchStorySoFar()
 
         // Truncate the page array so we can restart the story in the middle if we want
         pages = pages.slice(0, pageno + 1)
@@ -107,45 +111,52 @@ class State {
 
         const key = this.getKey("pages")
         localStorage.setItem(key, JSON.stringify(pages))
+
+        return App.PUT(`users/${this.username}/${this.gameid}`, pages)
     }
 
-    setAssistantMessage (content: string, pageno: number) {
-        const pages = this.getPages()
+    async setAssistantMessage (content: string, pageno: number) {
+        const pages = await this.fetchStorySoFar()
         pages[pageno].assistant = content;
 
         const key = this.getKey("pages")
         localStorage.setItem(key, JSON.stringify(pages))
+
+        return App.PUT(`users/${this.username}/${this.gameid}`, pages)
     }
 
     resetMessages () {
-        this.addUserMessage(this._game_definition!.prompt!, -1)
-        return this._game_definition
+        return this.addUserMessage(this._game_definition!.prompt!, -1)
     }
 
     lastPageNo() {
-        const pages = this.getPages();
+        const key = this.getKey("pages")
+        const json = localStorage.getItem(key) ?? "[]"
+
+        const pages = JSON.parse(json) as IPage[]
         if (pages == undefined || pages.length == 0)
             return -1
+        
         return (pages.length - 1)
     }
 
-    userMessageOnPage (pageno: number): string | null {
-        const pages = this.getPages();
+    async userMessageOnPage (pageno: number) {
+        const pages = await this.fetchStorySoFar();
         return pages[pageno]?.user
     }
 
-    userMessageOnNextPage (pageno: number) {
-        const pages = this.getPages();
+    async userMessageOnNextPage (pageno: number) {
+        const pages = await this.fetchStorySoFar();
         return pages[pageno + 1]?.user
     }
 
-    assistantMessageOnPage (pageno: number) {
-        const msgs = this.getPages();
+    async assistantMessageOnPage (pageno: number) {
+        const msgs = await this.fetchStorySoFar();
         return msgs[pageno]?.assistant
     }
 
-    pagesToMessages () {
-        const pages = this.getPages()
+    async pagesToMessages () {
+        const pages = await this.fetchStorySoFar()
         const messages: IChat[] = []
         pages.forEach((one, index) => {
 
@@ -208,7 +219,7 @@ class State {
 
     async chat(streamUpdater?: (message: string) => void) {
         const endpoint = App.apiurl(`stories/${this.gameid}/chat`)
-        const messages = this.pagesToMessages()
+        const messages = await this.pagesToMessages()
         
         const response = await window.fetch(endpoint, {
             method: "POST",
