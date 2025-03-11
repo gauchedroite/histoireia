@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr-CA">
 <head>
+    <!-- Fix to FOUC -->
+    <style>html{visibility:hidden; opacity:0;}</style>
+
     <meta charset="utf-8" />
     <meta name="description" content="Histoires pour Laura, Auteur: Papi">
     <title>HistoireIA</title>
@@ -17,6 +20,9 @@
 
     <!-- Browser tab icon -->
     <link rel="shortcut icon" href="#">
+
+    <!-- Fix to FOUT -->
+    <link rel="preload" as="font" href="webfonts/klee-one-v7-latin-regular.woff2" type="font/woff2" crossorigin="anonymous">
 
     <link rel="stylesheet" href="lib/toastify.min.css" defer async>
     <link rel="stylesheet" href="all.min.css" defer async>

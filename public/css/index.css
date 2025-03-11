@@ -9,3 +9,9 @@
 @import "./editor.css";
 @import "./waiting.css";
 @import "./modal.css";
+
+/* Fix to FOUC */
+html {
+    visibility: visible;
+    opacity: 1;
+}

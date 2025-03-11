@@ -52,8 +52,8 @@ class State {
     llmid: number | null = null
 
     constructor() {
-        this._username = "laura"
-        this.username = localStorage.getItem("username") ?? "laura"
+        this._username = ""
+        this.username = localStorage.getItem("username") ?? ""
     }
 
     set username(value: string) {

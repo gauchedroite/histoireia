@@ -7,6 +7,7 @@ declare const marked: any;
 
 
 export interface IOptText extends IOpt {
+    minlength: number
     maxlength: number
     listid: string
     placeholder: string
@@ -62,6 +63,7 @@ export const renderInputText = (ns: string, propName: string, value: string | nu
     ${option.required ? "required='required'" : ""} 
     ${option.disabled ? "disabled" : ""}
     ${option.maxlength ? `maxlength="${option.maxlength}"` : ""}
+    ${option.minlength ? `minlength="${option.minlength}"` : ""}
     ${option.datalistname ? `list="${option.datalistname}"` : ""}
     ${option.pattern ? `pattern="${option.pattern}"` : ""}
     ${option.noautocomplete ? option.password ? `autocomplete="new-password"` : "" : ""}

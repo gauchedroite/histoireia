@@ -38,5 +38,17 @@
             display: block;
             padding: 1rem 25%;
         }
+
+        button {
+            /* background-color: var(--accent-bgc); */
+            font-size: large;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+
+            border: none;
+            height: 3rem;
+            width: 3rem;
+            box-shadow: 0 2px 4px darkslategray;
+        }
     }
 }
