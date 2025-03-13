@@ -21,10 +21,13 @@ const formTemplate = (item: GameDefinition, llmid: string) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
+    const amAuthor = (item.author == state.username)
 
+    add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
     add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
-    add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "Histoire privée", "Seulement pour moi!", <Theme.IOpt>{}))
+
+    if (amAuthor)
+        add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "Histoire privée", "Privé: seulement pour moi!", <Theme.IOpt>{}))
 
     add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
     add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
@@ -156,6 +159,7 @@ const getFormState = () => {
     clone.prompt = Misc.fromInputText(`${NS}_prompt`, mystate.prompt);
     clone.llmid = Misc.fromSelectNumber(`${NS}_llmid`, mystate.llmid);
     clone.extra = Misc.fromInputText(`${NS}_extra`, mystate.extra);
+    clone.justme = Misc.fromInputCheckbox(`${NS}_justme`, mystate.justme);
     return clone;
 }
 

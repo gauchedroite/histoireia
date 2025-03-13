@@ -1,0 +1,25 @@
+
+input[type=checkbox]:checked, input[type=radio]:checked {
+    background: var(--accent-bgc);
+}
+
+input[type=checkbox],
+input[type=radio] {
+    position: relative;
+    width: 20px;
+    min-width: auto;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 1px;
+    margin: 0;
+    margin-right: 2px;
+}
+
+input[type=checkbox]:checked::before {
+    display: flex;
+    justify-content: center;
+    content: "✔";
+    color: var(--color);
+    font-size: .8rem;
+}

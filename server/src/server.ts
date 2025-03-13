@@ -179,7 +179,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
     }
 
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra: extra }
+        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme }
     
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");

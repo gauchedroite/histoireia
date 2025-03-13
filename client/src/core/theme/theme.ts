@@ -1,7 +1,7 @@
 
 
 //checkboxes
-export { IOptCheckbox, ICheckbox, renderFieldCheckbox, input_Checkbox, renderRawCheckbox } from "./theme-checkbox.js"
+export { IOptCheckbox, ICheckbox, renderFieldCheckbox, renderInputCheckbox } from "./theme-checkbox.js"
 
 //text
 export { IOptText, renderFieldText, renderFieldTextarea, renderInputText, renderInputTextarea } from "./theme-text.js"

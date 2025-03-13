@@ -194,7 +194,10 @@ class State {
             code: "new",
             title: "Nouveau!",
             bg_image: "",
-            prompt: "Tu es un assistant utile."
+            prompt: "Tu es un assistant utile.",
+            author: this.username,
+            justme: true,
+            extra: null
         }
 
         this._gameid = this._game_definition.code!
