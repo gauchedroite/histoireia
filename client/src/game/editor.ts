@@ -24,6 +24,8 @@ const formTemplate = (item: GameDefinition, llmid: string) => {
     add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
 
     add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
+    add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "Histoire privée", "Seulement pour moi!", <Theme.IOpt>{}))
+
     add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
     add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
 

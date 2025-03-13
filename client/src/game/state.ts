@@ -17,6 +17,8 @@ export interface GameDefinition {
     llmid: number | null
     llmid_text: string
     extra: string | null
+    author: string
+    justme: boolean
 }
 
 
@@ -57,8 +59,8 @@ class State {
     }
 
     set username(value: string) {
-        this._username = value
-        localStorage.setItem("username", value)
+        this._username = value.toLowerCase()
+        localStorage.setItem("username", this._username)
     }
 
     get username() {
@@ -174,7 +176,7 @@ class State {
     // Operations on the server
     //
     async fetchIndexAsync () {
-        this._index = await App.GET("stories") as any
+        this._index = await App.GET(`stories-for/${this.username}`) as any
     }
 
     async fetchGameDefinitionAsync (gameid: string) {

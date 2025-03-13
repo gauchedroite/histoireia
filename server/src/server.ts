@@ -13,6 +13,8 @@ interface GameDefinition {
     prompt: string
     llmid: number
     extra?: string | null
+    author: string
+    justme: boolean
 }
 
 interface Message {
@@ -78,7 +80,8 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 
 // List stories
-app.get("/stories", async (req: Request, res: Response) => {
+app.get("/stories-for/:username", async (req: Request, res: Response) => {
+    let username = req.params.username;
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         const index = [];
@@ -90,9 +93,10 @@ app.get("/stories", async (req: Request, res: Response) => {
                 try {
                     const metadataPath = path.join(folderPath, "metadata.json");
                     const fileContent = await fs.readFile(metadataPath, "utf8");
-                    const data = JSON.parse(fileContent);
+                    const data = JSON.parse(fileContent) as GameDefinition;
+                    const hidden = data.justme && data.author != username;
 
-                    if (data.code && data.title) {
+                    if (!hidden && data.code && data.title) {
                         index.push({
                             code: data.code,
                             title: data.title,
@@ -128,7 +132,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
     try {
         const metadataPath = path.join(gameid_Path, "metadata.json");
         const metaContent = await fs.readFile(metadataPath, "utf8");
-        const data = JSON.parse(metaContent);
+        const data = JSON.parse(metaContent) as GameDefinition;
 
         const promptPath = path.join(gameid_Path, "prompt.txt");
         const prompt = await fs.readFile(promptPath, "utf8");
@@ -140,7 +144,9 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
                 bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
                 prompt,
                 llmid: data.llmid ?? 1,
-                extra: data.extra
+                extra: data.extra,
+                author: data.author,
+                justme: data.justme
         }
 
         console.log(`GET /stories/${gameid}`)
@@ -154,7 +160,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, extra: extra } = req.body as GameDefinition
+    const { title, bg_image, prompt, llmid, extra, author, justme } = req.body as GameDefinition
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
 
