@@ -51,7 +51,9 @@ class State {
     private _gameid: string | undefined
     private _pages: IPage[] = []
     
-    llmid: number | null = null
+    private last_StorySoFar_url: string | null = null
+    private last_Index_url: string | null = null
+
 
     constructor() {
         this._username = ""
@@ -91,13 +93,23 @@ class State {
         if (gameid != undefined)
             this._gameid = gameid
 
-        this._pages = await App.GET(`users/${this.username}/${this.gameid}`) as any
+        const url = `users/${this.username}/${this.gameid}`
 
-        return App.GET(`users/${this.username}/${this.gameid}`)
+        if (url != this.last_StorySoFar_url) {
+            return App.GET(url)
             .then(payload => {
+                this.last_StorySoFar_url = url
                 this._pages = payload as any;
                 return this._pages
             })
+        }
+        else {
+            return Promise
+                .resolve()
+                .then(_ => {
+                    return this._pages
+                })
+        }
     }
 
     async addUserMessageAsync (content: string, pageno: number) {
@@ -176,7 +188,12 @@ class State {
     // Operations on the server
     //
     async fetchIndexAsync () {
-        this._index = await App.GET(`stories-for/${this.username}`) as any
+        const url = `stories-for/${this.username}`
+
+        if (this.last_Index_url != url) {
+            this.last_Index_url = url
+            this._index = await App.GET(url) as any
+        }
     }
 
     async fetchGameDefinitionAsync (gameid: string) {
@@ -204,13 +221,17 @@ class State {
     }
 
     async saveStoryAsync(game_definition: any) {
+        this.last_Index_url = null
         this._game_definition = game_definition
         return App.PUT(`stories/${this.gameid}`, game_definition)
     }
 
     async deleteStoryAsync() {
+        this.last_Index_url = null
         return App.DELETE(`stories/${this.gameid}`, {})
     }
+
+
 
     async chatAsync(streamUpdater?: (message: string) => void) {
         const endpoint = App.apiurl(`chat/${this.gameid}`)
@@ -259,5 +280,6 @@ class State {
         return await response.json();
     }
 }
+
 
 export const state = new State();
