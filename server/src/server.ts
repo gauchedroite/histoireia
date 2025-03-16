@@ -27,6 +27,14 @@ interface Extra {
     json_schema: object
 }
 
+interface Man {
+    endpoint: string
+    api_key: string | null
+    model: string
+    gameid: string
+    res: Response
+}
+
 const app = express();
 const port = 9340;
 
@@ -267,7 +275,7 @@ app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
 
 
 // Execute story prompt
-app.post("/chat/:gameid", async (req: Request, res: Response) => {
+app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     try {
         const messages = req.body as any
@@ -350,8 +358,6 @@ app.post("/chat/:gameid", async (req: Request, res: Response) => {
                             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta.content) {
                                 const content = parsed.choices[0].delta.content;
                                 res.write(content);
-
-                                //console.log(stringToHex(content), content);
                             }
                         }
                         catch (error) {
@@ -373,7 +379,86 @@ app.post("/chat/:gameid", async (req: Request, res: Response) => {
         console.error(`POST /chat/${gameid}`, error);
         res.status(500).json({ hasError: true, message: "Erreur interne" });
     }
-});
+});//OLD
+
+// Execute story prompt
+app.post("/chat/:gameid", async (req: Request, res: Response) => {
+    const gameid = req.params.gameid;
+    try {
+        const messages = req.body as any
+
+        let gameid_Path = path.join(assetsPath, gameid)
+        const metadataPath = path.join(gameid_Path, "metadata.json");
+        const metaContent = await fs.readFile(metadataPath, "utf8");
+        const game = JSON.parse(metaContent);
+
+        const llmid = game.llmid
+        let llm_Path = path.join(lookupPath, "llm.json")
+        const llmContent = await fs.readFile(llm_Path, "utf8")
+        const llmList = JSON.parse(llmContent) as []
+        const llm = llmList.find((one: any) => one.id == llmid) as any
+        const api = llm.value1
+        const model = llm.value2
+
+        // To provide additional context to api calls
+        const man = <Man>{};
+        man.res = res
+        man.model = model
+        man.gameid = gameid;
+
+        // To switch between ollama and openai
+        man.endpoint = "http://192.168.50.199:11434/v1/chat/completions"
+        man.api_key = null
+        //
+        if (api == "openai") {
+            man.endpoint = "https://api.openai.com/v1/chat/completions"
+            man.api_key = process.env.OPENAI_API_KEY!
+        }
+
+        // Headers for streaming back to client
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        let conversation = [...messages];
+        let isStreaming = true;
+
+        while (isStreaming) {
+            const stream = await fetchOpenAILike(man, conversation, true);
+            if (stream == null) return;
+
+            let collectedText = "";
+            let toolCall: any = null;
+
+            for await (const chunk of parseOpenAILikeStream(stream)) {
+                if (chunk.tool_calls) {
+                    toolCall = chunk.tool_calls[0];
+                    break;
+                }
+
+                const content = chunk.choices[0].delta.content
+                if (content) {
+                    collectedText += content;
+                    res.write(content);
+                }
+            }
+
+            if (toolCall) {
+            }
+            else {
+                // Terminé sans demander de tool. Fin du streaming
+                isStreaming = false;
+            }
+        }
+
+        res.write(" ")
+        res.end();
+    }
+    catch (error) {
+        console.error(`POST /chat/${gameid}`, error);
+        res.status(500).json({ hasError: true, message: "Erreur interne" });
+    }
+});//NEW
 
 // Execute story extra
 app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
@@ -451,6 +536,57 @@ app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
     }
 });
 
+// Appeler OpenAI(like)
+async function fetchOpenAILike(man: Man, messages: any[], stream = false) {
+    const response = await fetch(man.endpoint, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${man.api_key}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: man.model,
+            messages,
+            //tools,
+            //tool_choice: "auto",
+            stream
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.text();
+        console.error(`POST /chat/${man.gameid}`, error);
+        man.res.status(response.status).json({ hasError: true, message: `Impossible de poursuivre l'histoire. [${error}]` });
+        return null
+    }
+
+    return response.body!;
+}
+
+// Lire les streams ligne par ligne
+async function* parseOpenAILikeStream(stream: ReadableStream<Uint8Array>) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+		const dataString = decoder.decode(value, { stream: true });
+		const lines = dataString.split('\n').filter(line => line.trim() !== '');
+
+		for (const line of lines) {
+			if (line.startsWith('data: ')) {
+				const message = line.replace(/^data: /, '');
+				if (message == "[DONE]")
+					break;
+
+                const chunk = JSON.parse(message);
+                yield chunk;
+            }
+		}
+    }
+}
 
 
 
