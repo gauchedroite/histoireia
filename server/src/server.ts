@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
+import { resolvePbta, rollPbta } from './server_tools';
 
 
 interface GameDefinition {
@@ -32,6 +33,7 @@ interface Man {
     api_key: string | null
     model: string
     gameid: string
+    tools: object[]
     res: Response
 }
 
@@ -45,6 +47,7 @@ const assetsPath = path.join(__dirname, "../../public/assets");
 const lookupPath = path.join(__dirname, "../../public/data/lookup");
 const extraPath = path.join(__dirname, "../../public/data/chat-extra");
 const usersPath = path.join(__dirname, "../../public/data/users");
+const toolsPath = path.join(__dirname, "../../public/data/tools");
 
 
 // The src and webfonts folders are served by Caddy because
@@ -66,7 +69,7 @@ app.use((req, res, next) => {
 // Middleware to configure cache settings for /data endpoint
 const noCache: express.RequestHandler = (_req, res, next) => {
     console.log(`Accessing /data endpoint at ${new Date().toISOString()}`);
-    
+
     res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
     res.set("Pragma", "no-cache");
     res.set("Expires", "0");
@@ -146,15 +149,15 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const prompt = await fs.readFile(promptPath, "utf8");
 
         const _game_definition: GameDefinition = {
-                code: data.code,
-                title: data.title,
-                bg_image: data.bg_image,
-                bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
-                prompt,
-                llmid: data.llmid ?? 1,
-                extra: data.extra,
-                author: data.author,
-                justme: data.justme
+            code: data.code,
+            title: data.title,
+            bg_image: data.bg_image,
+            bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
+            prompt,
+            llmid: data.llmid ?? 1,
+            extra: data.extra,
+            author: data.author,
+            justme: data.justme
         }
 
         console.log(`GET /stories/${gameid}`)
@@ -176,7 +179,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
         while (true) {
             gameid = createFunName()
             gameid_Path = path.join(assetsPath, gameid)
-            
+
             if (!fs.existsSync(gameid_Path))
                 break
 
@@ -188,10 +191,10 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme }
-    
+
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
-    
+
         await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
         await fs.writeFile(gameid_txtPath, prompt);
 
@@ -213,10 +216,10 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
         const files = await fs.readdir(gameid_Path);
 
         // Delete each file in folder
-       for (const file of files) {
-           const filePath = path.join(gameid_Path, file);
-           await fs.unlink(filePath);
-       }
+        for (const file of files) {
+            const filePath = path.join(gameid_Path, file);
+            await fs.unlink(filePath);
+        }
 
         // After deleting all files, remove the folder
         await fs.rmdir(gameid_Path);
@@ -275,7 +278,7 @@ app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
 
 
 // Execute story prompt
-app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
+app.post("/old1___chat/:gameid", async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     try {
         const messages = req.body as any
@@ -308,12 +311,12 @@ app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
             headers: {
                 "Authorization": `Bearer ${api_key}`,
                 "Content-Type": "application/json"
-             },
+            },
             body: JSON.stringify({
                 model,
                 messages,
                 stream: true
-            }) 
+            })
         });
 
         if (!response.ok) {
@@ -338,7 +341,7 @@ app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
             }
             return hex;
         }
-    
+
         const processStream = async () => {
             while (true) {
                 const { done, value } = await reader.read();
@@ -369,7 +372,7 @@ app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
             res.write(" ")
             res.end();
         };
-    
+
         processStream().catch(error => {
             console.error(`POST /chat/${gameid}`, error);
             res.status(500).json({ hasError: true, message: "Erreur interne en traitant le stream" });
@@ -379,7 +382,114 @@ app.post("/oldchat/:gameid", async (req: Request, res: Response) => {
         console.error(`POST /chat/${gameid}`, error);
         res.status(500).json({ hasError: true, message: "Erreur interne" });
     }
-});//OLD
+});//OLD1
+
+// Execute story prompt
+app.post("/old2___chat/:gameid", async (req: Request, res: Response) => {
+    const gameid = req.params.gameid;
+    try {
+        const messages = req.body as any
+
+        let gameid_Path = path.join(assetsPath, gameid)
+        const metadataPath = path.join(gameid_Path, "metadata.json");
+        const metaContent = await fs.readFile(metadataPath, "utf8");
+        const game = JSON.parse(metaContent);
+
+        const llmid = game.llmid
+        let llm_Path = path.join(lookupPath, "llm.json")
+        const llmContent = await fs.readFile(llm_Path, "utf8")
+        const llmList = JSON.parse(llmContent) as []
+        const llm = llmList.find((one: any) => one.id == llmid) as any
+        const api = llm.value1
+        const model = llm.value2
+
+        // To provide additional context to api calls
+        const man = <Man>{};
+        man.res = res
+        man.model = model
+        man.gameid = gameid;
+        man.tools = []
+
+        const toolPath = path.join(toolsPath, "roll_pbta.json");
+        const toolContent = await fs.readFile(toolPath, "utf8");
+        man.tools.push(JSON.parse(toolContent))
+
+        // To switch between ollama and openai
+        man.endpoint = "http://192.168.50.199:11434/v1/chat/completions"
+        man.api_key = null
+        //
+        if (api == "openai") {
+            man.endpoint = "https://api.openai.com/v1/chat/completions"
+            man.api_key = process.env.OPENAI_API_KEY!
+        }
+
+        // Headers for streaming back to client
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        let conversation = [...messages];
+        let isStreaming = true;
+
+        while (isStreaming) {
+            const stream = await fetchOpenAILike(man, conversation, true);
+            if (stream == null) return;
+
+            let collectedText = "";
+            let toolCalls: any[] = [];
+
+            for await (const chunk of parseOpenAILikeStream(stream)) {
+                // Stop streaming pour exécuter les tool calls
+                if (chunk.tool_calls) {
+                    toolCalls.push(...chunk.tool_calls);
+                    break;
+                }
+
+                // Send to UI
+                const content = chunk.content
+                if (content) {
+                    collectedText += content;
+                    res.write(content);
+                }
+            }
+
+            console.log("TOOLS", toolCalls)
+            // Exécuter les tool calls si nécessaires
+            for (const toolCall of toolCalls) {
+                console.log("TOOL CALL", toolCall)
+                const funName = toolCall.function.name
+                const funArgs = JSON.parse(toolCall.function.arguments)
+
+                let toolResult;
+                if (funName == "roll_pbta") {
+                    console.log("roll_pbta", funArgs.modifier)
+                    toolResult = rollPbta(funArgs.modifier);
+                }
+                else if (funName == "resolve_pbta") {
+                    toolResult = resolvePbta(funArgs.roll);
+                }
+
+                // On ajoute la réponse du tool à la conversation et on relance OpenAI
+                conversation.push({
+                    role: "tool",
+                    name: funName,
+                    content: JSON.stringify(toolResult)
+                });
+            }
+            if (toolCalls.length == 0) {
+                // Terminé sans demander de tool. Fin du streaming
+                isStreaming = false;
+            }
+        }
+
+        res.write(" ")
+        res.end();
+    }
+    catch (error) {
+        console.error(`POST /chat/${gameid}`, error);
+        res.status(500).json({ hasError: true, message: "Erreur interne" });
+    }
+});//OLD2
 
 // Execute story prompt
 app.post("/chat/:gameid", async (req: Request, res: Response) => {
@@ -405,6 +515,11 @@ app.post("/chat/:gameid", async (req: Request, res: Response) => {
         man.res = res
         man.model = model
         man.gameid = gameid;
+        man.tools = []
+
+        const toolPath = path.join(toolsPath, "roll_pbta.json");
+        const toolContent = await fs.readFile(toolPath, "utf8");
+        man.tools.push(JSON.parse(toolContent))
 
         // To switch between ollama and openai
         man.endpoint = "http://192.168.50.199:11434/v1/chat/completions"
@@ -420,45 +535,142 @@ app.post("/chat/:gameid", async (req: Request, res: Response) => {
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
-        let conversation = [...messages];
-        let isStreaming = true;
+        let pendingMessages = messages;
 
-        while (isStreaming) {
-            const stream = await fetchOpenAILike(man, conversation, true);
-            if (stream == null) return;
-
-            let collectedText = "";
-            let toolCall: any = null;
-
-            for await (const chunk of parseOpenAILikeStream(stream)) {
-                if (chunk.tool_calls) {
-                    toolCall = chunk.tool_calls[0];
-                    break;
+        while (true) {
+            const openAIStream = await fetch(man.endpoint, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${man.api_key}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: man.model,
+                    messages,
+                    stream: true,
+                    tools: man.tools,
+                    tool_choice: "auto",
+                })
+            });
+    
+            if (!openAIStream.body) throw new Error("No stream body received");
+    
+            const reader = openAIStream.body.getReader();
+            let partialData = ""; // Stocke les fragments de JSON
+            let toolCallsBuffer: Record<string, any> = {};
+            let hasToolCalls = false;
+            let currentToolCallId: string | null = null;
+    
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+    
+                const chunk = new TextDecoder().decode(value);
+                partialData += chunk; // Ajouter au buffer
+    
+                // Découper en lignes complètes
+                const lines = partialData.split("\n").filter(line => line.startsWith("data: "));
+    
+                // Garder le dernier morceau incomplet
+                if (!partialData.endsWith("\n")) {
+                    partialData = lines.pop() || "";
                 }
-
-                const content = chunk.choices[0].delta.content
-                if (content) {
-                    collectedText += content;
-                    res.write(content);
+                else {
+                    partialData = "";
                 }
+    
+                for (let line of lines) {
+                    const jsonStr = line.replace("data: ", "").trim();
+                    if (jsonStr === "[DONE]") {
+                        res.write(" ");
+                        continue;
+                    }
+    
+                    try {
+                        const data = JSON.parse(jsonStr);
+    
+                        if (data.choices) {
+                            for (const choice of data.choices) {
+                                const delta = choice.delta;
+    
+                                // Diffuser le texte immédiatement
+                                if (delta?.content) {
+                                    res.write(delta.content);
+                                }
+    
+                                // Reconstruction des tool calls en delta
+                                if (delta?.tool_calls) {
+                                    hasToolCalls = true;
+    
+                                    for (const toolCall of delta.tool_calls) {
+                                        if (toolCall.index !== undefined) {
+                                            currentToolCallId = toolCall.index.toString();
+    
+                                            if (!toolCallsBuffer[currentToolCallId!]) {
+                                                toolCallsBuffer[currentToolCallId!] = {
+                                                    id: toolCall.id,
+                                                    function: { name: "", arguments: "" }
+                                                };
+                                            }
+                                        }
+    
+                                        if (toolCall.function?.name) {
+                                            toolCallsBuffer[currentToolCallId!].function.name = toolCall.function.name;
+                                        }
+    
+                                        if (toolCall.function?.arguments) {
+                                            toolCallsBuffer[currentToolCallId!].function.arguments += toolCall.function.arguments;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (error) {
+                        continue;
+                    }
+                }
+    
+                res.write(""); // Force l'envoi immédiat
             }
-
-            if (toolCall) {
-            }
-            else {
-                // Terminé sans demander de tool. Fin du streaming
-                isStreaming = false;
-            }
+    
+            if (!hasToolCalls) return;
+    
+            // Exécuter les tool calls
+            const toolResponses = await executeToolCalls(Object.values(toolCallsBuffer));
+    
+            // Ajouter les réponses des outils et refaire une requête
+            pendingMessages.push(...toolResponses);
         }
-
-        res.write(" ")
-        res.end();
     }
     catch (error) {
         console.error(`POST /chat/${gameid}`, error);
         res.status(500).json({ hasError: true, message: "Erreur interne" });
     }
 });//NEW
+
+async function executeToolCalls(toolCalls: any[]): Promise<any[]> {
+    const results = [];
+    for (const toolCall of toolCalls) {
+        const functionName = toolCall.function.name;
+        const functionArgs = JSON.parse(toolCall.function.arguments);
+
+        let toolResponse;
+        if (functionName == "roll_pbta") {
+            const result = rollPbta(functionArgs);
+            console.log("roll_pbta", functionArgs, result.roll)
+            toolResponse = { role: "tool", content: JSON.stringify(result), name: functionName };
+        }
+        else if (functionName == "resolve_pbta") {
+            const result = resolvePbta(functionArgs);
+            console.log("resolve_pbta", functionArgs, result.outcome)
+            toolResponse = { role: "tool", content: JSON.stringify(result), name: functionName };
+        }
+
+        results.push(toolResponse);
+    }
+    return results;
+}
 
 // Execute story extra
 app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
@@ -505,7 +717,7 @@ app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
             headers: {
                 "Authorization": `Bearer ${api_key}`,
                 "Content-Type": "application/json"
-             },
+            },
             body: JSON.stringify({
                 model,
                 messages,
@@ -513,7 +725,7 @@ app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
                     type: "json_schema",
                     json_schema
                 }
-            }) 
+            })
         });
 
         if (!response.ok) {
@@ -536,7 +748,7 @@ app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
     }
 });
 
-// Appeler OpenAI(like)
+// Appeler OpenAI(like) api
 async function fetchOpenAILike(man: Man, messages: any[], stream = false) {
     const response = await fetch(man.endpoint, {
         method: "POST",
@@ -547,8 +759,8 @@ async function fetchOpenAILike(man: Man, messages: any[], stream = false) {
         body: JSON.stringify({
             model: man.model,
             messages,
-            //tools,
-            //tool_choice: "auto",
+            tools: man.tools,
+            tool_choice: "auto",
             stream
         })
     });
@@ -568,23 +780,75 @@ async function* parseOpenAILikeStream(stream: ReadableStream<Uint8Array>) {
     const reader = stream.getReader();
     const decoder = new TextDecoder();
 
+    let buffer = ""; // Stocker les morceaux de JSON
+    let toolCalls: { [key: string]: any } = {}; // Stocke les tool_calls incomplets
+    let toolId: string | null = null
+
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-		const dataString = decoder.decode(value, { stream: true });
-		const lines = dataString.split('\n').filter(line => line.trim() !== '');
+        buffer += decoder.decode(value);
+        const lines = buffer.split("\n").filter(line => line.startsWith("data: "));
 
-		for (const line of lines) {
-			if (line.startsWith('data: ')) {
-				const message = line.replace(/^data: /, '');
-				if (message == "[DONE]")
-					break;
+        for (const line of lines) {
+            const json = line.replace("data: ", "").trim();
+            if (json == "[DONE]") break; //return;
 
-                const chunk = JSON.parse(message);
-                yield chunk;
+            try {
+                const chunk = JSON.parse(json);
+                const delta = chunk.choices?.[0]?.delta;
+
+                if (!delta) continue;
+
+                //console.log("----\nDELTA", delta)
+
+                // Reconstruction des tool calls
+                if (delta.tool_calls) {
+                    //console.log("DELTA.TOOL_CALLS", delta.tool_calls)
+                    for (const partialCall of delta.tool_calls) {
+                        //const id = partialCall.id || Object.keys(toolCalls).find(key => !toolCalls[key].complete);
+                        const id = partialCall.id || toolId;
+                        //console.log("PARTIAL CALL", id, partialCall)
+
+                        if (partialCall.id) {
+                            // Nouveau tool_call détecté
+                            toolId = partialCall.id
+                            toolCalls[toolId!] = {
+                                id: toolId,
+                                function: {
+                                    name: partialCall.function.name,
+                                    arguments: ""
+                                }
+                            };
+                        }
+                        else if (partialCall.function?.arguments) {
+                            // Ajout de nouveaux morceaux de paramètres
+                            toolCalls[id].function.arguments += partialCall.function.arguments;
+                        }
+
+                        //console.log(toolCalls[id])
+                    }
+                    continue; // On attend la fin du tool_call
+                }
+
+                // Envoi du texte à l'interface utilisateur
+                if (delta.content) {
+                    yield { content: delta.content };
+                }
             }
-		}
+            catch (err) {
+                console.error("Erreur parsing JSON OpenAI:", err);
+            }
+        }
+
+        // Nettoyage du buffer
+        buffer = buffer.includes("\n") ? buffer.split("\n").pop() || "" : buffer;
+    }
+
+    // Une fois tout le flux reçu, on envoie les tool_calls complets
+    for (const toolCall of Object.values(toolCalls)) {
+        yield { tool_calls: [toolCall] };
     }
 }
 

@@ -1,0 +1,19 @@
+{
+  "type": "function",
+  "function": {
+    "name": "roll_pbta",
+    "description": "Lance 2d6 et ajoute un modificateur.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "modifier": {
+          "type": "integer",
+          "description": "Modificateur au jet de dés."
+        }
+      },
+      "required": [
+        "modifier"
+      ]
+    }
+  }
+}

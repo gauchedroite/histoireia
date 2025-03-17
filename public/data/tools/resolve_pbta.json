@@ -1,0 +1,19 @@
+{
+  "type": "function",
+  "function": {
+    "name": "resolve_pbta",
+    "description": "Détermine l'issue d'un jet PbTA.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "roll": {
+          "type": "integer",
+          "description": "Résultat du jet (2d6 + mod)."
+        }
+      },
+      "required": [
+        "roll"
+      ]
+    }
+  }
+}

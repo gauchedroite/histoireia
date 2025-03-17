@@ -1,1 +1,1 @@
-Tu es un assistant utile qui répond en une seule phrase.
+You are a useful assistant that answers in one sentence only.
