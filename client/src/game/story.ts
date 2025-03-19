@@ -99,8 +99,8 @@ const streamUpdater = (message: string) => {
 
 const render_and_fetch_more = async () => {
     user_text = state.userMessageOnPage(pageno)
-    next_user_text = state.userMessageOnNextPage(pageno)
     assistant_text = state.assistantMessageOnPage(pageno)
+    next_user_text = state.userMessageOnNextPage(pageno)
     lastPageNo = state.lastPageNo()
 
     App.render()
