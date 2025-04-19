@@ -2,14 +2,12 @@ import type { Request, Response } from "express";
 import fs from "fs-extra";
 import path from "path";
 import { rollPbta, resolvePbta } from "./server_tools";
-import { assetsPath, lookupPath } from "./path-names";
+import { assetsPath, lookupPath, toolsPath } from "./path-names";
 import type { 
   ChatMessage, 
   ToolFunctionCall, 
   ToolResponseMessage 
 } from "./chat-interfaces";
-
-//--- 1. Define/Extend types if not already ---//
 
 type LLMConfig = {
   id: string;
@@ -22,26 +20,48 @@ type GameMetadata = {
   // ...others if relevant
 };
 
-//--- 2. Main Function ---//
+interface Man {
+    endpoint: string
+    api_key: string | null
+    model: string
+    gameid: string
+    tools: object[]
+    res: Response
+}
+
+
 export const chat03 = async (req: Request, res: Response) => {
   const gameid = req.params.gameid as string;
   try {
-    // 1. Load config
-    const gameMetaPath = path.join(assetsPath, gameid, "metadata.json");
-    const llmConfigPath = path.join(lookupPath, "llm.json");
+    const messages = req.body as ChatMessage[];
   
-    const gameMeta = JSON.parse(await fs.readFile(gameMetaPath, "utf8")) as GameMetadata;
-    const llmList = JSON.parse(await fs.readFile(llmConfigPath, "utf8")) as LLMConfig[];
-    const llm = llmList.find(one => one.id === gameMeta.llmid);
+    const gameMetaPath = path.join(assetsPath, gameid, "metadata.json");
+    const metaContent = await fs.readFile(gameMetaPath, "utf8");
+    const gameMeta = JSON.parse(metaContent) as GameMetadata;
+
+    const llmid = gameMeta.llmid
+    const llmConfigPath = path.join(lookupPath, "llm.json");
+    const llmContent = await fs.readFile(llmConfigPath, "utf8");
+    const llmList = JSON.parse(llmContent) as LLMConfig[];
+    const llm = llmList.find(one => one.id === llmid);
     if (!llm) {
       res.status(500).json({ error: "LLM not found" });
       return;
     }
+    const api = llm.value1
+    const model = llm.value2
+
+    // Tools
+    const toolPath = path.join(toolsPath, "roll_pbta.json");
+    const toolContent = await fs.readFile(toolPath, "utf8");
+    const tools = [];
+    tools.push(JSON.parse(toolContent))
   
-    // 2. Model config
+    // 2. Model config to switch between ollama and openai
     let endpoint = "http://localhost:11434/v1/chat/completions";
     let apiKey: string | undefined;
-    if (llm.value1 === "openai") {
+    //
+    if (api === "openai") {
       endpoint = "https://api.openai.com/v1/chat/completions";
       apiKey = process.env.OPENAI_API_KEY;
     }
@@ -51,16 +71,14 @@ export const chat03 = async (req: Request, res: Response) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
   
-    const messageHistory = req.body as ChatMessage[];
-  
     // 4. Loop: LLM + Tools
     while (true) {
       // (a) Send to LLM
       const fetchBody = {
-        model: llm.value2,
-        messages: messageHistory,
+        model,
+        messages,
         stream: true,
-        // tools: [...], // If used
+        tools
       };
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -82,14 +100,15 @@ export const chat03 = async (req: Request, res: Response) => {
       if (toolCalls.length === 0) break;
   
       // (d) Execute tool calls and append results
+      console.log(toolCalls)
       const toolResults = await Promise.all(toolCalls.map(executeToolCall));
   
-      messageHistory.push({
+      messages.push({
         role: "assistant",
         content: null,
         tool_calls: toolCalls,
       } as ChatMessage);
-      toolResults.forEach(tr => messageHistory.push(tr));
+      toolResults.forEach(tr => messages.push(tr));
     }
   
     res.end();
