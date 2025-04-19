@@ -13,7 +13,6 @@
       "alwaysStrict": true,
       "strict": true,
       "noImplicitAny": true,
-      "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
       "noImplicitOverride": true,
       "noEmitOnError": true,

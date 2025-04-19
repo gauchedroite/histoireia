@@ -1,197 +1,176 @@
-import { Request, Response } from 'express';
-import fs from 'fs-extra';
-import path from 'path';
-import { rollPbta, resolvePbta } from './server_tools';
-import { assetsPath, lookupPath, toolsPath } from './path-names';
+import type { Request, Response } from "express";
+import fs from "fs-extra";
+import path from "path";
+import { rollPbta, resolvePbta } from "./server_tools";
+import { assetsPath, lookupPath } from "./path-names";
+import type { 
+  ChatMessage, 
+  ToolFunctionCall, 
+  ToolResponseMessage 
+} from "./chat-interfaces";
 
+//--- 1. Define/Extend types if not already ---//
 
-interface Man {
-    endpoint: string
-    api_key: string | null
-    model: string
-    gameid: string
-    tools: object[]
-    res: Response
-}
+type LLMConfig = {
+  id: string;
+  value1: string; // e.g., provider: 'openai'
+  value2: string; // e.g., model: 'gpt-3.5-turbo'
+};
 
+type GameMetadata = {
+  llmid: string;
+  // ...others if relevant
+};
+
+//--- 2. Main Function ---//
 export const chat03 = async (req: Request, res: Response) => {
-    const gameid = req.params.gameid;
-    try {
-        const messages = req.body as any
+  const gameid = req.params.gameid as string;
+  try {
+    // 1. Load config
+    const gameMetaPath = path.join(assetsPath, gameid, "metadata.json");
+    const llmConfigPath = path.join(lookupPath, "llm.json");
+  
+    const gameMeta = JSON.parse(await fs.readFile(gameMetaPath, "utf8")) as GameMetadata;
+    const llmList = JSON.parse(await fs.readFile(llmConfigPath, "utf8")) as LLMConfig[];
+    const llm = llmList.find(one => one.id === gameMeta.llmid);
+    if (!llm) {
+      res.status(500).json({ error: "LLM not found" });
+      return;
+    }
+  
+    // 2. Model config
+    let endpoint = "http://localhost:11434/v1/chat/completions";
+    let apiKey: string | undefined;
+    if (llm.value1 === "openai") {
+      endpoint = "https://api.openai.com/v1/chat/completions";
+      apiKey = process.env.OPENAI_API_KEY;
+    }
+  
+    // 3. Streaming headers
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+  
+    const messageHistory = req.body as ChatMessage[];
+  
+    // 4. Loop: LLM + Tools
+    while (true) {
+      // (a) Send to LLM
+      const fetchBody = {
+        model: llm.value2,
+        messages: messageHistory,
+        stream: true,
+        // tools: [...], // If used
+      };
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+  
+      const aiResp = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(fetchBody),
+      });
+  
+      if (!aiResp.body) throw new Error("No stream body from LLM");
+  
+      // (b) Parse stream, relay text, collect tool calls
+      const toolCalls = await parseStreamAndCollectToolCalls(aiResp, res);
+  
+      // (c) If none, finish
+      if (toolCalls.length === 0) break;
+  
+      // (d) Execute tool calls and append results
+      const toolResults = await Promise.all(toolCalls.map(executeToolCall));
+  
+      messageHistory.push({
+        role: "assistant",
+        content: null,
+        tool_calls: toolCalls,
+      } as ChatMessage);
+      toolResults.forEach(tr => messageHistory.push(tr));
+    }
+  
+    res.end();
+  } catch (err: any) {
+    console.error(`POST /chat/${gameid}`, err);
+    // Do not crash the stream mid-flight
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Unhandled internal error" });
+    } else {
+      res.write(`\n[ERROR]: ${err.message || "Unexpected error"}\n`);
+      res.end();
+    }
+  }
+};
 
-        let gameid_Path = path.join(assetsPath, gameid)
-        const metadataPath = path.join(gameid_Path, "metadata.json");
-        const metaContent = await fs.readFile(metadataPath, "utf8");
-        const game = JSON.parse(metaContent);
+//--- 3. Streaming parser ---//
+async function parseStreamAndCollectToolCalls(
+  aiStream: globalThis.Response, // fetch Response
+  res: Response // Express Response
+): Promise<ToolFunctionCall[]> {
+  const reader = aiStream.body!.getReader();
+  let partial = "";
+  const toolCalls: Record<string, ToolFunctionCall> = {};
 
-        const llmid = game.llmid
-        let llm_Path = path.join(lookupPath, "llm.json")
-        const llmContent = await fs.readFile(llm_Path, "utf8")
-        const llmList = JSON.parse(llmContent) as []
-        const llm = llmList.find((one: any) => one.id == llmid) as any
-        const api = llm.value1
-        const model = llm.value2
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
 
-        // To provide additional context to api calls
-        const man = <Man>{};
-        man.res = res
-        man.model = model
-        man.gameid = gameid;
-        man.tools = []
+    partial += new TextDecoder().decode(value);
 
-        const toolPath = path.join(toolsPath, "roll_pbta.json");
-        const toolContent = await fs.readFile(toolPath, "utf8");
-        //man.tools.push(JSON.parse(toolContent))
+    const lines = partial.split("\n");
+    partial = lines.pop() ?? "";
 
-        // To switch between ollama and openai
-        man.endpoint = "http://192.168.50.199:11434/v1/chat/completions"
-        man.api_key = null
-        //
-        if (api == "openai") {
-            man.endpoint = "https://api.openai.com/v1/chat/completions"
-            man.api_key = process.env.OPENAI_API_KEY!
-        }
+    for (let line of lines) {
+      if (!line.startsWith("data:")) continue;
+      const payload = line.replace("data:", "").trim();
 
-        // Headers for streaming back to client
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
+      if (payload === "[DONE]") {
+        res.write("\n");
+        continue;
+      }
 
-        let pendingMessages = messages;
+      try {
+        const data = JSON.parse(payload);
+        for (const choice of data.choices ?? []) {
+          const delta = choice.delta;
 
-        console.log("================\n")
-        while (true) {
-            console.log(man.endpoint, messages)
-            const openAIStream = await fetch(man.endpoint, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${man.api_key}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: man.model,
-                    messages,
-                    stream: true,
-                    tools: man.tools
-                })
-            });
-
-            if (!openAIStream.body) throw new Error("No stream body received");
-
-            const reader = openAIStream.body.getReader();
-            let partialData = "";
-            let toolCallsBuffer: Record<string, any> = {};
-            let hasToolCalls = false;
-            let currentToolCallId: string | null = null;
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                const chunk = new TextDecoder().decode(value);
-                partialData += chunk; // Ajouter au buffer
-
-                // Découper en lignes complètes
-                const lines = partialData.split("\n").filter(line => line.startsWith("data: "));
-
-                // Garder le dernier morceau incomplet
-                if (!partialData.endsWith("\n")) {
-                    partialData = lines.pop() || "";
-                }
-                else {
-                    partialData = "";
-                }
-
-                for (let line of lines) {
-                    const jsonStr = line.replace("data: ", "").trim();
-                    if (jsonStr === "[DONE]") {
-                        res.write(" ");
-                        continue;
-                    }
-
-                    try {
-                        const data = JSON.parse(jsonStr);
-
-                        if (data.choices) {
-                            for (const choice of data.choices) {
-                                const delta = choice.delta;
-
-                                // Diffuser le texte immédiatement
-                                if (delta?.content) {
-                                    res.write(delta.content);
-                                }
-
-                                // Reconstruction des tool calls en delta
-                                if (delta?.tool_calls) {
-                                    hasToolCalls = true;
-
-                                    for (const toolCall of delta.tool_calls) {
-                                        if (toolCall.index !== undefined) {
-                                            currentToolCallId = toolCall.index.toString();
-
-                                            if (!toolCallsBuffer[currentToolCallId!]) {
-                                                toolCallsBuffer[currentToolCallId!] = {
-                                                    id: toolCall.id,
-                                                    function: { name: "", arguments: "" }
-                                                };
-                                            }
-                                        }
-
-                                        if (toolCall.function?.name) {
-                                            toolCallsBuffer[currentToolCallId!].function.name = toolCall.function.name;
-                                        }
-
-                                        if (toolCall.function?.arguments) {
-                                            toolCallsBuffer[currentToolCallId!].function.arguments += toolCall.function.arguments;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (error) {
-                        continue;
-                    }
-                }
-
-                res.write(""); // Force l'envoi immédiat
+          if (delta?.content) {
+            res.write(delta.content);
+          }
+          if (delta?.tool_calls) {
+            for (const t of delta.tool_calls) {
+              const id = t.id ?? t.index?.toString();
+              if (!id) continue;
+              if (!toolCalls[id]) {
+                toolCalls[id] = { id: t.id ?? "", type: "function", function: { name: "", arguments: "" } };
+              }
+              if (t.function?.name) toolCalls[id].function.name = t.function.name;
+              if (t.function?.arguments) toolCalls[id].function.arguments += t.function.arguments;
             }
-
-            if (!hasToolCalls) return;
-
-            // Exécuter les tool calls
-            const toolResponses = await executeToolCalls(Object.values(toolCallsBuffer));
-
-            // Ajouter les réponses des outils et refaire une requête
-            pendingMessages.push(...toolResponses);
+          }
         }
-        res.end()
+      } catch (err) {
+        // Ignore and continue
+      }
     }
-    catch (error) {
-        console.error(`POST /chat/${gameid}`, error);
-        res.status(500).json({ hasError: true, message: "Erreur interne" });
-    }
+  }
+  return Object.values(toolCalls);
 }
 
-async function executeToolCalls(toolCalls: any[]): Promise<any[]> {
-    const results = [];
-    for (const toolCall of toolCalls) {
-        const functionName = toolCall.function.name;
-        const functionArgs = JSON.parse(toolCall.function.arguments);
-
-        let toolResponse;
-        if (functionName == "roll_pbta") {
-            const result = rollPbta(functionArgs);
-            console.log("roll_pbta", functionArgs, result.roll)
-            toolResponse = { role: "tool", content: JSON.stringify(result), name: functionName };
-        }
-        else if (functionName == "resolve_pbta") {
-            const result = resolvePbta(functionArgs);
-            console.log("resolve_pbta", functionArgs, result.outcome)
-            toolResponse = { role: "tool", content: JSON.stringify(result), name: functionName };
-        }
-
-        results.push(toolResponse);
-    }
-    return results;
+//--- 4. Tool executor ---//
+async function executeToolCall(tc: ToolFunctionCall): Promise<ToolResponseMessage> {
+  if (tc.function.name === "roll_pbta") {
+    const parsed = JSON.parse(tc.function.arguments);
+    const res = rollPbta(parsed);
+    return { role: "tool", content: JSON.stringify(res), tool_call_id: tc.id };
+  }
+  else if (tc.function.name === "resolve_pbta") {
+    const parsed = JSON.parse(tc.function.arguments);
+    const res = resolvePbta(parsed);
+    return { role: "tool", content: JSON.stringify(res), tool_call_id: tc.id };
+  }
+  return { role: "tool", content: "Unknown tool", tool_call_id: tc.id };
 }

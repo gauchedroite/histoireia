@@ -2,7 +2,6 @@
 # caddy run --config ./Caddyfile --watch
 #
 lebaudy.gauchedroite.com {
-
 	#
 	# Kludge because I don't know how to get fontawesome to use 
 	# the local /webfonts of the application (as opposed to the root level /webfonts it's currently requesting)
@@ -30,6 +29,10 @@ lebaudy.gauchedroite.com {
 		reverse_proxy 192.168.50.199:9340
 	}
 
+	###########################################
+	# Everything below is fo reference only
+	###########################################
+
 	#
 	# ollama must listen to 0.0.0.0
 	# The reverse proxy must target 192.168.50.199
@@ -38,7 +41,9 @@ lebaudy.gauchedroite.com {
 	# curl https://lebaudy.gauchedroite.com/api/tags
 	# reverse_proxy /api* 192.168.50.199:11434
 
-	# Not used anymore because only the server talks to ollama now (used to be the web app)
+
+	# Not used anymore because only the Express server talks to ollama now (used to be the web app)
+	# I keep it here for reference only.
 	#handle_path /histoireia/ollama/api* {
 	#	rewrite * /api{path}
 	#	reverse_proxy 192.168.50.199:11434
