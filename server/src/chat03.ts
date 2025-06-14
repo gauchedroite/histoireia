@@ -7,13 +7,13 @@ import type { ChatMessage, ToolFunctionCall, ToolResponseMessage } from "./chat-
 
 type LLMConfig = {
     id: string;
-    value1: string; // e.g., provider: 'openai'
-    value2: string; // e.g., model: 'gpt-3.5-turbo'
+    provider: string; // e.g. 'openai'
+    model: string; // e.g. 'gpt-4o'
+    hasTools: boolean
 };
 
 type GameMetadata = {
     llmid: string;
-    // ...others if relevant
 };
 
 
@@ -35,14 +35,16 @@ export const chat03 = async (req: Request, res: Response) => {
             res.status(500).json({ error: "LLM not found" });
             return;
         }
-        const api = llm.value1
-        const model = llm.value2
+        const api = llm.provider
+        const model = llm.model
+        const hasTools = llm.hasTools
 
         // Tools
         const toolPath = path.join(toolsPath, "roll_pbta.json");
         const toolContent = await fs.readFile(toolPath, "utf8");
-        const tools = [];
-        tools.push(JSON.parse(toolContent))
+        const tools: string[] = [];
+        if (hasTools)
+            tools.push(JSON.parse(toolContent))
 
         // 2. Model config to switch between ollama and openai
         let endpoint = "http://localhost:11434/v1/chat/completions";
@@ -67,6 +69,7 @@ export const chat03 = async (req: Request, res: Response) => {
                 stream: true,
                 tools
             };
+            console.log(fetchBody)
             const headers: Record<string, string> = {
                 "Content-Type": "application/json",
             };
@@ -87,7 +90,7 @@ export const chat03 = async (req: Request, res: Response) => {
             if (toolCalls.length === 0) break;
 
             // (d) Execute tool calls and append results
-            console.log(toolCalls)
+            //console.log(toolCalls)
             const toolResults = await Promise.all(toolCalls.map(executeToolCall));
 
             messages.push({

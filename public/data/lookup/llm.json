@@ -2,49 +2,57 @@
     {
         "id": 1,
         "description": "neuraldaredevil",
-        "value1": "ollama",
-        "value2": "lstep/neuraldaredevil-8b-abliterated:q8_0"
+        "provider": "ollama",
+        "model": "lstep/neuraldaredevil-8b-abliterated:q8_0",
+        "hasTools": false
     },
     {
         "id": 2,
         "description": "mistral-small",
-        "value1": "ollama",
-        "value2": "mistral-small:22b"
+        "provider": "ollama",
+        "model": "mistral-small:22b",
+        "hasTools": false
     },
     {
         "id": 3,
         "description": "Dark-Champion",
-        "value1": "ollama",
-        "value2": "hf.co/DavidAU/Llama-3.2-8X3B-MOE-Dark-Champion-Instruct-uncensored-abliterated-18.4B-GGUF:latest"
+        "provider": "ollama",
+        "model": "hf.co/DavidAU/Llama-3.2-8X3B-MOE-Dark-Champion-Instruct-uncensored-abliterated-18.4B-GGUF:latest",
+        "hasTools": true
     },
     {
         "id": 4,
         "description": "llama3.2",
-        "value1": "ollama",
-        "value2": "llama3.2:latest"
+        "provider": "ollama",
+        "model": "llama3.2:latest",
+        "hasTools": true
     },
     {
         "id": 5,
         "description": "gpt-4-turbo",
-        "value1": "openai",
-        "value2": "gpt-4-turbo"
+        "provider": "openai",
+        "model": "gpt-4-turbo",
+        "hasTools": true
     },
     {
         "id": 6,
         "description": "gpt-4o",
-        "value1": "openai",
-        "value2": "gpt-4o"
+        "provider": "openai",
+        "model": "gpt-4o",
+        "hasTools": true
     },
     {
         "id": 7,
         "description": "gpt-4o-mini",
-        "value1": "openai",
-        "value2": "gpt-4o-mini"
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "hasTools": true
     },
     {
         "id": 8,
         "description": "deepseek-r1",
-        "value1": "ollama",
-        "value2": "deepseek-r1:8b"
+        "provider": "ollama",
+        "model": "deepseek-r1:8b",
+        "hasTools": false
     }
 ]
