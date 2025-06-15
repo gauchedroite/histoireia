@@ -27,3 +27,16 @@ export interface ToolResponseMessage {
   content: string;
   tool_call_id: string;
 }
+
+
+
+export type LLMConfig = {
+    id: string;
+    provider: string; // e.g. 'openai'
+    model: string; // e.g. 'gpt-4o'
+    hasTools: boolean
+};
+
+export type GameMetadata = {
+    llmid: string;
+};

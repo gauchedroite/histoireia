@@ -3,18 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import { rollPbta, resolvePbta } from "./server_tools";
 import { assetsPath, lookupPath, toolsPath } from "./path-names";
-import type { ChatMessage, ToolFunctionCall, ToolResponseMessage } from "./chat-interfaces";
-
-type LLMConfig = {
-    id: string;
-    provider: string; // e.g. 'openai'
-    model: string; // e.g. 'gpt-4o'
-    hasTools: boolean
-};
-
-type GameMetadata = {
-    llmid: string;
-};
+import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, LLMConfig, GameMetadata } from "./chat-interfaces";
 
 
 export const chat03 = async (req: Request, res: Response) => {

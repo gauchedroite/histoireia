@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import fs from 'fs-extra';
 import path from 'path';
 import { assetsPath, extraPath, lookupPath } from './path-names';
+import { LLMConfig } from './chat-interfaces';
 
 
 interface Extra {
@@ -24,9 +25,9 @@ export const chatExtra = async (req: Request, res: Response) => {
         let llm_Path = path.join(lookupPath, "llm.json")
         const llmContent = await fs.readFile(llm_Path, "utf8")
         const llmList = JSON.parse(llmContent) as []
-        const llm = llmList.find((one: any) => one.id == llmid) as any
-        const api = llm.value1
-        const model = llm.value2
+        const llm = llmList.find((one: any) => one.id == llmid) as unknown as LLMConfig
+        const api = llm.provider
+        const model = llm.model
 
         let extra_Path = path.join(extraPath, `${extraid}.json`)
         const extraContent = await fs.readFile(extra_Path, "utf8");
