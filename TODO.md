@@ -18,7 +18,7 @@ Types de vidéo
 - Creature (2D anim)
 
 
-## My dev environment
+## Starting processes on my macOS server
 
 Open four terminal sessions. From my home folder on the macos server, run
 
@@ -42,7 +42,7 @@ Typescript compiler
 
 ## Role of Caddy and Express
 
-Caddy receives all https traffic and reverse proxies it to the http Express server on port 9340.
+Caddy receives all https traffic and reverse proxies it to the http Express server listening on port 9340.
 
 The Express server.ts serves the api and files from the public folder, with the exception of the /webfonts and /client/src paths which are handled by Caddy for reasons. The api served includes user state management and calls to llms (ollama and openai)
 
@@ -53,4 +53,4 @@ The Express server.ts serves the api and files from the public folder, with the 
 
 From the internet, lebaudy.gauchedroite.com resolves to my router which forwards all https traffic to the macos server.
 
-From my lan, lebaudy.gauchedroite.com resolves to the macos server.
+From my laptop, lebaudy.gauchedroite.com resolves to the macos server local ip (hosts file).

@@ -4,55 +4,63 @@
         "description": "neuraldaredevil",
         "provider": "ollama",
         "model": "lstep/neuraldaredevil-8b-abliterated:q8_0",
-        "hasTools": false
+        "hasTools": false,
+        "hasJsonSchema": true
     },
     {
         "id": 2,
         "description": "mistral-small",
         "provider": "ollama",
         "model": "mistral-small:22b",
-        "hasTools": false
+        "hasTools": false,
+        "hasJsonSchema": true
     },
     {
         "id": 3,
         "description": "Dark-Champion",
         "provider": "ollama",
         "model": "hf.co/DavidAU/Llama-3.2-8X3B-MOE-Dark-Champion-Instruct-uncensored-abliterated-18.4B-GGUF:latest",
-        "hasTools": true
+        "hasTools": true,
+        "hasJsonSchema": true
     },
     {
         "id": 4,
         "description": "llama3.2",
         "provider": "ollama",
         "model": "llama3.2:latest",
-        "hasTools": true
+        "hasTools": true,
+        "hasJsonSchema": true
     },
     {
         "id": 5,
         "description": "gpt-4-turbo",
         "provider": "openai",
         "model": "gpt-4-turbo",
-        "hasTools": true
+        "hasTools": true,
+        "hasJsonSchema": false
     },
     {
         "id": 6,
         "description": "gpt-4o",
         "provider": "openai",
         "model": "gpt-4o",
-        "hasTools": true
+        "hasTools": true,
+        "hasJsonSchema": true
     },
     {
         "id": 7,
         "description": "gpt-4o-mini",
         "provider": "openai",
         "model": "gpt-4o-mini",
-        "hasTools": true
+        "hasTools": true,
+        "hasJsonSchema": true
     },
     {
         "id": 8,
         "description": "deepseek-r1",
         "provider": "ollama",
         "model": "deepseek-r1:8b",
-        "hasTools": false
+        "hasTools": false,
+        "hasJsonSchema": true
     }
 ]

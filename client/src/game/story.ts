@@ -35,9 +35,12 @@ const formTemplate = () => {
         const submitDisabled = (next_user_text == undefined || next_user_text.length == 0)
         const helpDisabled = false
 
-        let help = `<button type="button" onclick="${NS}.help(true)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-question"></i></button>`
-        if (helping)
-            help = `<button type="button" onclick="${NS}.help(false)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-rotate-left"></i></button>`
+        let help = ""
+        if (mystate.hasJsonSchema) {
+            help = `<button type="button" onclick="${NS}.help(true)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-question"></i></button>`
+            if (helping)
+                help = `<button type="button" onclick="${NS}.help(false)" ${helpDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-rotate-left"></i></button>`
+        }
 
         const submit = `<button type="submit" onclick="${NS}.submit()" ${submitDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-up"></i></button>`
         const label = `<div class="ask">
@@ -47,7 +50,12 @@ const formTemplate = () => {
         add(label)
 
         if (!helping) {
-            const textarea = Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, "", <Theme.IOptText>{ required: true, rows: 4 })
+            const option = <Theme.IOptText>{
+                required: true,
+                oninput: `${NS}.oninput(this)`,
+                rows: 4
+            }
+            const textarea = Theme.renderFieldTextarea(NS, "next_user_text", next_user_text, "", option)
             add(`<div class="input">${textarea}</div>`)
         }
         else {
@@ -91,6 +99,8 @@ const pageTemplate = (form: string) => {
 }
 
 const streamUpdater = (message: string) => {
+    App.untransitionUI()
+
     const span = document.createElement("span");
     span.innerHTML = message.replace(/\n/g, "<br>");
     document.getElementById("ct_response")?.appendChild(span);
@@ -106,10 +116,10 @@ const render_and_fetch_more = async () => {
     App.render()
 
     if (assistant_text == undefined) {
+        App.transitionUI()
         assistant_text = await state.chatAsync(streamUpdater)
         await state.setAssistantMessageAsync(assistant_text, pageno)
 
-        App.untransitionUI()
         App.render()
     }
     else {
@@ -172,6 +182,11 @@ const getFormState = () => {
 }
 
 export const onchange = (input: HTMLInputElement) => {
+    getFormState();
+    App.render();
+}
+
+export const oninput = (input: HTMLInputElement) => {
     getFormState();
     App.render();
 }

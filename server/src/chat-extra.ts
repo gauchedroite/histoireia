@@ -67,7 +67,7 @@ export const chatExtra = async (req: Request, res: Response) => {
 
         if (!response.ok) {
             const error = await response.text();
-            console.error(`POST /chat/${gameid}/${extra}`, error);
+            console.error(`POST /chat/${gameid}/${extraid}`, error);
             res.status(response.status).json({ hasError: true, message: "Impossible de poursuivre l'histoire" });
             return
         }

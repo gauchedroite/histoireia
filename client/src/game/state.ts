@@ -19,6 +19,7 @@ export interface GameDefinition {
     extra: string | null
     author: string
     justme: boolean
+    hasJsonSchema: boolean
 }
 
 
@@ -202,7 +203,7 @@ class State {
         }
 
         this._gameid = gameid
-        this._game_definition = await App.GET(`stories/${gameid}`) as any
+        this._game_definition = await App.GET(`stories/${gameid}`) as unknown as GameDefinition
         return this._game_definition
     }
 

@@ -16,6 +16,7 @@ export interface IOptText extends IOpt {
     pattern?: string
     password: boolean
     noautocomplete: boolean
+    oninput?: string
 }
 
 
@@ -80,6 +81,7 @@ export const renderInputTextarea = (ns: string, propName: string, value: string 
     rows="${option.rows}"
     spellcheck="false"
     onchange="${ns}.onchange(this)" 
+    ${option.oninput ? `oninput="${option.oninput}"` : ""}
     ${option.required ? "required='required'" : ""} 
     ${option.disabled ? "disabled" : ""}
     ${option.maxlength > 0 ? `maxlength="${option.maxlength}"` : ``}>${Misc.toInputText(value)}</textarea>

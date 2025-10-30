@@ -4,20 +4,9 @@ import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
 import { chat01, chat02, chat03, chat04, chatExtra } from './chat';
-import { assetsPath, publicPath, usersPath } from './path-names';
+import { assetsPath, publicPath, usersPath, lookupPath } from './path-names';
+import { LLMConfig, GameDefinition } from './chat-interfaces';
 
-
-interface GameDefinition {
-    code: string
-    title: string
-    bg_url: string
-    bg_image: string | null
-    prompt: string
-    llmid: number
-    extra?: string | null
-    author: string
-    justme: boolean
-}
 
 const app = express();
 const port = 9340;
@@ -124,6 +113,12 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const promptPath = path.join(gameid_Path, "prompt.txt");
         const prompt = await fs.readFile(promptPath, "utf8");
 
+        const llmid = data.llmid
+        const llmConfigPath = path.join(lookupPath, "llm.json");
+        const llmContent = await fs.readFile(llmConfigPath, "utf8");
+        const llmList = JSON.parse(llmContent) as LLMConfig[];
+        const llm = llmList.find(one => one.id === llmid)!;
+
         const _game_definition: GameDefinition = {
             code: data.code,
             title: data.title,
@@ -133,7 +128,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
             llmid: data.llmid ?? 1,
             extra: data.extra,
             author: data.author,
-            justme: data.justme
+            justme: data.justme,
+            hasJsonSchema: llm.hasJsonSchema
         }
 
         console.log(`GET /stories/${gameid}`)

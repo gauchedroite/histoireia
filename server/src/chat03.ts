@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import { rollPbta, resolvePbta } from "./server_tools";
 import { assetsPath, lookupPath, toolsPath } from "./path-names";
-import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, LLMConfig, GameMetadata } from "./chat-interfaces";
+import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, LLMConfig, GameDefinition } from "./chat-interfaces";
 
 
 export const chat03 = async (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ export const chat03 = async (req: Request, res: Response) => {
 
         const gameMetaPath = path.join(assetsPath, gameid, "metadata.json");
         const metaContent = await fs.readFile(gameMetaPath, "utf8");
-        const gameMeta = JSON.parse(metaContent) as GameMetadata;
+        const gameMeta = JSON.parse(metaContent) as GameDefinition;
 
         const llmid = gameMeta.llmid
         const llmConfigPath = path.join(lookupPath, "llm.json");
