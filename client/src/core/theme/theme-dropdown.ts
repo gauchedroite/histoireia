@@ -24,7 +24,7 @@ export const renderFieldDropdown = (ns: string, propName: string, options: strin
     }
 
     if (option.readonly ?? false) {
-        let html = hasUrl ? `<a href="${option.url}">${Misc.toStaticText(text)}&nbsp;&nbsp;<i class="far fa-external-link-square-alt"></i></a>` : Misc.toStaticText(text);
+        let html = hasUrl ? `<a href="${option.url}">${Misc.toStaticText(text)}&nbsp;&nbsp;<i class="fa-regular fa-external-link-square-alt"></i></a>` : Misc.toStaticText(text);
 
         return wrap_field_readonly(label, option, `
 <div style="width: 100%; padding-top: 6px;">
@@ -36,7 +36,7 @@ export const renderFieldDropdown = (ns: string, propName: string, options: strin
     }
 
 
-    let anchor = hasUrl ? `<a href="${option.url}">&nbsp;<i class="far fa-external-link-square-alt"></i></a>` : "";
+    let anchor = hasUrl ? `<a href="${option.url}">&nbsp;<i class="fa-regular fa-external-link-square-alt"></i></a>` : "";
 
     return wrap_field(ns, propName, label, option, `
 <div class="field">

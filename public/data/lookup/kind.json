@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "description": "AI interactif",
+        "fa": "fa-thin fa-book"
+    },
+    {
+        "id": 2,
+        "description": "Aventure",
+        "fa": "fa-thin fa-book"
+    }
+]

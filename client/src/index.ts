@@ -14,9 +14,7 @@ export const NS = "INDEX";
 // Initialize the app
 App.initialize(
     () => {
-        return `
-        ${GameMain.render()}
-    `
+        return GameMain.render();
     }, () => {
         GameMain.postRender();
     }, 
