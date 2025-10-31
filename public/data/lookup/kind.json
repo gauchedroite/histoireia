@@ -1,12 +1,14 @@
 [
     {
         "id": 1,
+        "code": "llm",
         "description": "AI interactif",
-        "fa": "fa-thin fa-book"
+        "fa": "fa-thin fa-book-sparkles"
     },
     {
         "id": 2,
+        "code": "adv",
         "description": "Aventure",
-        "fa": "fa-thin fa-book"
+        "fa": "fa-thin fa-book-font"
     }
 ]

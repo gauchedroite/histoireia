@@ -12,3 +12,12 @@ export const fetch_llm = async () => {
     llm = await App.GET(`data/lookup/llm.json`) as any;
 }
 export const get_llm = () => llm;
+
+let kind: LookupData[];
+export const invalidate_kind = () => (kind as any) = null;
+export const fetch_kind = async () => {
+    if (kind != undefined && kind.length > 0)
+        return;
+    kind = await App.GET(`data/lookup/kind.json`) as any;
+}
+export const get_kind = () => kind;

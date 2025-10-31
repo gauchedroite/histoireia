@@ -6,6 +6,8 @@ export interface GameList {
     code: string
     title: string
     promptfile: string
+    kind_code: string
+    kind_fa: string
 }
 
 export interface GameDefinition {
@@ -16,6 +18,8 @@ export interface GameDefinition {
     prompt: string | null
     llmid: number | null
     llmid_text: string
+    kindid: number | null
+    kindid_text: string
     extra: string | null
     author: string
     justme: boolean

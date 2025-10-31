@@ -37,6 +37,13 @@ export type LLMConfig = {
     hasJsonSchema: boolean
 };
 
+export type KindLookup = {
+    id: number
+    code: string
+    description: string
+    fa: string
+};
+
 export interface GameDefinition {
     code: string
     title: string
@@ -44,8 +51,19 @@ export interface GameDefinition {
     bg_image: string | null
     prompt: string
     llmid: number
+    kindid: number
     extra?: string | null
     author: string
     justme: boolean
     hasJsonSchema: boolean
+}
+
+export interface GameList {
+    code: string
+    title: string
+    bg_url: string
+    bg_image: string | null
+    promptfile: string
+    kind_code: string | undefined
+    kind_fa: string | undefined
 }

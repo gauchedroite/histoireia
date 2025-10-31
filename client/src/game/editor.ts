@@ -14,25 +14,30 @@ let mystate: GameDefinition = <GameDefinition>{};
 let gameid: string = ""
 let isNew = false;
 let modalWhat: string | null = null
+let LUID_KIND_ADV: number | null
 
 
 
-const formTemplate = (item: GameDefinition, llmid: string) => {
+const formTemplate = (item: GameDefinition, llmid: string, kindid: string) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
     const amAuthor = (item.author == state.username)
 
     add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
-    add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
+    add(Theme.renderFieldDropdown(NS, "kindid", kindid, item.kindid_text, "Kind", <Theme.IOptDropdown>{ required: true }))
 
-    if (amAuthor)
-        add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "Histoire privée", "Privé: seulement pour moi!", <Theme.IOpt>{}))
+    if (item.kindid != LUID_KIND_ADV) {
+        add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
 
-    add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
-    add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
+        add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
+        add(Theme.renderFieldDropdown(NS, "llmid", llmid, item.llmid_text, "LLM", <Theme.IOptDropdown>{ required: true }))
+    }
 
     add(Theme.renderFieldText(NS, "bg_image", item.bg_image, "Image de la page titre", <Theme.IOptText>{ maxlength: 32 }))
+
+    if (amAuthor)
+        add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "", "Privé: seulement pour moi!", <Theme.IOpt>{}))
 
     if (isNew) {
         add(`<button type="button" class="button" onclick="${NS}.save_story()"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire</button>`)
@@ -94,6 +99,7 @@ const fetchState = () => {
             })
             //.then(waitTwoSecondAsync)
             .then(Lookup.fetch_llm)
+            .then(Lookup.fetch_kind)
             .then(App.untransitionUI)
     }
     else {
@@ -101,6 +107,7 @@ const fetchState = () => {
         mystate = Misc.clone(state.game_definition) as GameDefinition
         return Promise.resolve()
             .then(Lookup.fetch_llm)
+            .then(Lookup.fetch_kind)
             .then(App.untransitionUI)
     }
 }
@@ -129,9 +136,13 @@ export const render = () => {
     if (!App.inContext(NS)) return "";
 
     const lookup_llm = Lookup.get_llm();
+    const lookup_kind = Lookup.get_kind();
     let llmid = Theme.renderOptions(lookup_llm, mystate.llmid, isNew);
+    let kindid = Theme.renderOptions(lookup_kind, mystate.kindid, isNew);
 
-    const form = formTemplate(mystate, llmid);
+    LUID_KIND_ADV = lookup_kind.find(one => one.code == "adv")?.id as number
+
+    const form = formTemplate(mystate, llmid, kindid);
     const modal = layout_Modal()
     return pageTemplate(form, modal)
 }
@@ -158,6 +169,7 @@ const getFormState = () => {
     clone.bg_image = Misc.fromInputText(`${NS}_bg_image`, mystate.bg_image);
     clone.prompt = Misc.fromInputText(`${NS}_prompt`, mystate.prompt);
     clone.llmid = Misc.fromSelectNumber(`${NS}_llmid`, mystate.llmid);
+    clone.kindid = Misc.fromSelectNumber(`${NS}_kindid`, mystate.kindid);
     clone.extra = Misc.fromInputText(`${NS}_extra`, mystate.extra);
     clone.justme = Misc.fromInputCheckbox(`${NS}_justme`, mystate.justme);
     return clone;

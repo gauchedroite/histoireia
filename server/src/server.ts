@@ -5,7 +5,7 @@ import path from 'path';
 import { createFunName } from './funny-name';
 import { chat01, chat02, chat03, chat04, chatExtra } from './chat';
 import { assetsPath, publicPath, usersPath, lookupPath } from './path-names';
-import { LLMConfig, GameDefinition } from './chat-interfaces';
+import { LLMConfig, GameDefinition, KindLookup, GameList } from './chat-interfaces';
 
 
 const app = express();
@@ -60,7 +60,11 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
     let username = req.params.username;
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
-        const index = [];
+        const index: GameList[] = [];
+
+        const kindPath = path.join(lookupPath, "kind.json");
+        const kindContent = await fs.readFile(kindPath, "utf8");
+        const kindList = JSON.parse(kindContent) as KindLookup[];
 
         for (const entry of entries) {
             if (entry.isDirectory()) {
@@ -71,6 +75,7 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
                     const fileContent = await fs.readFile(metadataPath, "utf8");
                     const data = JSON.parse(fileContent) as GameDefinition;
                     const hidden = data.justme && data.author != username;
+                    const kind = kindList.find(one => one.id == data.kindid)
 
                     if (!hidden && data.code && data.title) {
                         index.push({
@@ -78,7 +83,9 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
                             title: data.title,
                             bg_image: data.bg_image,
                             bg_url: (data.bg_image ? `assets/billy/${data.bg_image}` : ""),
-                            promptfile: `${data.code}.txt`
+                            promptfile: `${data.code}.txt`,
+                            kind_code: kind?.code,
+                            kind_fa: kind?.fa
                         });
                     }
                 }
@@ -129,7 +136,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
             extra: data.extra,
             author: data.author,
             justme: data.justme,
-            hasJsonSchema: llm.hasJsonSchema
+            hasJsonSchema: llm.hasJsonSchema,
+            kindid: data.kindid
         }
 
         console.log(`GET /stories/${gameid}`)
@@ -143,7 +151,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, extra, author, justme } = req.body as GameDefinition
+    const { title, bg_image, prompt, llmid, extra, author, justme, kindid } = req.body as GameDefinition
     let gameid = req.params.gameid;
     let gameid_Path = path.join(assetsPath, gameid)
 
@@ -162,7 +170,7 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
     }
 
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme }
+        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme, kindid }
 
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
         const gameid_txtPath = path.join(gameid_Path, "prompt.txt");

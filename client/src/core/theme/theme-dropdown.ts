@@ -12,72 +12,29 @@ export interface IOptDropdown extends IOpt {
 
 
 export const renderFieldDropdown = (ns: string, propName: string, options: string, text: string, label: string, option: IOptDropdown) => {
-    if (option.size == undefined)
-        option.size = "js-width-50";
+    if (option.readonly ?? false)
+        return wrap_field(label, Misc.toStaticText(text))
 
-    let hasAddon = (option.addon != undefined);
-    let hasUrl = (option.url && !option.url.endsWith("/null"))
-
-    if (options.startsWith("<!--")) {
-        option.missingid = +options.substring("<!--".length, options.indexOf("-->"));
-        option.missingtext = text;
-    }
-
-    if (option.readonly ?? false) {
-        let html = hasUrl ? `<a href="${option.url}">${Misc.toStaticText(text)}&nbsp;&nbsp;<i class="fa-regular fa-external-link-square-alt"></i></a>` : Misc.toStaticText(text);
-
-        return wrap_field_readonly(label, option, `
-<div style="width: 100%; padding-top: 6px;">
-    ${html}
-    ${option.addon ? `<span style="padding-left:1rem;">${option.addon}</span>` : ""}
-    ${option.help ? `<p class="help">${option.help}</p>` : ``}
-</div>
-`)
-    }
-
-
-    let anchor = hasUrl ? `<a href="${option.url}">&nbsp;<i class="fa-regular fa-external-link-square-alt"></i></a>` : "";
-
-    return wrap_field(ns, propName, label, option, `
-<div class="field">
-    <div class="field is-grouped ${hasAddon || anchor ? "has-addons" : ""}">
-        ${input_Dropdown(ns, propName, options, option)}
-        ${anchor ? `<div class="control"><div style="padding: 0.5rem;">${anchor}</div></div>` : ``}
-        ${option.addon ? wrapAddon(option.addon, option.disabled) : ``}
-    </div>
-    ${option.help ? `<p class="help">${option.help}</p>` : ``}
-</div>
-`)
-}
-
-
-const wrap_field = (ns: string, propName: string, label: string, option: IOptDropdown, html: string) => {
-    return `
-<div class="field is-horizontal">
-    <div class="field-label is-normal"><label class="label ${option.required ? "js-required" : ""}" for="${ns}_${propName}">${label}</label></div>
-    <div class="field-body">
-        ${html}
-    </div>
-</div>
-`
-}
-
-const wrap_field_readonly = (label: string, option: IOpt, html: string) => {
-    return `
-<div class="field is-horizontal js-field-static">
-    <div class="field-label is-normal"><label class="label ${option.required ? "js-required" : ""}">${label}</label></div>
-    <div class="field-body">
-        ${html}
-    </div>
-</div>
-`
+    return wrap_field(label, renderInputDropdown(ns, propName, options, option))
 }
 
 
 
-const input_Dropdown = (ns: string, propName: string, options: string, option: IOptDropdown) => {
+
+const wrap_field = (label: string, html: string) => {
+    if (label != undefined && label.length > 0)
+        return `
+        <label>${label}
+            ${html}
+        </label>`
+    else
+        return html
+}
+
+
+
+const renderInputDropdown = (ns: string, propName: string, options: string, option: IOptDropdown) => {
     return `
-<div class="select jso ${option.size ?? ""} ${option.missingid ? "js-archived" : ""}">
 <select id="${ns}_${propName}"
     onchange="${ns}.onchange(this)" 
     ${option.required ? "required" : ""}
@@ -85,8 +42,6 @@ const input_Dropdown = (ns: string, propName: string, options: string, option: I
     ${option.missingid ? `<option value="${option.missingid}" selected disabled>${option.missingtext}</option>` : ""}
     ${options}
 </select>
-<div class="jso-td">&nbsp;</div>
-</div>
 `;
 }
 

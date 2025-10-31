@@ -16,7 +16,7 @@ const formTemplate = (list: GameList[]) => {
         return `<a href="#/menu/${item.code}">
             <div>
                 <div>${item.title}</div>
-                <i class="fa-thin fa-book"></i>
+                <i class="${item.kind_fa ?? "fa-thin fa-book"}"></i>
             </div>
         </a>`
     })

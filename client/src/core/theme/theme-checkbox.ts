@@ -19,16 +19,27 @@ export interface IOptCheckbox extends IOpt {
 export const renderFieldCheckbox = (ns: string, propName: string, value: boolean, label: string, text: string, option: IOpt) => {
 
     if (option.readonly ?? false)
-        return Misc.toStaticText(value)
+        return wrap_field(label, Misc.toStaticText(value))
 
-    return renderInputCheckbox(ns, propName, value, text, option)
+    return wrap_field(label, renderInputCheckbox(ns, propName, value, text, option))
 }
 
 
 
+
+const wrap_field = (label: string, html: string) => {
+    if (label != undefined && label.length > 0)
+        return `
+        ${label}
+        ${html}
+        `
+    else
+        return html
+}
+
+
 export const renderInputCheckbox = (ns: string, propName: string, value: boolean, text: string, option: IOpt, filter = false) => {
     return `
-<div style="margin:0.5rem 0 1rem;">
 <input type="checkbox"
     id="${ns}_${propName}" 
     onchange="${ns}.onchange(this)" 
@@ -36,6 +47,5 @@ export const renderInputCheckbox = (ns: string, propName: string, value: boolean
     ${option.disabled ? "disabled" : ""}
 >
 <label for="${ns}_${propName}">${text}</label>
-</div>
 `;
 }

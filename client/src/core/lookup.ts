@@ -1,14 +1,14 @@
 
 export interface ILookup {
     id: number | string
-    xcode: string
+    code: string
     description: string
 }
 
 export interface LookupData extends ILookup {
     id: number | string
     groupe: string
-    xcode: string
+    code: string
     description: string
     value1: string | number
     value2: string | number
