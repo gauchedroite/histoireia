@@ -3,7 +3,6 @@ import * as Router from "../core/router.js"
 import * as Misc from "../core/misc.js"
 import * as Theme from "../core/theme/theme.js"
 import { state, GameDefinition } from "./state.js"
-import { waitTwoSecondAsync } from "../common/utils.js"
 import * as Lookup from "../lookupdata.js"
 
 export const NS = "GED";

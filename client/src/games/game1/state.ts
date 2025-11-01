@@ -1,30 +1,6 @@
 import * as App from "../../core/app.js"
-import { waitAsync, capitalize } from "../../common/utils.js";
-
-
-export interface GameList {
-    code: string
-    title: string
-    promptfile: string
-    kind_id: number
-    kind_fa: string
-}
-
-export interface GameDefinition {
-    code: string | null
-    title: string | null
-    bg_url: string | null
-    bg_image: string | null
-    prompt: string | null
-    llmid: number | null
-    llmid_text: string
-    kindid: number | null
-    kindid_text: string
-    extra: string | null
-    author: string
-    justme: boolean
-    hasJsonSchema: boolean
-}
+import { state as base, GameDefinition } from "../state.js"
+export { GameDefinition }
 
 
 export interface IChat {
@@ -50,55 +26,28 @@ export interface IChoice {
 
 
 class State {
-    private _username: string
-    private _index: GameList[] = []
     private _game_definition: GameDefinition | undefined
-    private _gameid: string | undefined
     private _pages: IPage[] = []
     
     private last_StorySoFar_url: string | null = null
-    private last_Index_url: string | null = null
 
 
     constructor() {
-        this._username = ""
-        this.username = localStorage.getItem("username") ?? ""
-    }
-
-    set username(value: string) {
-        this._username = value.toLowerCase()
-        localStorage.setItem("username", this._username)
-    }
-
-    get username() {
-        return this._username!
     }
 
     get usernameCapitalized() {
-        return capitalize(this._username!)
+        return base.usernameCapitalized
     }
 
-    get index() {
-        return this._index!
-    }
-
-    get gameid() {
-        return this._gameid!
-    }
-
-    get game_definition() {
-        return this._game_definition!
-    }
-
-
+    
     //
     // Managing the state
     //
     async fetchStorySoFarAsync (gameid?: string) {
         if (gameid != undefined)
-            this._gameid = gameid
+            base.gameid = gameid
 
-        const url = `users/${this.username}/${this.gameid}`
+        const url = `users/${base.username}/${base.gameid}`
 
         if (url != this.last_StorySoFar_url) {
             return App.GET(url)
@@ -124,7 +73,7 @@ class State {
         this._pages = this._pages.slice(0, pageno + 1)
         this._pages.push(<IPage> { user: content })
 
-        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        await App.PUT(`users/${base.username}/${base.gameid}`, this._pages)
         return this.fetchStorySoFarAsync()
     }
 
@@ -133,7 +82,7 @@ class State {
 
         this._pages[pageno].assistant = content;
 
-        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        await App.PUT(`users/${base.username}/${base.gameid}`, this._pages)
         return this.fetchStorySoFarAsync()
     }
 
@@ -141,7 +90,7 @@ class State {
         this._pages = [];
         this._pages.push(<IPage> { user: this._game_definition!.prompt! })
 
-        await App.PUT(`users/${this.username}/${this.gameid}`, this._pages)
+        await App.PUT(`users/${base.username}/${base.gameid}`, this._pages)
         return this.fetchStorySoFarAsync()
     }
 
@@ -192,54 +141,14 @@ class State {
     //
     // Operations on the server
     //
-    async fetchIndexAsync () {
-        const url = `stories-for/${this.username}`
-
-        if (this.last_Index_url != url) {
-            this.last_Index_url = url
-            this._index = await App.GET(url) as any
-        }
-    }
-
     async fetchGameDefinitionAsync (gameid: string) {
-        if (this._gameid == gameid) {
-            return this._game_definition
-        }
-
-        this._gameid = gameid
-        this._game_definition = await App.GET(`stories/${gameid}`) as unknown as GameDefinition
-        return this._game_definition
-    }
-
-    newStory () {
-        this._game_definition = <GameDefinition> {
-            code: "new",
-            title: "Nouveau!",
-            bg_image: "",
-            prompt: "Tu es un assistant utile.",
-            author: this.username,
-            justme: true,
-            extra: null
-        }
-
-        this._gameid = this._game_definition.code!
-    }
-
-    async saveStoryAsync(game_definition: any) {
-        this.last_Index_url = null
-        this._game_definition = game_definition
-        return App.PUT(`stories/${this.gameid}`, game_definition)
-    }
-
-    async deleteStoryAsync() {
-        this.last_Index_url = null
-        return App.DELETE(`stories/${this.gameid}`, {})
+        return base.fetchGameDefinitionAsync(gameid)
     }
 
 
 
     async chatAsync(streamUpdater?: (message: string) => void) {
-        const endpoint = App.apiurl(`chat/${this.gameid}`)
+        const endpoint = App.apiurl(`chat/${base.gameid}`)
         const messages = this.pagesToMessages()
         
         const response = await window.fetch(endpoint, {
@@ -269,7 +178,7 @@ class State {
     }
 
     async chatExtraAsync(extra: string) {
-        const endpoint = App.apiurl(`chat/${this.gameid}/${extra}`)
+        const endpoint = App.apiurl(`chat/${base.gameid}/${extra}`)
         const messages = this.pagesToMessages()
 
         const response = await window.fetch(endpoint, {

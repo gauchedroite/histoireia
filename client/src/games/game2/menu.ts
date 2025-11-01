@@ -1,7 +1,7 @@
 import * as App from "../../core/app.js"
 import * as Router from "../../core/router.js"
 import * as Misc from "../../core/misc.js"
-import { state, GameDefinition, IPage } from "./state.js"
+import { state, GameDefinition } from "./state.js"
 
 export const NS = "GMENU2";
 const ns = NS.toLowerCase()
@@ -95,7 +95,7 @@ export const fetch = (args: string[] | undefined) => {
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition
-            lastPage = state.lastPageNo()
+            lastPage = 1 // state.lastPageNo()
         })
         .then(App.untransitionUI)
         .then(App.render)
@@ -104,7 +104,7 @@ export const fetch = (args: string[] | undefined) => {
 
 export const render = () => {
     if (!App.inContext(NS)) return "";
-    if (state.pages() == undefined) return ""
+    //if (state.pages() == undefined) return ""
 
     const form = formTemplate()
     const modal = layout_Modal()
