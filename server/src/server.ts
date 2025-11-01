@@ -84,7 +84,7 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
                             bg_image: data.bg_image,
                             bg_url: (data.bg_image ? `assets/billy/${data.bg_image}` : ""),
                             promptfile: `${data.code}.txt`,
-                            kind_code: kind?.code,
+                            kind_id: kind?.id,
                             kind_fa: kind?.fa
                         });
                     }
@@ -117,14 +117,27 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const metaContent = await fs.readFile(metadataPath, "utf8");
         const data = JSON.parse(metaContent) as GameDefinition;
 
-        const promptPath = path.join(gameid_Path, "prompt.txt");
-        const prompt = await fs.readFile(promptPath, "utf8");
-
         const llmid = data.llmid
         const llmConfigPath = path.join(lookupPath, "llm.json");
         const llmContent = await fs.readFile(llmConfigPath, "utf8");
         const llmList = JSON.parse(llmContent) as LLMConfig[];
         const llm = llmList.find(one => one.id === llmid)!;
+
+        const kindid = data.kindid
+        const kindConfigPath = path.join(lookupPath, "kind.json");
+        const kindContent = await fs.readFile(kindConfigPath, "utf8");
+        const kindList = JSON.parse(kindContent) as KindLookup[];
+        const kind = kindList.find(one => one.id === kindid)!;
+
+        let prompt = ""
+        if (kind.code == "llm") {
+            const promptPath = path.join(gameid_Path, "prompt.txt");
+            prompt = await fs.readFile(promptPath, "utf8");
+        }
+        else {
+            const dataPath = path.join(gameid_Path, "data.tsv");
+            prompt = await fs.readFile(dataPath, "utf8");
+        }
 
         const _game_definition: GameDefinition = {
             code: data.code,
@@ -173,10 +186,16 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
         const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme, kindid }
 
         const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
-        const gameid_txtPath = path.join(gameid_Path, "prompt.txt");
-
         await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
-        await fs.writeFile(gameid_txtPath, prompt);
+
+        if (kindid == 1) {
+            const promptPath = path.join(gameid_Path, "prompt.txt");
+            await fs.writeFile(promptPath, prompt);
+        }
+        else {
+            const dataPath = path.join(gameid_Path, "data.tsv");
+            await fs.writeFile(dataPath, prompt);
+        }
 
         console.log(`PUT /stories/${gameid}`);
         res.json({ gameid });
@@ -218,7 +237,7 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
 app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
     let username = req.params.username;
     let gameid = req.params.gameid;
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
         let pagesContent: string;
@@ -241,7 +260,7 @@ app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
 app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
     let username = req.params.username.toLowerCase();
     let gameid = req.params.gameid.toLowerCase();
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_pages.json`)
+    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
         await fs.writeFile(pages_Path, JSON.stringify(req.body));

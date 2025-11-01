@@ -6,7 +6,7 @@ export interface GameList {
     code: string
     title: string
     promptfile: string
-    kind_code: string
+    kind_id: number
     kind_fa: string
 }
 

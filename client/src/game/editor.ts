@@ -14,7 +14,6 @@ let mystate: GameDefinition = <GameDefinition>{};
 let gameid: string = ""
 let isNew = false;
 let modalWhat: string | null = null
-let LUID_KIND_ADV: number | null
 
 
 
@@ -25,9 +24,9 @@ const formTemplate = (item: GameDefinition, llmid: string, kindid: string) => {
     const amAuthor = (item.author == state.username)
 
     add(Theme.renderFieldText(NS, "title", item.title, `Titre <div class="code">${item.code}</div>`, <Theme.IOptText>{ maxlength: 32, required: true }))
-    add(Theme.renderFieldDropdown(NS, "kindid", kindid, item.kindid_text, "Kind", <Theme.IOptDropdown>{ required: true }))
+    add(Theme.renderFieldDropdown(NS, "kindid", kindid, item.kindid_text, "Type d'histoire", <Theme.IOptDropdown>{ required: true }))
 
-    if (item.kindid != LUID_KIND_ADV) {
+    if (item.kindid != Lookup.LUID_KIND_ADV) {
         add(Theme.renderFieldTextarea(NS, "prompt", item.prompt, "Prompt", <Theme.IOptText>{ maxlength: 8192, required: true, rows: 10 }))
 
         add(Theme.renderFieldText(NS, "extra", item.extra, "Extra", <Theme.IOptText>{}))
@@ -39,6 +38,7 @@ const formTemplate = (item: GameDefinition, llmid: string, kindid: string) => {
     if (amAuthor)
         add(Theme.renderFieldCheckbox(NS, "justme", item.justme, "", "Privé: seulement pour moi!", <Theme.IOpt>{}))
 
+    add(`<br><br>`);
     if (isNew) {
         add(`<button type="button" class="button" onclick="${NS}.save_story()"><i class="fa-solid fa-sparkles"></i>&nbsp;Enregistrer la nouvelle histoire</button>`)
     }
@@ -139,8 +139,6 @@ export const render = () => {
     const lookup_kind = Lookup.get_kind();
     let llmid = Theme.renderOptions(lookup_llm, mystate.llmid, isNew);
     let kindid = Theme.renderOptions(lookup_kind, mystate.kindid, isNew);
-
-    LUID_KIND_ADV = lookup_kind.find(one => one.code == "adv")?.id as number
 
     const form = formTemplate(mystate, llmid, kindid);
     const modal = layout_Modal()

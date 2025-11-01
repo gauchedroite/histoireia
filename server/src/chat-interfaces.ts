@@ -64,6 +64,6 @@ export interface GameList {
     bg_url: string
     bg_image: string | null
     promptfile: string
-    kind_code: string | undefined
+    kind_id: number | undefined
     kind_fa: string | undefined
 }

@@ -1,5 +1,6 @@
 import * as App from "../core/app.js"
 import { GameList, state } from "./state.js"
+import { LUID_KIND_ADV } from "../lookupdata.js"
 
 export const NS = "GHOME";
 
@@ -13,7 +14,9 @@ export const NS = "GHOME";
 
 const formTemplate = (list: GameList[]) => {
     const games = list.map(item => {
-        return `<a href="#/menu/${item.code}">
+        const menu = item.kind_id == LUID_KIND_ADV ? `menu2` : `menu`;
+        
+        return `<a href="#/${menu}/${item.code}">
             <div>
                 <div>${item.title}</div>
                 <i class="${item.kind_fa ?? "fa-thin fa-book"}"></i>

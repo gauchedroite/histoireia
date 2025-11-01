@@ -13,6 +13,7 @@ export const fetch_llm = async () => {
 }
 export const get_llm = () => llm;
 
+
 let kind: LookupData[];
 export const invalidate_kind = () => (kind as any) = null;
 export const fetch_kind = async () => {
@@ -21,3 +22,13 @@ export const fetch_kind = async () => {
     kind = await App.GET(`data/lookup/kind.json`) as any;
 }
 export const get_kind = () => kind;
+
+
+
+// Populate some default LUIDs
+export let LUID_KIND_ADV: number | null;
+//
+export const populateLUID = async () => {
+    await fetch_kind()
+    LUID_KIND_ADV = kind.find(one => one.code == "adv")?.id as number;
+}

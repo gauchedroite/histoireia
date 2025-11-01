@@ -2,6 +2,7 @@ import * as App from "./core/app.js"
 import * as GameMain from "./game/main.js"
 import WebglRunner from "./common/webgl-runner.js";
 import * as Reloader from "./common/reloader.js"
+import * as Lookup from "./lookupdata.js"
 
 export const NS = "INDEX";
 
@@ -20,6 +21,10 @@ App.initialize(
     }, 
     "HistoireIA"
 );
+
+
+// Populate some default LUIDs
+Lookup.populateLUID();
 
 
 // Configure routes
