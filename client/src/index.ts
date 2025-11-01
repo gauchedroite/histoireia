@@ -1,5 +1,5 @@
 import * as App from "./core/app.js"
-import * as GameMain from "./game/main.js"
+import * as GameMain from "./games/main.js"
 import WebglRunner from "./common/webgl-runner.js";
 import * as Reloader from "./common/reloader.js"
 import * as Lookup from "./lookupdata.js"

@@ -1,7 +1,7 @@
-import * as App from "../core/app.js"
-import * as Router from "../core/router.js"
-import * as Misc from "../core/misc.js"
-import * as Theme from "../core/theme/theme.js"
+import * as App from "../../core/app.js"
+import * as Router from "../../core/router.js"
+import * as Misc from "../../core/misc.js"
+import * as Theme from "../../core/theme/theme.js"
 import { state, GameDefinition, IChoice } from "./state.js"
 
 export const NS = "GSTORY";

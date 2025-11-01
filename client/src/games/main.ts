@@ -1,10 +1,10 @@
 
 import * as router from "../core/router.js"
 import * as home from "./home.js"
-import * as menu from "./menu.js"
-import * as menu2 from "./menu2.js"
-import * as story from "./story.js"
-import * as story2 from "./story2.js"
+import * as menu from "./game1/menu.js"
+import * as menu2 from "./game2/menu.js"
+import * as story from "./game1/story.js"
+import * as story2 from "./game2/story.js"
 import * as editor from "./editor.js"
 import * as bonjour from "./bonjour.js"
 
