@@ -91,7 +91,7 @@ export const fetch = (args: string[] | undefined) => {
     Promise.all
         ([
             state.fetchGameDefinitionAsync(gameid),
-            state.fetchStorySoFarAsync(gameid)
+            state.fetchGameStateAsync(gameid)
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition

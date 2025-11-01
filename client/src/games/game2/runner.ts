@@ -1,4 +1,20 @@
 // --- INTERFACES ---
+export interface ISituationUI {
+    id: number
+    title: string
+    choices: {choice: string}[]
+}
+export interface IConsequenceUI {
+    title: string
+    choice: string
+    consequence: string
+    nextid: number
+}
+export interface INextUI {
+    newid: number
+    end: boolean
+}
+
 interface ISituation {
     id: number;
     gid: number;
@@ -19,8 +35,8 @@ interface IGroupSize {
     size: number;
 }
 
-// --- GAME CLASS ---
-class OrdGame {
+// --- GAME RUNNER CLASS ---
+class Runner {
     situations: ISituation[] = [];
     situationsById: Map<number, ISituation> = new Map();
     groupSizes: Map<number, number> = new Map();
@@ -29,11 +45,17 @@ class OrdGame {
     currentGroup: number = 0;
 
     // --- LOADING ---
-    async Initialize(dataUrl: string, groupSizesData: IGroupSize[]): Promise<void> {
+    Initialize(tsv: string) {
+        const groupSizesData: IGroupSize[] = [
+            {group: 1, size: 2},
+            {group: 2, size: 5},
+            {group: 4, size: 4},
+            {group: 5, size: 4},
+            {group: 6, size: 3}
+        ];
         for (const gs of groupSizesData) this.groupSizes.set(gs.group, gs.size);
-        const resp = await fetch(dataUrl);
-        const raw = await resp.text();
-        this.parseSituations(raw);
+
+        this.parseSituations(tsv);
     }
 
     parseSituations(raw: string) {
@@ -78,23 +100,23 @@ class OrdGame {
     }
 
     // --- API ---
-    GetSituation(id: number): {id: number, title: string, choices: {choice: string}[]} {
+    GetSituation(id: number): ISituationUI {
         const s = this.situationsById.get(id);
         if (!s) throw "Situation not found";
         this.currentGroup = s.gid;
-        return { id: s.id, title: s.title, choices: s.choices.map(c => ({choice: c.choice})) }
+        return <ISituationUI>{ id: s.id, title: s.title, choices: s.choices.map(c => ({choice: c.choice})) }
     }
-    GetConsequence(id: number, choiceid: number) {
+    GetConsequence(id: number, choiceid: number) : IConsequenceUI {
         const s = this.situationsById.get(id)!;
         const c = s.choices[choiceid];
-        return {
+        return <IConsequenceUI>{
             title: s.title,
             choice: c.choice,
             consequence: c.consequence,
-            nextid: c.nextid
+            nextid: c.nextid!
         }
     }
-    NextSituation(id: number, choiceid: number): {newid: number, end: boolean} {
+    NextSituation(id: number, choiceid: number): INextUI {
         const s = this.situationsById.get(id)!;
         const c = s.choices[choiceid];
 
@@ -143,65 +165,9 @@ class OrdGame {
             nextid = possible[Math.floor(Math.random() * possible.length)].id;
         }
 
-        return {newid: nextid!, end: isEnd};
+        return <INextUI>{newid: nextid!, end: isEnd};
     }
 }
 
 
-// --- UI LOGIC ---
-const groupSizesData: IGroupSize[] = [
-    {group: 1, size: 2},
-    {group: 2, size: 5},
-    {group: 4, size: 4},
-    {group: 5, size: 4},
-    {group: 6, size: 3}
-];
-
-async function main() {
-    const url = `http://localhost:45145/dev-gd/story-ord/game_table.tsv`;
-    const game = new OrdGame();
-    await game.Initialize(url, groupSizesData);
-
-    // Start from id == 1
-    let situationId = 1;
-
-    renderSituation(situationId);
-
-    function renderSituation(id: number) {
-        const s = game.GetSituation(id);
-        const app = document.getElementById('app')!;
-
-        // Render choices as h3 elements
-        const choiceHtml = [0, 1].map(i => {
-            const text = s.choices[i].choice;
-            return `<h3 id="choice${i}" style="cursor:pointer;margin:0.5em 0">${text}</h3>`;
-        }).join('');
-
-        app.innerHTML = `<h2>${s.title}</h2>${choiceHtml}<p id="conseq"></p>`;
-
-        for (let i = 0; i < 2; ++i) {
-            const el = document.getElementById(`choice${i}`) as HTMLElement | null;
-            if (!el) continue;
-            // skip if this choice doesn't exist
-            if (!s.choices[i]) {
-                el.style.display = 'none';
-                continue;
-            }
-            el.onclick = () => {
-                const res = game.GetConsequence(id, i);
-                (document.getElementById("conseq") as HTMLParagraphElement).innerText = res.consequence;
-                setTimeout(() => {
-                    const { newid, end } = game.NextSituation(id, i);
-                    if (end || !newid) {
-                        app.innerHTML = "<h2>THE END</h2><button id='restart'>Restart</button>";
-                        document.getElementById('restart')!.onclick = () => window.location.reload();
-                        return;
-                    }
-                    renderSituation(newid);
-                }, 1000);
-            };
-        }
-    }
-}
-
-//main();
+export const runner = new Runner();
