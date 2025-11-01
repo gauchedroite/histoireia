@@ -237,19 +237,22 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
 app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
     let username = req.params.username;
     let gameid = req.params.gameid;
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
+    let state_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
-        let pagesContent: string;
-        if (!fs.existsSync(pages_Path))
-            pagesContent = "[]";
-        else
-            pagesContent = await fs.readFile(pages_Path, "utf8");
+        let state: any = null;
 
-        const pages = JSON.parse(pagesContent);
+        let stateContent: string;
+        if (!fs.existsSync(state_Path)) {
+            state = "{}";
+        }
+        else {
+            stateContent = await fs.readFile(state_Path, "utf8");
+            state = JSON.parse(stateContent);
+        }
 
         console.log(`GET /stories/${gameid}/${username}`)
-        res.json(pages);
+        res.json(state);
     }
     catch (err) {
         console.error(`GET /stories/${gameid}/${username}`, err);

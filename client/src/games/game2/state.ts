@@ -4,9 +4,7 @@ export { GameDefinition }
 
 
 class State {
-    private _game_definition: GameDefinition | undefined
 /**/private _pages: any[] = []
-    
     private last_StorySoFar_url: string | null = null
 
 
@@ -47,7 +45,7 @@ class State {
 
     async resetMessagesAsync () {
         this._pages = [];
-        this._pages.push(<any> { user: this._game_definition!.prompt! })
+        this._pages.push(<any> { user: base.game_definition!.prompt! })
 
         await App.PUT(`users/${base.username}/${base.gameid}`, this._pages)
         return this.fetchStorySoFarAsync()
@@ -60,20 +58,6 @@ class State {
     //
     async fetchGameDefinitionAsync (gameid: string) {
         return base.fetchGameDefinitionAsync(gameid)
-    }
-
-    newStory () {
-        this._game_definition = <GameDefinition> {
-            code: "new",
-            title: "Nouveau!",
-            bg_image: "",
-            prompt: "Tu es un assistant utile.",
-            author: base.username,
-            justme: true,
-            extra: null
-        }
-
-        base.gameid = this._game_definition.code!
     }
 }
 

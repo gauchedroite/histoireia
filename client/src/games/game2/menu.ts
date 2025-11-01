@@ -37,7 +37,7 @@ const formTemplate = () => {
     add(`<div class="app-list">`)
 
     if (lastPage == -1) {
-        action(`#/story2/${gameid}/new`, "Commencer la lecture", `<i class="fa-thin fa-book-user"></i>`)
+        action(`#/story2/${gameid}/new`, "Lire à partir du début", `<i class="fa-thin fa-book-user"></i>`)
     }
     else {
         action(`#/story2/${gameid}/${lastPage}`, "Continuer la lecture", `<i class="fa-thin fa-book-open-reader"></i>`)
@@ -95,7 +95,7 @@ export const fetch = (args: string[] | undefined) => {
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition
-            lastPage = 1 // state.lastPageNo()
+            lastPage = -1; //state.lastPageNo()
         })
         .then(App.untransitionUI)
         .then(App.render)

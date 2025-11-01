@@ -145,7 +145,6 @@ export const fetch = (args: string[] | undefined) => {
             ])
             .then((payloads: any) => {
                 mystate = Misc.clone(payloads[0]) as GameDefinition
-                console.log(state)
             })
             .then(() => { state.resetMessagesAsync() })
             .then(() => { Router.goto(`#/story/${gameid}/0`, 1) })

@@ -9,7 +9,7 @@ export const NS = "GSTORY2";
 
 let mystate: GameDefinition
 let gameid = ""
-let lineId = 0
+let eventid = 0
 let lastLineId = 0
 let isNew = false
 
@@ -18,6 +18,8 @@ let isNew = false
 const formTemplate = () => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
+
+    add("HERE")
     
     return rows.join("")
 }
@@ -25,7 +27,7 @@ const formTemplate = () => {
 const pageTemplate = (form: string) => {
     return `
 <div class="app-header">
-    <a class="js-waitable-2" href="#/menu/${gameid}">
+    <a class="js-waitable-2" href="#/menu2/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
 </div>
@@ -38,8 +40,8 @@ const pageTemplate = (form: string) => {
 
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
-    lineId = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
-    isNew = isNaN(lineId)
+    eventid = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
+    isNew = isNaN(eventid)
 
     if (isNew) {
         Promise.all
@@ -89,11 +91,6 @@ const getFormState = () => {
 
 
 export const onchange = (input: HTMLInputElement) => {
-    getFormState();
-    App.render();
-}
-
-export const oninput = (input: HTMLInputElement) => {
     getFormState();
     App.render();
 }

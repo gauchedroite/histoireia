@@ -26,9 +26,7 @@ export interface IChoice {
 
 
 class State {
-    private _game_definition: GameDefinition | undefined
     private _pages: IPage[] = []
-    
     private last_StorySoFar_url: string | null = null
 
 
@@ -51,9 +49,9 @@ class State {
 
         if (url != this.last_StorySoFar_url) {
             return App.GET(url)
-            .then(payload => {
+            .then((payload: any) => {
                 this.last_StorySoFar_url = url
-                this._pages = payload as any;
+                this._pages = payload;
                 return this._pages
             })
         }
@@ -88,7 +86,7 @@ class State {
 
     async resetMessagesAsync () {
         this._pages = [];
-        this._pages.push(<IPage> { user: this._game_definition!.prompt! })
+        this._pages.push(<IPage> { user: base.game_definition!.prompt! })
 
         await App.PUT(`users/${base.username}/${base.gameid}`, this._pages)
         return this.fetchStorySoFarAsync()
