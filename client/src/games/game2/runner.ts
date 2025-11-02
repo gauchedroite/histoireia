@@ -5,14 +5,13 @@ export interface ISituationUI {
     choices: {choice: string}[]
 }
 export interface IConsequenceUI {
+    id: number
     title: string
     choice: string
     consequence: string
     nextid: number
-}
-export interface INextUI {
-    newid: number
     end: boolean
+    gameover: boolean
 }
 
 interface ISituation {
@@ -53,6 +52,14 @@ class Runner {
             {group: 5, size: 4},
             {group: 6, size: 3}
         ];
+        
+        this.situations = [];
+        this.situationsById = new Map();
+        this.groupSizes = new Map();
+        this.originalAllow = new Map();
+        this.groupSituationCount = 0;
+        this.currentGroup = 0;
+
         for (const gs of groupSizesData) this.groupSizes.set(gs.group, gs.size);
 
         this.parseSituations(tsv);
@@ -110,13 +117,16 @@ class Runner {
         const s = this.situationsById.get(id)!;
         const c = s.choices[choiceid];
         return <IConsequenceUI>{
+            id,
             title: s.title,
             choice: c.choice,
             consequence: c.consequence,
-            nextid: c.nextid!
+            nextid: c.nextid!,
+            end: (c.nextid == undefined ? false : c.nextid == 1),
+            gameover: (c.nextid == undefined ? false : c.nextid == 0)
         }
     }
-    NextSituation(id: number, choiceid: number): INextUI {
+    NextSituation(id: number, choiceid: number) {
         const s = this.situationsById.get(id)!;
         const c = s.choices[choiceid];
 
@@ -136,36 +146,47 @@ class Runner {
                 if (sit) sit.allow = idx > 0 ? "yes" : "";
             }
         }
-        // Reset allow if nextid==0 or 1
+        // Reset allow and exit if nextid==0 or 1
         if (c.nextid === 0 || c.nextid === 1) {
             for (const [id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
             this.groupSituationCount = 0;
+            return 1;
         }
 
         let nextid: number | undefined;
-        let isEnd = false;
 
         if (typeof c.nextid === "number" && c.nextid > 1) {
             nextid = c.nextid;
             if (!groupChanged) this.groupSituationCount++;
-        } else if (typeof c.nextid === "number" && (c.nextid === 0 || c.nextid === 1)) {
-            isEnd = true;
-            return {newid: 0, end: isEnd};
         } else {
             if (!groupChanged) this.groupSituationCount++;
             // group limit?
             const size = this.groupSizes.get(this.currentGroup);
             if (size !== undefined && this.groupSituationCount >= size) {
                 const exitSit = this.situations.find(s=>s.gid===this.currentGroup && s.allow==="EXIT");
-                if (exitSit) return {newid: exitSit.id, end: false};
+                if (exitSit) return exitSit.id;
             }
             // random situation in group, allow = yes
             const possible = this.situations.filter(s => s.gid === this.currentGroup && s.allow === "yes");
-            if (possible.length === 0) return {newid: 0, end: true};
+            if (possible.length === 0) return 0;
             nextid = possible[Math.floor(Math.random() * possible.length)].id;
         }
 
-        return <INextUI>{newid: nextid!, end: isEnd};
+        return nextid!;
+    }
+    ClearState() {
+        for (const [id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
+    }
+    GetState() {
+        return new Map(Array.from(this.situationsById, ([key, situation]) => [key, situation.allow]));
+    }
+    SetState(state: Map<number, string>) {
+        for (const [key, allowValue] of state) {
+            const situation = this.situationsById.get(key);
+            if (situation) {
+                situation.allow = allowValue;
+            }
+        }
     }
 }
 

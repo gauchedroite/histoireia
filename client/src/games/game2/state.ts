@@ -4,11 +4,12 @@ export { GameDefinition }
 
 export interface GameState {
     currentid: number
+    allows: Map<number, string>
 }
 
 
 class State {
-    private _game_state: GameState = { currentid: 0}
+    private _game_state: GameState = { currentid: 0, allows: new Map() }
     private last_StorySoFar_url: string | null = null
 
 
@@ -21,6 +22,10 @@ class State {
 
     get game_definition() {
         return base.game_definition
+    }
+
+    get game_state() {
+        return this._game_state
     }
 
 
@@ -37,7 +42,12 @@ class State {
             return App.GET(url)
             .then(payload => {
                 this.last_StorySoFar_url = url
-                this._game_state = payload as any;
+
+                const currentid = (payload as any).currentid;
+                const allowsArray: [number, string][] = JSON.parse((payload as any).allowsArray);
+                const allows = new Map<number, string>(allowsArray);
+
+                this._game_state = { currentid, allows }
                 return this._game_state
             })
         }
@@ -51,8 +61,21 @@ class State {
     }
 
     async resetGameStateAsync () {
-        this._game_state = { currentid: 0}
-        await App.PUT(`users/${base.username}/${base.gameid}`, this._game_state)
+        this._game_state = { currentid: 1, allows: new Map()}
+        const game_state = {
+            currentid: this._game_state.currentid,
+            allowsArray: JSON.stringify(Array.from(this._game_state.allows.entries()))
+        }
+        await App.PUT(`users/${base.username}/${base.gameid}`, game_state)
+    }
+
+    async saveGameStateAsync (id: number, allows: Map<number, string>) {
+        this._game_state = { currentid: id, allows }
+        const game_state = {
+            currentid: this._game_state.currentid,
+            allowsArray: JSON.stringify(Array.from(this._game_state.allows.entries()))
+        }
+        await App.PUT(`users/${base.username}/${base.gameid}`, game_state)
     }
 
 

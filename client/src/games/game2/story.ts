@@ -15,17 +15,19 @@ let isNew = false
 
 
 const choiceTemplate = (i: number, text: string) => {
-    return `<h1 onclick="${NS}.onChoice(${i})">${text}</h1>`;
+    return `<h3 onclick="${NS}.onChoice(${i})">${text}</h3>`;
 }
 
 const questionTemplate = (s: ISituationUI, choiceHtml: string) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
+    add(`<div class="question">`)
     add(`<h1>${s.title}</h1>`)
-    add(`<br>`)
+    add(`<div class="answers">`)
     add(choiceHtml)
-    add(`<br>`)
+    add(`</div>`)
+    add(`</div>`)
     
     return rows.join("")
 }
@@ -34,9 +36,15 @@ const consequenceTemplate = (s: IConsequenceUI) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
+    add(`<div class="consequence">`)
     add(`<h1>${s.title}</h1>`)
-    add(`<h1>${s.choice}</h1>`)
-    add(`<h1>${s.consequence}</h1>`)
+    add(`<h2>${s.choice}</h2>`)
+    add(`<h2 class="standout">${s.consequence}</h2>`)
+    if (s.end)
+        add(`<h2>Fin.</h2>`)
+    if (s.gameover)
+        add(`<h2>Game Over.</h2>`)
+    add(`</div>`)
     
     return rows.join("")
 }
@@ -59,10 +67,16 @@ const pageTemplate = (form: string, showConsequence: boolean) => {
 
 export const fetch = (args: string[] | undefined) => {
     gameid = (args ? args[0] : "");
+
     situationId = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
+    selectedChoice = -1
+    step = 1
+
     isNew = isNaN(situationId)
 
     if (isNew) {
+        situationId = 0
+        
         Promise.all
             ([
                 state.fetchGameDefinitionAsync(gameid),
@@ -79,11 +93,11 @@ export const fetch = (args: string[] | undefined) => {
         Promise.all
             ([
                 state.fetchGameDefinitionAsync(gameid),
-                //state.fetchGameStateAsync(gameid)
+                state.fetchGameStateAsync(gameid)
             ])
             .then((payloads: any) => {
                 runner.Initialize(state.game_definition.prompt!)
-                // apply the user state
+                runner.SetState(state.game_state.allows)
             })
             .then(App.render)
             .catch(App.render)
@@ -96,7 +110,6 @@ export const render = () => {
     if (!App.inContext(NS)) return "";
 
     let form = ""
-    let isConsequence = false;
 
     if (step == 1) {
         const s = runner.GetSituation(situationId);
@@ -105,22 +118,18 @@ export const render = () => {
     }
     else if (step == 2) {
         const res = runner.GetConsequence(situationId, selectedChoice);
-        const { newid, end } = runner.NextSituation(situationId, selectedChoice);
-
-        // LES CHANGEMENTS DE STATE DEVRAIENT SE FAIRE DANS UN ONLICK() EVENT
-        // DE FAÇON À CE QU'UN F5 NE CHANGE PAS LE STATE
         form = consequenceTemplate(res)
-
-        situationId = newid
-        step = 1
-        isConsequence = true
     }
 
-    return pageTemplate(form, isConsequence)
+    return pageTemplate(form, step == 2)
 }
 
 export const postRender = () => {
     if (!App.inContext(NS)) return
+    const content = document.querySelector(".app-content");
+    if (content) {
+        setTimeout(() => { content.classList.add(`fadin`) }, 125);
+    }
 }
 
 
@@ -141,6 +150,19 @@ export const onChoice = (i: number) => {
     App.renderOnNextTick();
 }
 
-export const onConsequence = () => {
-    App.renderOnNextTick();
+export const onConsequence = async () => {
+    situationId = runner.NextSituation(situationId, selectedChoice);
+    step = 1
+
+    const runnerState = runner.GetState()
+    await state.saveGameStateAsync(situationId, runnerState)
+
+    const content = document.querySelector(".app-content");
+    if (content) {
+        setTimeout(() => { content.classList.add(`fadout`) }, 10);
+        setTimeout(() => { App.render() }, 250);
+    }
+    else {
+        App.render();
+    }
 }

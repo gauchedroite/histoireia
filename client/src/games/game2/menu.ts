@@ -1,7 +1,7 @@
 import * as App from "../../core/app.js"
 import * as Router from "../../core/router.js"
 import * as Misc from "../../core/misc.js"
-import { state, GameDefinition } from "./state.js"
+import { state, GameDefinition, GameState } from "./state.js"
 
 export const NS = "GMENU2";
 const ns = NS.toLowerCase()
@@ -95,7 +95,7 @@ export const fetch = (args: string[] | undefined) => {
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition
-            lastPage = -1; //state.lastPageNo()
+            lastPage = (payloads[1] as GameState).currentid
         })
         .then(App.untransitionUI)
         .then(App.render)
