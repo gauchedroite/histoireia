@@ -22,7 +22,7 @@ const questionTemplate = (s: ISituationUI, choiceHtml: string) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(`<div class="question">`)
+    add(`<div class="question" id="step_1">`)
     add(`<h1>${s.title}</h1>`)
     add(`<div class="answers">`)
     add(choiceHtml)
@@ -36,7 +36,7 @@ const consequenceTemplate = (s: IConsequenceUI) => {
     const add = (row: string) => rows.push(row);
     let rows: string[] = [];
 
-    add(`<div class="consequence">`)
+    add(`<div class="consequence" id="step_2">`)
     add(`<h1>${s.title}</h1>`)
     add(`<h2>${s.choice}</h2>`)
     add(`<h2 class="standout">${s.consequence}</h2>`)
