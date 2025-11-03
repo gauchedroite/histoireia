@@ -1,308 +1,308 @@
 ID	GID	Allow	Title	Choice1	Consequence1	GID1	ID1	Allow1	Choice2	Consequence2	GID2	ID2	Allow2	
-1	0	yes	Alarm.	Wake.	Quest.	1	1001		Snooze.	Snore.	0	2		
-2	0	yes	Alarm.	Wake.	Quest.	1	1001		Snooze.	Snore.	0	3		
-3	0	yes	Alarm.	Wake.	Quest.	1	1001		Snooze.	Snore.	0	4		
-4	0	yes	Alarm.	Wake.	Quest.	1	1001		Snooze.	Snore.	0	5		
-5	0	yes	Alarm.	Wake.	Quest.	1	1001		Snooze.	Snore.	0	1		
-1001	1		Home.	Leave.	Forest.	2			Stay.	Cozy.				
-1002	1	yes	Dog.	Pet.	Woof.			[1002]	Play.	Woof!		1003		
-1003	1		Stick.	Throw.	Fetch.		1008		Pretend.	Woof?				
-1004	1	yes	Coffee.	Drink.	Awake.		1005		Leave.	Bitter.				
-1005	1		Coffee!	Drink!	Awake!!!!!		1006		Spill.	Hot!				
-1006	1		Coffeee!!	Drink!!	Jittery.		1007		Spill.	Hot!				
-1007	1		Coffeeee!!!	DRINK!!!!!!!!!!	Overdose.		1		NO!!!!	AWAKE!!!				
-1008	1	yes	Newspaper.	Read.	Headline.		1009		Ignore.	Boring.				
-1009	1		Warlock.	Where?	Tower.		1009		What?	Evil.		1001		
-1010	1	EXIT	Home.	Leave.	Forest.	2			Stay.	Lazy.		1010		
-1011	1	yes	Television.	Watch.	Cartoons.		1012		Boring.	Quest!				
-1012	1		Television.	Watch.	Advertisement.		1013		Boring.	Quest!				
-1013	1		Television.	Watch.	News.		1014		Boring.	Quest!				
-1014	1		News.	Watch.	Warlock!		1015		Boring.	Quest!		1016		
-1015	1		Evil!	Where?	Tower.		1016		Hero?	You?		1016		
-1016	1		Television.	Watch.	Reruns.		1017		Quest!	Adventure!		1010		
-1017	1		Television.	Watch.	Sitcoms.		1018		Boring.	Quest!				
-1018	1		Television.	Watch.	News.		1019		Boring.	Quest!				
-1019	1		Television.	Watch.	Advertisement.		1020		Boring.	Quest!				
-1020	1		Television.	Watch.	Blockbuster.		1021		Boring.	Quest!				
-1021	1		Television.	Watch.	Show.		1022		Boring.	Quest!				
-1022	1		Television.	Watch.	Advertisement.		1024		Boring.	Quest!				
-1024	1		Television.	Watch.	Asleep.		1		Boring.	Asleep.		1		
-1025	1	yes	Plant.	Water.	Healthy.				Forget.	Dead.				
-1026	1	yes	Breakfast.	Important.	Delicious.				Later.	Hungry.				
-2001	2	yes	Raccoon.	Wrestle.	Rabies.		1		Bribe.	Deal.				
-2002	2	yes	Stream.	Jump.	Slip.		1		Wade.	Wet.				
-2003	2	yes	Berries.	Pick.	Fresh.			[2004, 6019]	Squish.	Juicy.				
-2004	2		Hungry.	Berries.	Poisoned.		1		Later.	Tempting.			[2004]	
-2005	2	yes	Bridge.	Over.	River.				Under.	Troll.		1		
-2007	2	yes	Statue.	Admire.	Elegant.				Climb.	Fall.		1		
-2009	2	EXIT	Dungeon.	Enter.	Scary.	4			Reconsider.	Coward.		2009		
-2010	2	yes	Deer.	Watch.	Calm.			[2012]	Chase.	Gone.			[-2012]	
-2012	2		Hunter.	Wave.	Distracted.				Join.	Hunt.		2013		
-2013	2		Meat.	Cook.	Bitter?			[-2010]	Reject.	Vegetarian.			[-2010]	
-2015	2	yes	Nest.	Search.	Eggs.		2016		Hide.	Protect.				
-2016	2		Eggs.	Cook.	Omlette.				Paint.	Pretty.				
-2017	2	yes	Hut.	Approach.	Small.		2018		Leave.	Privacy.				
-2018	2		Bed.	Rest.	Lice.			[2020]	Push.	Secret!		2019		
-2019	2		Magazine.	Inspect.	Lewd.		2019		Open.	Stuck.				
-2020	2		Itching.	Scratch.	Relief.			[2020]	Ignore.	Suffering.				
-2021	2	yes	Lake.	Swim.	Drown.		1		Fishing.	Boot.				
-2022	2	yes	Beehive.	Watch.	Bzzz.				Honey?	Swarm.		1		
-3001	2	yes	Flowers.	Pick.	Pretty.			[5019, -5020]	Smell.	Sweet.				
-3002	2	yes	Stranger.	Greet.	Hello.		3003		Pickpocket.	Breadcrumbs.			[5050]	
-3003	2		Conversation.	Insult.	Rude.				Compliment.	Smile.		3004		
-3004	2		Conversation.	Chat.	Friend.			[6007]	Kiss?	Rejected.				
-3005	2	yes	Music.	Follow.	Enchanting.		3008		Listen.	Mysterious.				
-3008	2		Thicket.	Continue.	Deeper.		3010		Back.	Suspicious.				
-3010	2		Music.	Chase.	Clearing.		3037		Back.	Lost.		1		
-3011	2	yes	Map.	Fold.	Origami.				Study.	X		2009		
-3012	2	yes	Road.	Examine.	Long.				Hitchhike.	Cart.		3013		
-3013	2		Strangers.	Join.	Kidnapped.		1		Reject.	Wary.				
-3015	2	yes	Sun.	Bathe.	Tan.				Stare.	Blind.		1		
-3016	2	yes	Fog.	Avoid.	Creepy.				Enter.	Vast.		3017		
-3017	2		Hazy.	Structure.	Dark.		3018		Deeper.	Lost.		1		
-3018	2		Hut.	Enter.	Locked.		3019		Investigate.	Empty?		3018		
-3019	2		Door.	Knock.	Nobody.		3020		Break.	Sturdy.		3019		
-3020	2		Door.	Knock.	Nobody.		3021		Break.	Sturdy.		3020		
-3021	2		Door.	Knock.	Somebody.		3022		Break.	Sturdy.		3021		
-3022	2		Witch.	Run!	Melted!		1		Talk.	Welcome.		3033		
-3033	2		Inside.	Sit?	Comfy.		3034		Tea?	Hot.		3034		
-3034	2		Witch.	Talk.	Stories.		3034		Leave.	Trapped.		3035		
-3035	2		Cackle.	Fight.	Zapped!		1		Flee.	Zapped!		1		
-3036	2	yes	Well.	Pulley.	Broken.				Wish.	Hopeful.				
-3037	2		Bard.	Watch.	Skillful.		3037		Approach.	Friendly.		3038		
-3038	2		Perform?	Try.	Guitar.		3039		Decline.	Upset.		3040		
-3039	2		Genre?	Jazz.	Upset.		3040		Classical.	Pleased.				
-3040	2		Screams.	Help.	Transformation?!		3041		Apologise.	Transformation?!		3041		
-3041	2		Demon!	Pray.	Doomed.		1		Pact?	No.		1		
-3042	2	yes	Tree.	Hug.	Hippie.				Sit.	Sleepy.		3043		
-3043	2		Darkness.	Fight.	Awake.		3042		Surrender.	Asleep.	3	3044		
-3044	3		House.	Empty.	Sickness.		3046		Scary.	Obsession.		3046		
-3046	3		Orphanage.	Cry.	Parents?		3047		Enter.	Dragged.		3047		
-3047	3		Children.	No.	Faces.		3048		Avoid.	Closet.		3048		
-3048	3		Toy.	Steal.	Hide!		3049		Break.	Grinning.		3049		
-3049	3		Window.	Look.	Goodbye.		3050		Stone.	Broken.		3050		
-3050	3		Fog.	Run.	Awake.	2	3051		Embrace.	Awake.	2	3051		
-3051	2		Tree.	Sit.	Contemplate.				Hug.	Comfort.				
-4001	4	EXIT	Exit.	Village.	Bright.	5			Rest.	Trapdoor!		4067		
-4002	4	yes	Goblin.	Fight.	Wound.			[4003]	Flee.	Coward.			[4002]	
-4003	4		Wound.	Tend.	Fail.		1		Ignore.	Persevere.				
-4004	4	yes	Lever.	Up.	Click.		4005		Down.	Click.			[4027]	
-4005	4		Arrow.	Duck.	Pierced.		1		Jump.	Wound.			[4003]	
-4006	4	yes	Chest.	Open.	Moths.		4007		Kick.	Ouch.				
-4007	4		Potion.	Examine.	Red.		4008		Drink.	Healthy.			[-4003]	
-4008	4		Potion.	Drink.	Healthy.			[-4003]	Throw.	Shatter.				
-4009	4	yes	Hole.	Down.	Narrow.		4011		Leave.	Spooky.				
-4011	4		Hole.	Deeper.	Claustrophobic.		4012		Out.	Ominous.				
-4012	4		Hole.	Continue.	Room.		4025		Out.	Stuck.		1		
-4013	4	yes	Mushrooms.	Eat.	Funny.	12	4075		Ignore.	Hungry.				
-4014	4	yes	Doors.	Left.	Open.		4022		Right.	Locked.		4015		
-4015	4		Door.	Kick.	Open.		4016		Leave.	Mysterious.				
-4016	4		Prisoner.	Free.	Running.		4020		Talk.	Weapon!		4017		
-4017	4		Prisoner.	Free.	Running.		4020		Talk.	Warlock!		4018		
-4018	4		Prisoner.	Free.	Running.		4020		Talk.	Aaagh!		4019		
-4019	4		Prisoner.	Free.	Dead?				Talk.	Dead?				
-4020	4		Prisoner.	Follow.	Fast.		4021		Ignore.	Insane.				
-4021	4		Lost.	Backtrack.	Exit?				Search.	Glow.		4025		
-4022	4		Ogre.	Talk.	Friendly.				Fight.	Crushed.		1		
-4023	4	yes	Gem.	Take.	Cursed!		1		Leave.	Voices?				
-4024	4	yes	Abyss.	Jump.	Fall.		1		Backtrack.	Smart.				
-4025	4		Altar.	Examine.	Old.		4025		Pray.	Light!		4026		
-4026	4		Mace.	Examine.	Magic.		4026		Take.	Destiny.		4028	[8011, -8002]	
-4027	4		Passage.	Enter.	Room.		4025		Avoid.	Trap?				
-4028	4		Exit.	Leave.	Village.	5			Rest.	Breathe.		4028		
-4029	4	yes	Wire.	Touch.	Twang.		4030		Jump.	Cleared.				
-4030	4		Boulder!	Run.	Rolling!		4031		Walk.	Crushed.		1		
-4031	4		Run!	Straight.	Boulder!		4031		Side.	Safe.				
-4032	4	yes	Chamber.	Search.	Mould.		4033		Ignore.	Boring.				
-4033	4		Cough.	Heimlich.	Alone.		1		Suppress.	Sneeze.				
-4034	4	yes	Troll.	Confront.	Huge.		4035		Entertain.	Sing.				
-4035	4		Unfair.	Fight.	Lost.		1		Flee.	Chase!		4036		
-4036	4		Curtain.	Hide.	Caught!		1		Run.	Escaped.				
-4037	4	yes	Skeleton.	Touch.	Dusty.				Search.	Bones.		4038		
-4038	4		Amulet.	Wear.	Cursed!		1		Smash.	Destroyed.				
-4040	4	yes	Spider.	Squash.	Small.			[4041]	Examine.	Cute.				
-4041	4		Spider.	Squash.	Giant!		4043		Examine.	Giant.		4043		
-4042	4	yes	Button.	Push.	Trap!		1		Pull.	Impossible.				
-4043	4		Eyes.	Look.	Beatuiful.		4044		Run!	Slow!		4048		
-4044	4		Eyes.	Look.	Mesmerising.		4045		Run!	Slow!		4047		
-4045	4		Eyes.	Look.	Hungry.		4046		Run!	Caught.		1		
-4046	4		Pincers.	Look.	Pierced.		1		Run!	Caught.		1		
-4047	4		Web.	Hack.	Cleared.		4048		Struggle.	Useless.		1		
-4048	4		Spider.	Run!	Caught.		1		Fight.	Brave.		4049		
-4049	4		Pincers.	Roll.	Dodge.		4050		Parry.	Eaten.		1		
-4050	4		Belly.	Slice.	Wound.		4051		Pat.	Eaten.		1		
-4051	4		Spider.	Talk.	Hungry.		1		Attack.	Battle.		4052		
-4052	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4053		
-4053	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4054		
-4054	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4055		
-4055	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4056		
-4056	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4057		
-4057	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4058		
-4058	4		Attacking.	Head.	Eaten.		1		Legs.	Chop.		4059		
-4059	4		Attacking.	Head.	Eaten.		1		Leg.	Chop.		4060		
-4060	4		Attacking.	Head.	Chopped.		4061		Legs?	Yours.		1		
-4061	4		Spider.	Kick.	Dead.		4061		Leave.	Victory!				
-4062	4	yes	Urn.	Inspect.	Ribbit?		4064		Kick.	Smash.				
-4063	4		Frog.	Kiss.	Princess.		4065		Throw.	Squishy.				
-4064	4		Urn.	Leave.	Respect.				Open.	Frog!		4063		
-4065	4		Princess.	Kiss.	Frog.		4063		Talk.	Grateful.		4066		
-4066	4		Marry?	Yes.	Happy.		1		No.	Heartbroken.				
-4067	4		Floor.	Head.	Splattered.		1		Feet.	Painful.		4068		
-4068	4		Corridor.	Sneak.	Click.		4069		Run.	Fast.		4070		
-4069	4		Spear!	Roll.	Dodged.		4070		Jump.	Pierced.		1		
-4070	4		Light.	Leave.	Exit?		4071		Stay.	Dark.		4073		
-4071	4		Room.	Search.	Bones.		4071		Leave.	Locked.		4072		
-4072	4		Cell.	Starve.	Slow.		4072		Dehydrate.	Anguish.		1		
-4073	4		Click!	Jump!	Spear.		1		Crouch!	Safe.		4074		
-4074	4		Ladder.	Push.	Untrustworthy.		4027		Climb.	Breaks.		1		
-4075	12		Dog.	Laugh.	Woof.		4076		Face.	Scary.		4076		
-4076	12		Abyss.	Fly.	Floor.		1		Jump.	Weeeew.		4077		
-4077	12		.lennuT	.edilS	.weeeeW		4078		.lloR	.weeeeW		4078		
-4078	12		.worraN	.hcuorC	.ssergorP		4079		.lwarC	.ssergorP		4079		
-4079	12		Hole.	Exit.	Wasteland.	6			Wait.	Sober.	4			
-5000	5	yes	Chicken.	Hit.	Cluck!		5001		Feed.	Cluck.				
-5001	5		Chicken.	Hit.	Cluck!		5002		Feed.	Cluck.				
-5002	5		Peck.	Run.	Peck.		5003		Pet.	Peck.		5003		
-5003	5		Peck.	Run!	Pecked.		1		Pet!	Pecked.		1		
-5004	5	yes	Tavern.	Leave.	Sober.				Drink.	Drunk.	14	5005		
-5005	14		Taven.	Leave.	Sober?	5			Drink!	Drunker.	15	5006		
-5006	15		Tavrn.	Lave.	Sober!!!	5			Drik!	Drnk.		5007		
-5007	15		Tav.	Love.	Pig!		5008		Drrrr.	Drk.		5007		
-5008	15		Pig?	What?	Regret.	5			Water!	Sober?	5			
-5009	5	EXIT	Road.	Wasteland.	Downpour.	9	9000		Prepare.	Courage.		5009		
-5013	5	yes	Graveyard.	Enter.	Defiled.	16			Ignore.	Eerie.				
-5015	5	yes	Elder.	Talk.	Wisdom.		5016		Bow.	Respectful.				
-5016	5		Conversation.	Quest?	Dangerous.		5017		Evil?	Warlock.		5017		
-5017	5		Warning.	Help?	Weapon.		5018		Ignore.	Fool.				
-5018	5		Hidden.	Why?	Magic.				Where?	Dungeon.				
-5019	16		Graves.	Investigate.	Empty.	5			Flowers.	Mother.	5			
-5020	16	yes	Graves.	Investigate.	Empty.	5			Mourn.	Mother.	5			
-5021	5	yes	Cat.	Play.	Ignored.				Stroke.	Purr.				
-5022	5		Police.	Run.	Wanted.		5009		Surrender.	Jail.		1		
-5023	5	yes	Market.	Shop.	Loot!		5024		Watch.	Bustling.				
-5024	5		Mace.	Price?	Expensive.		5025		Buy!	Broke.		5024		
-5025	5		Home.	Sell.	Rich.		5026		Keep.	Memories.				
-5026	5		Mace.	Buy.	Happy.		5027		Haggle.	No.				
-5027	5		Mace.	Inspect.	Fake.		5028		Swing.	Breaks.		5028		
-5028	5		Merchant.	Refund!	No.		5029		Threaten.	Help!		5022		
-5029	5		Merchant.	Threaten.	Help!		5022		Leave.	Conned.				
-5030	5	yes	Church.	Pray.	Nothing.				Pay.	Blessed.				
-5031	5	yes	Jugglers.	Watch.	Entertained.				Challenge.	Accepted!		5032		
-5032	5		Balls?	Three.	Boring.		5033		Seven.	Many.		5034		
-5033	5		Juggle.	Slow.	Booo!		5036		Fast.	Impressive.		5035		
-5034	5		Juggle.	Slow.	Dropped.		5036		Fast.	Chaos.		5036		
-5035	5		Winner!	Gloat.	Arrogant.				Bow.	Glamorous.				
-5036	5		Loser!	Cry.	Pathetic.				Accept.	Sportsmanship.				
-5037	5	yes	Guillotine.	Test.	Works.		1		Inspect.	Equaliser.				
-5038	5	yes	Bakery.	Enter.	Nobody.		5039		Smell.	Good.				
-5039	1		Cookie.	Eat.	Tasty.		5040		Leave.	Unhealthy.				
-5040	1		Cookie.	Eat.	Tasty.		5041		Leave.	Unhealthy.				
-5041	1		Cookie.	Eat.	Regret.		5042		Leave.	Unhealthy.				
-5042	1		Baker!	Hide.	Quiet.		5045		Run.	Unfit.		5043		
-5043	1		Caught.	Explain.	Furious.		5044		Fight.	Charge!		5044		
-5044	1		Fist.	Duck.	Angry.		5046		Accept.	Face.		1		
-5045	1		Crumbs!	Stay.	Found!		5043		Run!	Unfit.		5043		
-5046	1		Police.	Run.	Full.		1		Surrender.	Jail.		1		
-5047	5	yes	Donkey.	Ride.	Stubborn.				Apple?	Crunch.				
-5050	5		Bird.	Breadcrumbs.	Chirpy.				Pet.	Flu.		1		
-6001	6	yes	Mud.	Jump.	Clear.				Wade.	Stuck.		1		
-6002	6	yes	Ghoul.	Fight.	Possessed.		1		Offering.	Pleased.				
-6003	6	EXIT	Tower.	Approach.	Sinister.	7	7001		Look.	Tall.		6003		
-6004	6	yes	Clouds.	Watch.	Shapes.				Consider.	Sublime.				
-6006	6	yes	Puddle.	Splash.	Childhood.				Pass.	Adult.				
-6007	6		Friend.	Greet.	Joyous.		6008		Avoid.	Quest!				
-6008	6		Conversation.	Feeling?	Tired.		6009		Weather.	Bad.		6010		
-6009	6		Exhausted?	Same.	Camaraderie.		6010		Why?	Sad.		6010		
-6010	6		Farewell.	Goodbye!	Friend.				Hug.	Bond.				
-6013	6	yes	Lights.	Watch.	Hypnotising.		6015		Follow.	Pretty.		6014		
-6014	6		Fairies!	Appreciate.	Hypnotised!		6016		Hunt.	Gone.				
-6015	6		Lights.	Watch.	Fairies!		6014		Ignore.	Dangerous.		6014		
-6016	6		Lights.	Follow.	Swamp.		6017		Follow.	Swamp.		6017		
-6017	6		Swamp.	Enter.	Sinking.		6018		Enter.	Sinking.		6018		
-6018	6		Neck.	Wait.	Sunken.		1		Wait.	Sunken.		1		
-6019	6		Rats.	Feed.	Berries.				Catch.	Plague.		1		
-6020	6	yes	Crow.	Talk.	Caw!				Stone.	Bullseye!		6021		
-6021	6		Crows!	Run.	Threatening.				Fight.	Swarmed.		1		
-6023	6	yes	Scarecrow.	Greet.	Scarecrow.				Hat.	Stylish.				
-6026	6	yes	Dirt.	Eat.	Why?		1		Search.	Worms.				
-6027	6	yes	Ruins.	Paint.	Graffiti.				Explore.	Ancient.		6028		
-6028	6		Stones.	Clamber.	Movement!		6030		Sit.	Peaceful.				
-6030	6		Golem.	Run!	Gravel.		1		Fight!	Gravel.		1		
-7001	7		Door.	Knock.	Nothing.		7002		Open.	Inside.				
-7002	7		Hallway.	Sneak.	Silent.		7003		Walk.	Loud.		7003		
-7003	7		Guard.	Attack.	Undead!		7004		Bribe.	Braains!		1		
-7004	7		Zombie!	Stab.	Undead!		7005		Run.	Faster.		7007		
-7005	7		Zombie!!	Slash.	Undead!		7006		Run.	Faster.		7007		
-7006	7		Zombie!!!	Stab?	Eaten.		1		Run.	Faster.		7007		
-7007	7		Door.	Push.	Locked.		7008		Pull.	Open.				
-7008	7		Zombie!	Slash.	Eaten.		1		Stab.	Eaten.		1		
-7009	7	yes	Guard.	Hide.	Hidden.		7010		Attack.	Undead!		7004		
-7010	7		Sneeze.	Surpress.	Ouch.				Achoo!	Detected!		7004		
-7011	7	yes	Laboratory.	Search.	Warlock?		7012		Disregard.	Unimportant.				
-7012	7		Corpse.	Poke.	Dead.		7013		Sniff.	Gross.		7013		
-7013	7		Lever.	Pull.	Electricity.		7014		Leave.	Corridor.				
-7014	7		Corpse.	Poke.	Alive?!		7004		Avoid.	Spooky.				
-7015	7	yes	Library.	Search.	Books.	13			Yawn.	Dull.				
-7017	7	yes	Kitchen.	Search.	Soup.				Ignore.	Hungry.				
-7018	7	yes	Painting.	Take.	Cumbersome.				Inspect.	Fake.				
-7019	7	yes	Stairs.	Up.	Dark.		7020		Back.	Exhausting.			[7019, 7015, 7011]	
-7020	7		Stairs.	Continue.	Noises.	8	8001		Down.	Spooky.		7019		
-8001	8		Door.	Peek.	Warlock!		8001		Open.	Warlock!				
-8002	8	yes	Warlock.	Charge!	Die!		8006		Insult!	Asscake!		8003		
-8003	8		Insulted.	Charge!	Asscaaake!		8006		Insult!	Buttsandwich!		8004		
-8004	8		Angry.	Charge!	Buttsandwiiich!		8006		Insult!	Cheekpotato!		8006		
-8005	8		Fireball!	Oh.	No.		0		Oh.	Damn.		0		
-8006	8		Frostbolt!	Dodge.	Roll.		8007		Hug.	Frozen.		1		
-8007	8		Warlock.	Stab.	Wounded.		8008		Slash.	Wounded!		8008		
-8008	8		Warlock.	Stab.	Dead!		8009		Slash.	Dead.		8009		
-8009	8		Victory!	Dance.	Happy.		8009		Leave.	Wait...		8010		
-8010	8		Warlock?!	What?	Ressurected.		8005		How?	Magic.		8005		
-8011	8		Warlock!	Attack.	Attack!		8012		Threaten.	Laughs.		8011		
-8012	8		With?	Sword.	Sharp.		8007		Mace!	Destiny.		8013		
-8013	8		Surprised.	Smash.	Pulp.		8014		Slice.	Mace.		8006		
-8014	8		Victory!	Mother.	Avenged.		8015		Village.	Saved.		8016		
-8015	8		Victory!	Mother.	Avenged.		8015		Village.	Saved.		0		
-8016	8		Victory!	Mother.	Avenged.		0		Village.	Saved.		8016		
-9000	9	yes	Storm.	Umbrella.	Lightning.	6			Wellies.	Lightning.	6			
-10000	10		Alarm.	Wake.	Quest.		10001		Snooze.	Snore.		10000		
-10001	10		Home.	Kitchen.	Eggs.		10002		Porch.	Sunny.		10002		
-10002	10		Newspaper.	News.	Headline.		10003		Politics.	Boring.		10002		
-10003	10		Warlock.	Hero?	Needed!		10006		What?	Evil.		10006		
-10006	10		Prepare.	Brave.	Sword.		10007		Cautious.	Sword.		10007		
-10007	10		Home.	Stay.	Lazy.		10007		Leave.	Forest.		10008		
-10008	10		Acorn.	Plant.	Patience.		10009		Keep.	Memento.		10009	[-11000, 11001]	
-10009	10		Traveller.	Rob.	Coins		10012		Wave.	Hello.		10010		
-10010	10		Trade.	Stories.	Intriguing.		10012		Food.	Exotic.		10012		
-10012	10		Bird.	Feed.	Seed.	11			Sing.	Duet.	11			
-10013	10		Boar.	Run!	Trampled.		1		Ride.	Trampled.		1		
-11000	11	yes	Squirrel.	Chase.	Slow.	10	10013		Pet.	Fluffy.	10	10013		
-11001	11		Squirrel.	Chase.	Slow.	10	10013		Gift.	Acorn.	10	10013		
-13000	13	yes	Cookbook.	Inspect.	Handwritten.		13001		Throw.	Hefty.				
-13001	13		Cookbook.	Fry.	Burgers.		13002		Stop.	Hungry.				
-13002	13		Cookbook.	Boil.	Spaghetti.		13003		Stop.	Hungry.				
-13003	13		Cookbook.	Roast.	Brains.		13004		Stop.	Hungry.				
-13004	13		Cookbook.	Feed.	Zombies.		13005		Stop.	Spooky.				
-13005	13		Cookbook.	Done.	Finished.				Stop.	Disgusting.				
-13053	13	yes	Diary.	Read.	Secrets.		13056		Ignore.	Private.				
-13055	13		Diary.	Author?	Warlock!		13065		Age?	Decades.		13055		
-13056	13		Wife.	Tragic.	Dead.		13057		Stop.	Private.				
-13057	13		Desperate.	Magic.	Ressurect.		13058		Stop.	Private.				
-13058	13		Experiment.	Risky.	Failed.		13059		Stop.	Private.				
-13059	13		Wife.	Transformation.	Zombie.		13060		Stop.	Private.				
-13060	13		Child.	Danger.	Orphanage.		13061		Stop.	Private.				
-13061	13		Wife.	Help.	Cure?		13062		Stop.	Private.				
-13062	13		Experiments.	More.	Anything.		13063		Stop.	Private.				
-13063	13		Failure.	Lost.	Madness.		13064		Stop.	Private.				
-13064	13		Child.	Years.	Forgotten.		13055		Stop.	Private.				
-13065	13		Footsteps!	Hide.	Hidden.		13066		Prepare.	Fight!	8			
-13066	13		Warlock.	Observe.	Sits.		13067		Sneak.	Seen!	8			
-13067	13		Warlock.	Observe.	Diary.		13068		Sneak.	Seen!	8			
-13068	13		Warlock.	Observe.	Cries.		13069		Sneak.	Behind.	8			
-13069	13		Warlock.	Approach.	Surprise.		13070		Sneak.	Behind.	8			
-13070	13		Warlock.	Examine.	Familiar.		13071		Attack!	Destiny!	8			
-13071	13		Warlock.	Father?	Daughter?		0		Attack!	Destiny!	8			
-13072	13	yes	Library.	Stay.	Books.			[13072]	Leave.	Dusty.	7			
-13073	13	yes	Book.	Inspect.	Adventure.		13074		Throw.	Thunk.				
-13074	13		Book.	Read.	Epic.		13075		Discard.	Distraction.				
-13075	13		Chicken.	Cross.	Road.		13076		Stop.	Boring.				
-13076	13		Book.	Completed.	Perfection.				Finished.	Masterpiece.				
+1	0	yes	Alarme.	Réveil.	Quête.	1	1001		Roupiller.	Ronflements.	0	2		
+2	0	yes	Alarme.	Réveil.	Quête.	1	1001		Roupiller.	Ronflements.	0	3		
+3	0	yes	Alarme.	Réveil.	Quête.	1	1001		Roupiller.	Ronflements.	0	4		
+4	0	yes	Alarme.	Réveil.	Quête.	1	1001		Roupiller.	Ronflements.	0	5		
+5	0	yes	Alarme.	Réveil.	Quête.	1	1001		Roupiller.	Ronflements.	0	1		
+1001	1		Maison.	Partir.	Forêt.	2			Rester.	Douillet.				
+1002	1	yes	Chien.	Caresser.	Ouaf.			[1002]	Jouer.	Ouaf !		1003		
+1003	1		Bâton.	Jeter.	Récupérer.		1008		Prétendre.	Ouaf ?				
+1004	1	yes	Café.	Boire.	Réveillée.		1005		Partir.	Amer.				
+1005	1		Café !	Boire !	Réveillée !!!		1006		Renverser.	Chaud !				
+1006	1		Cafééé !!	Boire !!	Nervosité.		1007		Renverser.	Chaud !				
+1007	1		Cafééé !!!	BOIRE !!	Overdose.		1		NON !!!	RÉVEILLÉE !!!				
+1008	1	yes	Journal.	Lire.	Titres.		1009		Ignorer.	Ennui.				
+1009	1		Sorcier.	Où ?	Tour.		1009		Quoi ?	Démon.		1001		
+1010	1	EXIT	Maison.	Quitter.	Forêt.	2			Rester.	Flemme.		1010		
+1011	1	yes	Télévision.	Regarder.	Cartoons.		1012		Ennui.	Quête !				
+1012	1		Télévision.	Regarder.	Publicités.		1013		Ennui.	Quête !				
+1013	1		Télévision.	Regarder.	Informations.		1014		Ennui.	Quête !				
+1014	1		Informations.	Regarder.	Sorcier !		1015		Ennui.	Quête !		1016		
+1015	1		Démon !	Où ?	Tour.		1016		Héroïne ?	Toi ?		1016		
+1016	1		Télévision.	Regarder.	Rediffusions.		1017		Quête !	Aventure !		1010		
+1017	1		Télévision.	Regarder.	Sitcoms.		1018		Ennui.	Quête !				
+1018	1		Télévision.	Regarder.	Informations.		1019		Ennui.	Quête !				
+1019	1		Télévision.	Regarder.	Publicités.		1020		Ennui.	Quête !				
+1020	1		Télévision.	Regarder.	Blockbuster.		1021		Ennui.	Quête !				
+1021	1		Télévision.	Regarder.	Show.		1022		Ennui.	Quête !				
+1022	1		Télévision.	Regarder.	Publicités.		1024		Ennui.	Quête !				
+1024	1		Télévision.	Regarder.	Endormie.		1		Ennui.	Endormie.		1		
+1025	1	yes	Plante.	Eau.	Bonne santé.				Oublier.	Morte.				
+1026	1	yes	Déjeuner.	Important.	Délicieux.				Après.	Faim.				
+2001	2	yes	Rat.	Affronter.	Rage.		1		Soudoyer.	Entente.				
+2002	2	yes	Rivière.	Sauter.	Glisser.		1		Patauger.	Mouillée.				
+2003	2	yes	Baies.	Cueillir.	Rafraîchissant.			[2004, 6019]	Écraser.	Juteuses.				
+2004	2		Faim.	Baies.	Empoisonnées.		1		Après.	Tentant.			[2004]	
+2005	2	yes	Pont.	Dessus.	Rivière.				Dessous.	Troll.		1		
+2007	2	yes	Statue.	Admirer.	Élégante.				Escalader.	Tomber.		1		
+2009	2	EXIT	Donjon.	Entrer.	Effrayant.	4			Reconsidérer.	Trouillarde.		2009		
+2010	2	yes	Renne.	Regarder.	Calme.			[2012]	Pourchasser.	Parti.			[-2012]	
+2012	2		Chasseur.	Saluer.	Distrait.				Rejoindre.	Chasser.		2013		
+2013	2		Viande.	Cuisiner.	Amer ?			[-2010]	Jeter.	Végétarien.			[-2010]	
+2015	2	yes	Nid.	Fouiller.	Oeufs.		2016		Cacher.	Protéger.				
+2016	2		Oeufs.	Cuisiner.	Omelette.				Peindre.	Jolis.				
+2017	2	yes	Cabane.	Approcher.	Petite.		2018		Partir.	Privé.				
+2018	2		Lit.	Repos.	Vermine.			[2020]	Pousser.	Secret !		2019		
+2019	2		Magazine.	Feuilleter.	Obscène.		2019		Ouvrir.	Collé.				
+2020	2		Démangeaisons.	Gratter.	Soulagement.			[2020]	Ignorer.	Souffrir.				
+2021	2	yes	Lac.	Nager.	Couler.		1		Pêcher.	Botte.				
+2022	2	yes	Ruche.	Regarder.	Bzzz.				Miel ?	Essaim.		1		
+3001	2	yes	Fleurs.	Cueillir.	Jolies.			[5019, -5020]	Sentir.	Délicates.				
+3002	2	yes	Étranger.	Saluer.	Bonjour.		3003		Pickpocket.	Miettes.			[5050]	
+3003	2		Conversation.	Insulter.	Malpolie.				Complimenter.	Sourire.		3004		
+3004	2		Conversation.	Discuter.	Ami.			[6007]	Embrasser ?	Rejet.				
+3005	2	yes	Musique.	Suivre.	Envoûtante.		3008		Écouter.	Mystérieuse.				
+3008	2		Bosquet.	Continuer.	Davantage.		3010		Revenir.	Suspicieuse.				
+3010	2		Musique.	Suivre.	Clairière.		3037		Revenir.	Perdue.		1		
+3011	2	yes	Carte.	Replier.	Origami.				Étudier.	X		2009		
+3012	2	yes	Route.	Examiner.	Longer.				Autostop.	Emmenée.		3013		
+3013	2		Étrangers.	Rejoindre.	Enlevée.		1		Rejeter.	Prudente.				
+3015	2	yes	Soleil.	Bronzer.	Bronzée.				Regarder.	Aveugle.		1		
+3016	2	yes	Brume.	Éviter.	Effrayante.				Entrer.	Immense.		3017		
+3017	2		Brumeux.	Structure.	Sombre.		3018		Avancer.	Perdue.		1		
+3018	2		Cabane.	Entrer.	Fermée.		3019		Examiner.	Vide ?		3018		
+3019	2		Porte.	Frapper.	Personne.		3020		Briser.	Solide.		3019		
+3020	2		Porte.	Frapper.	Personne.		3021		Briser.	Solide.		3020		
+3021	2		Porte.	Frapper.	Quelqu'un.		3022		Briser.	Solide.		3021		
+3022	2		Sorcière.	Fuir !	Fondue !		1		Parler.	Bienvenue.		3033		
+3033	2		Intérieur.	S'assoir ?	Confortable.		3034		Thé ?	Chaud.		3034		
+3034	2		Sorcière.	Parler.	Histoires.		3034		Partir.	Piégée.		3035		
+3035	2		Gloussement.	Affronter.	Électrocutée !		1		Fuir !	Électrocutée !		1		
+3036	2	yes	Puits.	Poulie.	Cassée.				Voeu.	Espoir.				
+3037	2		Barde.	Regarder.	Doué.		3037		Approcher.	Amical.		3038		
+3038	2		Jouer ?	Essayer.	Guitare.		3039		Décliner.	Contrarié.		3040		
+3039	2		Genre ?	Jazz.	Contrarié.		3040		Classique.	Ravi.				
+3040	2		Cris.	Aider.	Transformation ?!		3041		S'excuser.	Transformation ?!		3041		
+3041	2		Démon !	Prier.	Damnée.		1		Pacte ?	Non.		1		
+3042	2	yes	Arbre.	Serrer.	Hippie.				S'assoir.	Somnolente.		3043		
+3043	2		Ténèbres.	Affronter.	Réveillée.		3042		Capituler.	Endormie.	3	3044		
+3044	3		Maison.	Vide.	Maladie.		3046		Effrayante.	Obsession.		3046		
+3046	3		Orphelinat.	Pleurs.	Parents ?		3047		Entrer.	Entrainée.		3047		
+3047	3		Enfants.	Non.	Visages.		3048		Éviter.	Toilettes.		3048		
+3048	3		Jouet.	Voler.	Cacher !		3049		Casser.	Sourire.		3049		
+3049	3		Fenêtre.	Regarder.	Salut.		3050		Pierre.	Cassée.		3050		
+3050	3		Brume.	Courir.	Réveillée.	2	3051		Embrasser.	Réveillée.	2	3051		
+3051	2		Arbre.	S'assoir.	Contempler.				Câlin.	Confortable.				
+4001	4	EXIT	Partir.	Village.	Lueur.	5			Repos.	Trappe !		4067		
+4002	4	yes	Gobelin.	Affronter.	Blessure.			[4003]	Fuir.	Trouillarde.			[4002]	
+4003	4		Blessure.	Soigner.	Échouer.		1		Ignorer.	Persévérer.				
+4004	4	yes	Levier.	Monter.	Clic.		4005		Baisser.	Clic.			[4027]	
+4005	4		Flèche.	Esquiver.	Percée.		1		Sauter.	Blessure.			[4003]	
+4006	4	yes	Coffre.	Ouvrir.	Mites.		4007		Frapper.	Aïe.				
+4007	4		Potion.	Examiner.	Rouge.		4008		Boire.	Revigorée.			[-4003]	
+4008	4		Potion.	Boire.	Revigorée.			[-4003]	Lancer.	Briser.				
+4009	4	yes	Trou.	Descendre.	Étroit.		4011		Partir.	Effrayant.				
+4011	4		Trou.	Profondément.	Claustrophobe.		4012		Sortir.	Inquiétant.				
+4012	4		Trou.	Continuer.	Pièce.		4025		Sortir.	Coincé.		1		
+4013	4	yes	Champignons.	Manger.	Amusants.	12	4075		Ignorer.	Faim.				
+4014	4	yes	Portes.	Gauche.	Ouverte.		4022		Droite.	Fermée.		4015		
+4015	4		Porte.	Frapper.	Ouverte.		4016		Partir.	Mystère.				
+4016	4		Prisonnier.	Libérer.	Course.		4020		Parler.	Arme !		4017		
+4017	4		Prisonnier.	Libérer.	Course.		4020		Parler.	Sorcier !		4018		
+4018	4		Prisonnier.	Libérer.	Course.		4020		Parler.	Aaargh !		4019		
+4019	4		Prisonnier.	Libérer.	Mort ?				Parler.	Mort ?				
+4020	4		Prisonnier.	Suivre.	Rapide.		4021		Ignorer.	Folie.				
+4021	4		Perdu.	Demi-tour.	Sortie ?				Chercher.	Lueur.		4025		
+4022	4		Ogre.	Parler.	Amicale.				Affronter.	Écrasée.		1		
+4023	4	yes	Gemme.	Prendre.	Maudit !		1		Laisser.	Voix ?				
+4024	4	yes	Abysse.	Sauter.	Tomber.		1		Demi-tour.	Intelligente.				
+4025	4		Autel.	Examiner.	Ancien.		4025		Prier.	Lumière !		4026		
+4026	4		Masse.	Examiner.	Magique.		4026		Prendre.	Destin.		4028	[8011, -8002]	
+4027	4		Passage.	Entrer.	Pièce.		4025		Éviter.	Piège ?				
+4028	4		Sortie.	Partir.	Village.	5			Repos.	Respirer.		4028		
+4029	4	yes	Câble.	Touche.	Tirer.		4030		Sauter.	Dégagée.				
+4030	4		Rocher !	Courir.	Rouler !		4031		Marcher.	Écrasée.		1		
+4031	4		Courir !	Devant.	Rocher !		4031		Côté.	Sécurité.				
+4032	4	yes	Chambre.	Chercher.	Moisissures.		4033		Ignorer.	Ennui.				
+4033	4		Toux.	Heimlich.	Solitude.		1		Étouffer.	Éternuer.				
+4034	4	yes	Troll.	Affronter.	Immense.		4035		Amuser.	Chanter.				
+4035	4		Injuste.	Combattre.	Perdre.		1		Fuir.	Poursuite !		4036		
+4036	4		Rideau.	Cacher.	Attrapée !		1		Courir.	Enfuie.				
+4037	4	yes	Squelette.	Toucher.	Poussiéreux.				Chercher.	Os.		4038		
+4038	4		Amulette.	Porter.	Maudit !		1		Casser.	Détruite.				
+4040	4	yes	Araignée.	Écraser.	Petite.			[4041]	Examiner.	Jolie.				
+4041	4		Araignée.	Écraser.	Géante !		4043		Examiner.	Géante.		4043		
+4042	4	yes	Bouton.	Appuyer.	Piège !		1		Tirer.	Impossible.				
+4043	4		Yeux.	Regarder.	Jolis.		4044		Courir !	Doucement !		4048		
+4044	4		Yeux.	Regarder.	Envoûtants.		4045		Courir !	Doucement !		4047		
+4045	4		Yeux.	Regarder.	Faim.		4046		Courir !	Attrapée.		1		
+4046	4		Crochets.	Regarder.	Percée.		1		Courir !	Attrapée.		1		
+4047	4		Toile.	Couper.	Libre.		4048		Lutter.	Inutile.		1		
+4048	4		Araignée.	Courir !	Attrapée !		1		Combattre.	Courageuse.		4049		
+4049	4		Crochets.	Rouler.	Esquiver.		4050		Parer.	Mangée.		1		
+4050	4		Estomac.	Ouvrir.	Blessure.		4051		Caresser.	Mangé.		1		
+4051	4		Araignée.	Parler.	Faim.		1		Attaquer.	Combat.		4052		
+4052	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4053		
+4053	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4054		
+4054	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4055		
+4055	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4056		
+4056	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4057		
+4057	4		Attaquer.	Tête.	Mangé.		1		Pattes.	Coupées.		4058		
+4058	4		Attaquer.	Tête.	Mangée.		1		Pattes.	Coupées.		4059		
+4059	4		Attaquer.	Tête.	Mangée.		1		Patte.	Coupée.		4060		
+4060	4		Attaquer.	Tête.	Coupée.		4061		Pattes ?	Tiennes.		1		
+4061	4		Araignée.	Frapper.	Morte.		4061		Partir.	Victoire !				
+4062	4	yes	Urne.	Inspecter.	Croa ?		4064		Pied.	Écraser.				
+4063	4		Grenouille.	Embrasser.	Princesse.		4065		Jeter.	Gluante.				
+4064	4		Urne.	Laisser.	Respect.				Ouvrir.	Grenouille !		4063		
+4065	4		Princesse.	Embrasser.	Grenouille.		4063		Parler.	Reconnaissante.		4066		
+4066	4		Mariage ?	Oui.	Heureuse.		1		Non.	Déprimée.				
+4067	4		Sol.	Tête.	Écrabouillée.		1		Pieds.	Douleur.		4068		
+4068	4		Corridor.	S'infiltrer.	Clic.		4069		Courir.	Vite.		4070		
+4069	4		Lance !	Rouler.	Évitée.		4070		Sauter.	Percée.		1		
+4070	4		Lumière.	Partir.	Sortie ?		4071		Rester.	Noir.		4073		
+4071	4		Pièce.	Fouiller.	Os.		4071		Partir.	Verrouillé.		4072		
+4072	4		Cellule.	Affamée.	Lent.		4072		Déshydratée.	Angoisse.		1		
+4073	4		Clic !	Sauter !	Lance.		1		S'accroupir !	Sécurité.		4074		
+4074	4		Échelle.	Pousser.	Douteuse.		4027		Monter.	Cassée.		1		
+4075	12		Chien.	Rire.	Ouaf.		4076		Visage.	Effrayant.		4076		
+4076	12		Abysse.	Voler.	Sol.		1		Sauter.	Pfioooou.		4077		
+4077	12		.lennuT	.ressilG	.uooooifP		4078		.relluoR	.uooooifP		4078		
+4078	12		.ricèrtèR	.ripuorcca'S	.ressergorP		4079		.repmaR	.ressergorP		4079		
+4079	12		Trou.	Sortir.	Désert.	6			Attendre.	Sage.	4			
+5000	5	yes	Poulet.	Frapper.	Cot !		5001		Nourrir.	Cot.				
+5001	5		Poulet.	Frapper.	Cot !		5002		Nourrir.	Cot.				
+5002	5		Picorer.	Courir.	Picorer.		5003		Caresser.	Picorer.		5003		
+5003	5		Picorer.	Courir !	Picorée.		1		Caresser !	Picorée.		1		
+5004	5	yes	Taverne.	Partir.	Sobriété.				Boire.	Ivre.	14	5005		
+5005	14		Tave'ne.	Partir.	Sobre ?	5			Boire !	Poivrote.	15	5006		
+5006	15		Taver...	Part...	Sobre !!!	5			Picoler !!	Bourrée.		5007		
+5007	15		Tav...	Amour.	Cochon !		5008		Boirrrr...	Bourrrr...		5007		
+5008	15		Cochon ?	Quoi ?	Regretter.	5			Eau !	Sobre ?	5			
+5009	5	EXIT	Route.	Désert.	Averse.	9	9000		Préparer.	Courage.		5009		
+5013	5	yes	Cimetière.	Entrer.	Profané.	16			Ignorer.	Étrange.				
+5015	5	yes	Ancien.	Parler.	Sagesse.		5016		S'incliner.	Respect.				
+5016	5		Conversation.	Quête ?	Dangereuse.		5017		Démon ?	Sorcier.		5017		
+5017	5		Avertissement.	Aide ?	Arme.		5018		Ignorer.	Imbécile.				
+5018	5		Caché.	Pourquoi ?	Magie.				Où ?	Donjon.				
+5019	16		Tombes.	Examiner.	Vides.	5			Fleurs.	Mère.	5			
+5020	16	yes	Tombes.	Examiner.	Vides.	5			Recueillement.	Mère.	5			
+5021	5	yes	Chat.	Jouer.	Ignoré.				Caresser.	Ronron.				
+5022	5		Police.	Courir.	Recherchée.		5009		Renoncer.	Prison.		1		
+5023	5	yes	Marché.	Acheter.	Butin !		5024		Regarder.	Effervescence.				
+5024	5		Massue.	Prix ?	Chère.		5025		Acheter !	Cassée.		5024		
+5025	5		Maison.	Vendre.	Riche.		5026		Garder.	Souvenirs.				
+5026	5		Massue.	Acheter.	Content.		5027		Négocier.	Non.				
+5027	5		Massue.	Inspecter.	Fausse.		5028		Essayer.	Cassée.		5028		
+5028	5		Marchand.	Rembourser !	Non.		5029		Menacée.	Aide !		5022		
+5029	5		Marchand.	Menacée.	Aide !		5022		Partir.	Arnaquée.				
+5030	5	yes	Église.	Prier.	Rien.				Payer.	Bénie.				
+5031	5	yes	Jongleurs.	Regarder.	Amusée.				Défi.	Accepté !		5032		
+5032	5		Balles ?	Trois.	Ennui.		5033		Sept.	Tellement.		5034		
+5033	5		Jongler.	Lente.	Ouh !		5036		Vite.	Impressionnant.		5035		
+5034	5		Jongler.	Lente.	Lâchées.		5036		Rapide.	Chaos.		5036		
+5035	5		Vainqueur !	Pavoiser.	Arrogant.				S'incliner.	Glamour.				
+5036	5		Perdante !	Pleurer.	Pathétique.				Accepter.	Fairplay.				
+5037	5	yes	Guillotine.	Essayer.	Fonctionnelle.		1		Examiner.	Égalisation.				
+5038	5	yes	Boulangerie.	Entrer.	Vide.		5039		Sentir.	Miam.				
+5039	1		Cookie.	Manger.	Délicieux.		5040		Partir.	Néfaste.				
+5040	1		Cookie.	Manger.	Délicieux.		5041		Partir.	Néfaste.				
+5041	1		Cookie.	Manger.	Regretter.		5042		Partir.	Néfaste.				
+5042	1		Boulanger !	Cacher.	Silence.		5045		Courir.	Incapable.		5043		
+5043	1		Attrapé.	Expliquer.	Furieuse.		5044		Combattre.	Chargez !		5044		
+5044	1		Poing.	S'accroupir.	Colère.		5046		Accepter.	Affronter.		1		
+5045	1		Miettes !	Rester.	Trouvée !		5043		Fuir !	Incapable.		5043		
+5046	1		Police.	Fuir.	Rattrapée.		1		Abandonner.	Prison.		1		
+5047	5	yes	Âne.	Monter.	Têtu.				Pomme ?	Croque.				
+5050	5		Oiseau.	Miettes.	Gai.				Caresser.	Grippe.		1		
+6001	6	yes	Boue.	Sauter.	Évitée.				Patauger.	Embourbée.		1		
+6002	6	yes	Goule.	Affronter.	Possédée.		1		Offrande.	Ravie.				
+6003	6	EXIT	Tour.	Approcher.	Sinistre.	7	7001		Observer.	Grande.		6003		
+6004	6	yes	Nuages.	Regarder.	Formes.				Contempler.	Sublimes.				
+6006	6	yes	Flaque.	Splash.	Enfance.				Éviter.	Adulte.				
+6007	6		Ami.	Salut.	Joyeux.		6008		Éviter.	Quête !				
+6008	6		Conversation.	Ressenti ?	Fatiguée.		6009		Météo.	Mauvaise.		6010		
+6009	6		Fatigué ?	Pareil.	Camaraderie.		6010		Pourquoi ?	Triste.		6010		
+6010	6		Adieu.	Au revoir !	Ami.				Câlin.	Liens.				
+6013	6	yes	Lumières.	Regarder.	Hypnotisantes.		6015		Suivre.	Jolies.		6014		
+6014	6		Fées !	Contempler.	Hypnotisée !		6016		Pourchasser.	Disparues.				
+6015	6		Lumières.	Regarder.	Fées !		6014		Ignorer.	Dangereuses.		6014		
+6016	6		Lumières.	Suivre.	Marais.		6017		Suivre.	Marais.		6017		
+6017	6		Marais.	Entrer.	Sombrer.		6018		Entrer.	Sombrer.		6018		
+6018	6		Cou.	Attendre.	Noyée.		1		Attendre.	Noyée.		1		
+6019	6		Rats.	Nourrir.	Baies.				Attraper.	Peste.		1		
+6020	6	yes	Corbeau.	Parler.	Croa !				Pierre.	Touché !		6021		
+6021	6		Corbeaux !	Fuir.	Menacée.				Affronter.	Débordée.		1		
+6023	6	yes	Épouvantail.	Saluer.	Épouvantail.				Chapeau.	Stylé.				
+6026	6	yes	Terre.	Manger.	Pourquoi ?		1		Fouiller.	Vers.				
+6027	6	yes	Ruines.	Peinture.	Graffitis.				Explorer.	Antiques.		6028		
+6028	6		Pierres.	Escalader.	Mouvement !		6030		S'assoir.	Apaisée.				
+6030	6		Golem !	Fuir !	Cailloux.		1		Affronter.	Cailloux.		1		
+7001	7		Porte.	Taper.	Rien.		7002		Ouvrir.	Intérieur.				
+7002	7		Couloir.	S'infiltrer.	Silence.		7003		Marcher.	Bruyante.		7003		
+7003	7		Garde.	Attaquer !	Zombie !		7004		Corrompre.	Cerveaaaux !		1		
+7004	7		Zombie !	Poignarder.	Mort-vivant !		7005		Fuir.	Accélérer.		7007		
+7005	7		Zombie !!	Trancher.	Mort-vivant !		7006		Fuir.	Accélérer.		7007		
+7006	7		Zombie !!!	Poignarder !	Dévorée.		1		Fuir.	Accélérer.		7007		
+7007	7		Porte.	Pousser.	Verrouillée.		7008		Tirer.	Ouverte.				
+7008	7		Zombie !	Trancher.	Dévorée.		1		Poignarder.	Dévorée.		1		
+7009	7	yes	Garde.	Cachette.	Cachée.		7010		Attaquer.	Mort-vivant !		7004		
+7010	7		Éternuer.	Retenir.	Aïe.				Atchoum !	Repérée !		7004		
+7011	7	yes	Laboratoire.	Chercher.	Sorcier ?		7012		Mépris.	Insignifiant.				
+7012	7		Cadavre.	Pousser.	Mort.		7013		Sentir.	Dégueu.		7013		
+7013	7		Levier.	Tirer.	Électricité.		7014		Partir.	Couloir.				
+7014	7		Cadavre.	Pousser.	Vivant ?!		7004		Éviter.	Effrayant.				
+7015	7	yes	Bibliothèque.	Fouiller.	Livres.	13			Bâiller.	Ennui.				
+7017	7	yes	Cuisine.	Fouiller.	Soupe.				Ignorer.	Faim.				
+7018	7	yes	Peinture.	Prendre.	Encombrante.				Inspecter.	Fausse.				
+7019	7	yes	Escaliers.	Monter.	Noir.		7020		Revenir.	Fatigant.			[7019, 7015, 7011]	
+7020	7		Escaliers.	Continuer.	Bruits.	8	8001		Descendre.	Effrayant.		7019		
+8001	8		Porte.	Regarder.	Sorcier !		8001		Ouvrir.	Sorcier !				
+8002	8	yes	Sorcier.	Traiter !	Meurs !		8006		Insulter !	Fumier !		8003		
+8003	8		Insulté.	Traiter !	Fumieeer !		8006		Insulter !	Culdwich !		8004		
+8004	8		Colère.	Traiter !	Culdwiiich !		8006		Insulter !	Patafesse !		8006		
+8005	8		Feu !	Oh.	Non.		0		Oh.	Merde.		0		
+8006	8		Glace !	Éviter.	Rouler.		8007		Encaisser.	Gelée.		1		
+8007	8		Sorcier.	Poignarder.	Blessé.		8008		Trancher.	Blessé !		8008		
+8008	8		Sorcier.	Poignarder.	Mort !		8009		Trancher.	Mort.		8009		
+8009	8		Victoire !	Danser.	Joie.		8009		Partir.	Attends...		8010		
+8010	8		Sorcier ?!	Quoi ?	Ressuscité.		8005		Comment ?	Magie.		8005		
+8011	8		Sorcier !	Attaquer.	Attaquer !		8012		Menacer.	Rires.		8011		
+8012	8		Avec ?	Épée.	Pointue.		8007		Masse !	Destin.		8013		
+8013	8		Supris.	Frapper.	Cervelle.		8014		Découper.	Masse.		8006		
+8014	8		Victoire !	Mère.	Vengée.		8015		Village.	Sauvé.		8016		
+8015	8		Victoire !	Mère.	Vengée.		8015		Village.	Sauvé.		0		
+8016	8		Victoire !	Mère.	Vengée.		0		Village.	Sauvé.		8016		
+9000	9	yes	Tempête.	Parapluie.	Foudre.	6			Accessoires.	Foudre.	6			
+10000	10		Alarme.	Réveil.	Quête.		10001		Roupiller.	Ronflements.		10000		
+10001	10		Maison.	Cuisine.	Oeufs.		10002		Porche.	Ensoleillé.		10002		
+10002	10		Journal.	Nouvelles.	Titres.		10003		Politique.	Ennuyeux.		10002		
+10003	10		Sorcier.	Héros ?	Besoin !		10006		Quoi ?	Démon.		10006		
+10006	10		Préparatifs.	Courageuse.	Épée.		10007		Méticuleuse.	Épée.		10007		
+10007	10		Maison.	Rester.	Flemme.		10007		Quitter.	Forêt.		10008		
+10008	10		Gland.	Planter.	Patience.		10009		Garder.	Souvenir.		10009	[-11000, 11001]	
+10009	10		Voyageur.	Voler.	Pièces.		10012		Saluer.	Bonjour.		10010		
+10010	10		Échanger.	Histoires.	Intrigantes.		10012		Nourriture.	Exotique.		10012		
+10012	10		Oiseau.	Nourrir.	Graines.	11			Chanter.	Duo.	11			
+10013	10		Sanglier.	Fuir !	Piétinée.		1		Monter.	Piétinée.		1		
+11000	11	yes	Écureuil.	Pourchasser.	Lent.	10	10013		Caresser.	Doux.	10	10013		
+11001	11		Écureuil.	Pourchasser.	Lent.	10	10013		Offrir.	Gland.	10	10013		
+13000	13	yes	Recettes.	Regarder.	Manuscrites.		13001		Jeter.	Lourd.				
+13001	13		Recettes.	Cuire.	Burgers.		13002		Arrêter.	Faim.				
+13002	13		Recettes.	Bouillir.	Spaghetti.		13003		Arrêter.	Faim.				
+13003	13		Recettes.	Rôtir.	Cervelles.		13004		Arrêter.	Faim.				
+13004	13		Recettes.	Nourrir.	Zombies.		13005		Arrêter.	Effrayant.				
+13005	13		Recettes.	Terminées.	Terminées.				Arrêter.	Répugnant.				
+13053	13	yes	Journal.	Lire.	Secrets.		13056		Ignorer.	Privé.				
+13055	13		Journal.	Auteur ?	Sorcier !		13065		Âge ?	Décennies.		13055		
+13056	13		Femme.	Tragédie.	Morte.		13057		Arrêter.	Privé.				
+13057	13		Désespéré.	Magie.	Ressusciter.		13058		Arrêter.	Privé.				
+13058	13		Expériences.	Risquées.	Échec.		13059		Arrêter.	Privé.				
+13059	13		Femme.	Transformation.	Zombie.		13060		Arrêter.	Privé.				
+13060	13		Enfance.	Danger.	Orphelinat.		13061		Arrêter.	Privé.				
+13061	13		Femme.	Aider.	Remède ?		13062		Arrêter.	Privé.				
+13062	13		Expériences.	Plus.	Tout.		13063		Arrêter.	Privé.				
+13063	13		Échec.	Perdu.	Folie.		13064		Arrêter.	Privé.				
+13064	13		Enfance.	Années.	Oubliées.		13055		Arrêter.	Privé.				
+13065	13		Pas !	Cachette.	Cachée.		13066		Préparatifs.	Affronter !	8			
+13066	13		Sorcier.	Observer.	Assis.		13067		S'infiltrer.	Trouvée !	8			
+13067	13		Sorcier.	Observer.	Journal.		13068		S'infiltrer.	Trouvée !	8			
+13068	13		Sorcier.	Observer.	Pleurs.		13069		S'infiltrer.	Derrière.	8			
+13069	13		Sorcier.	Approcher.	Surpris.		13070		S'infiltrer.	Derrière.	8			
+13070	13		Sorcier.	Examiner.	Familier.		13071		Attaquer !	Destin !	8			
+13071	13		Sorcier.	Papa ?	Fille ?		0		Attaquer !	Destin !	8			
+13072	13	yes	Bibliothèque.	Rester.	Livres.			[13072]	Partir.	Poussiéreuse.	7			
+13073	13	yes	Livres.	Regarder.	Aventure.		13074		Jeter.	Choquée.				
+13074	13		Livres.	Lire.	Épique.		13075		Écarter.	Distraction.				
+13075	13		Poulet.	Croiser.	Route.		13076		Stop.	Ennuyeux.				
+13076	13		Livre.	Terminé.	Perfection.				Achevé.	Joyau.				
