@@ -82,7 +82,7 @@ export const fetch = (args: string[] | undefined) => {
                 state.fetchGameDefinitionAsync(gameid),
                 state.resetGameStateAsync()
             ])
-            .then((payloads: any) => {
+            .then((_payloads: any) => {
                 situationId = 1;
                 runner.Initialize(state.game_definition.prompt!)
             })
@@ -95,7 +95,7 @@ export const fetch = (args: string[] | undefined) => {
                 state.fetchGameDefinitionAsync(gameid),
                 state.fetchGameStateAsync(gameid)
             ])
-            .then((payloads: any) => {
+            .then((_payloads: any) => {
                 runner.Initialize(state.game_definition.prompt!)
                 runner.SetState(state.game_state.allows)
             })
@@ -139,7 +139,7 @@ const getFormState = () => {
 
 
 
-export const onchange = (input: HTMLInputElement) => {
+export const onchange = (_input: HTMLInputElement) => {
     getFormState();
     App.render();
 }

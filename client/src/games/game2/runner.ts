@@ -148,7 +148,7 @@ class Runner {
         }
         // Reset allow and exit if nextid==0 or 1
         if (c.nextid === 0 || c.nextid === 1) {
-            for (const [id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
+            for (const [_id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
             this.groupSituationCount = 0;
             return 1;
         }
@@ -175,7 +175,7 @@ class Runner {
         return nextid!;
     }
     ClearState() {
-        for (const [id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
+        for (const [_id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
     }
     GetState() {
         return new Map(Array.from(this.situationsById, ([key, situation]) => [key, situation.allow]));

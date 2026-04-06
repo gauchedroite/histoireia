@@ -173,7 +173,7 @@ const getFormState = () => {
     return clone;
 }
 
-export const onchange = (input: HTMLInputElement) => {
+export const onchange = (_input: HTMLInputElement) => {
     mystate = getFormState();
     App.render();
 }

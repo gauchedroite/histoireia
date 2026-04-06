@@ -17,7 +17,6 @@ let assistant_text: string | null = null
 let next_user_text: string | null = null
 let editable = false
 let helping = false
-let helping_choices: string[] = []
 let choices: IChoice[];
 
 
@@ -117,8 +116,14 @@ const render_and_fetch_more = async () => {
 
     if (assistant_text == undefined) {
         App.transitionUI()
-        assistant_text = await state.chatAsync(streamUpdater)
-        await state.setAssistantMessageAsync(assistant_text, pageno)
+        try {
+            assistant_text = await state.chatAsync(streamUpdater)
+            await state.setAssistantMessageAsync(assistant_text, pageno)
+        }
+        catch (err) {
+            assistant_text = "Le serveur ne répond pas. Vérifie qu'Ollama est bien démarré."
+            console.error("Chat error:", err)
+        }
 
         App.render()
     }
@@ -180,19 +185,19 @@ const getFormState = () => {
     next_user_text = Misc.fromInputText(`${NS}_next_user_text`, next_user_text);
 }
 
-export const onchange = (input: HTMLInputElement) => {
+export const onchange = (_input: HTMLInputElement) => {
     getFormState();
     App.render();
 }
 
-export const oninput = (input: HTMLInputElement) => {
+export const oninput = (_input: HTMLInputElement) => {
     getFormState();
     App.render();
 }
 
 
 
-export const submit = async (input: HTMLInputElement) => {
+export const submit = async (_input: HTMLInputElement) => {
     await state.addUserMessageAsync(next_user_text!, pageno)
 
     next_user_text = null

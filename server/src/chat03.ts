@@ -70,6 +70,11 @@ export const chat03 = async (req: Request, res: Response) => {
                 body: JSON.stringify(fetchBody),
             });
 
+            if (!aiResp.ok) {
+                const errBody = await aiResp.text();
+                throw new Error(`LLM returned ${aiResp.status}: ${errBody}`);
+            }
+
             if (!aiResp.body) throw new Error("No stream body from LLM");
 
             // (b) Parse stream, relay text, collect tool calls

@@ -10,13 +10,12 @@ let secret = "";
 
 
 const template = () => {
-    const root = document.documentElement;
-    const styles = getComputedStyle(root);
-    const sait = styles.getPropertyValue('--sait').trim();
-    const saib = styles.getPropertyValue('--saib').trim();
-    const sail = styles.getPropertyValue('--sail').trim();
-    const sair = styles.getPropertyValue('--sair').trim();
-
+    //const root = document.documentElement;
+    //const styles = getComputedStyle(root);
+    //const sait = styles.getPropertyValue('--sait').trim();
+    //const saib = styles.getPropertyValue('--saib').trim();
+    //const sail = styles.getPropertyValue('--sail').trim();
+    //const sair = styles.getPropertyValue('--sair').trim();
     if (!editing) {
         return `
         <div class="app-content">
@@ -81,7 +80,7 @@ export const postRender = () => {
 
 
 
-export const onchange = (input: HTMLInputElement) => {
+export const onchange = (_input: HTMLInputElement) => {
     state.username = Misc.fromInputText(`${NS}_username`, state.username)!;
     secret = Misc.fromInputText(`${NS}_secret`, secret)!;
     App.render();

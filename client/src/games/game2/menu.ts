@@ -17,7 +17,6 @@ let modalWhat: string | null = null
 const formTemplate = () => {
     const add = (row: string) => rows.push(row);
     const action = (href: string, text: string, icon: string) => rows.push(`<a href="${href}"><div><div>${text}</div>${icon}</div></a>`);
-    const page = (index: number, text: string) => rows.push(`<a href="#/story2/${gameid}/${index}" class="page ${index == 0 ? "page-0" : ""}"><div><div>${text}</div><span>p.${index+1}</span></div></a>`);
     let rows: string[] = [];
 
     if (mystate.bg_url) {

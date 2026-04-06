@@ -1,5 +1,3 @@
-import * as App from "../core/app.js"
-
 export const NS = "RELOADER";
 
 
@@ -24,7 +22,7 @@ window.addEventListener("touchmove", function(event) {
     }
 })
 
-window.addEventListener("touchend", function(event) {
+window.addEventListener("touchend", function(_event) {
     if (isDraggingDown) {
         isDraggingDown = false
         reload()

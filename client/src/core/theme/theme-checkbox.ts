@@ -38,7 +38,7 @@ const wrap_field = (label: string, html: string) => {
 }
 
 
-export const renderInputCheckbox = (ns: string, propName: string, value: boolean, text: string, option: IOpt, filter = false) => {
+export const renderInputCheckbox = (ns: string, propName: string, value: boolean, text: string, option: IOpt, _filter = false) => {
     return `
 <input type="checkbox"
     id="${ns}_${propName}" 

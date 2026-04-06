@@ -1,9 +1,9 @@
-import express, { Request, Response, Application, NextFunction } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
-import { chat01, chat02, chat03, chat04, chatExtra } from './chat';
+import { chat03, chatExtra } from './chat';
 import { assetsPath, publicPath, usersPath, lookupPath } from './path-names';
 import { LLMConfig, GameDefinition, KindLookup, GameList } from './chat-interfaces';
 
@@ -44,24 +44,10 @@ app.use("/chat", checkAuth);
 
 
 // Middleware to print the URI of all requests
-app.use((req, res, next) => {
-    //console.log(`Requested URI: ${req.originalUrl}`);
+app.use((_req, _res, next) => {
+    //console.log(`Requested URI: ${_req.originalUrl}`);
     next();
 });
-
-
-// Middleware to configure cache settings for /data endpoint
-const noCache: express.RequestHandler = (_req, res, next) => {
-    console.log(`Accessing /data endpoint at ${new Date().toISOString()}`);
-
-    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-    res.set("Pragma", "no-cache");
-    res.set("Expires", "0");
-    res.set("Surrogate-Control", "no-store");
-
-    next();
-};
-//app.use("/story", noCache);
 
 // Configure access to static files
 app.use("/story", express.static(assetsPath));
@@ -293,6 +279,7 @@ app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
     let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
+        await fs.ensureDir(path.dirname(pages_Path));
         await fs.writeFile(pages_Path, JSON.stringify(req.body));
 
         console.log(`PUT /users/${username}/${gameid}`);

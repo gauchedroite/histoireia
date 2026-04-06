@@ -59,7 +59,7 @@ export const renderInputText = (ns: string, propName: string, value: string | nu
 <input type="${option.password ? "password" : "text"}"
     class="${option.size || ""} ${option.class || ""}" ${option.style ? `style="${option.style}"` : ""}
     id="${ns}_${propName}"
-    value="${Misc.toInputText(value)}" 
+    value="${Misc.toInputText(value)}"
     ${filter ? `onchange="${ns}.filter_${propName}(this)"` : `onchange="${ns}.onchange(this)"`}
     ${option.required ? "required='required'" : ""} 
     ${option.disabled ? "disabled" : ""}
@@ -73,7 +73,7 @@ export const renderInputText = (ns: string, propName: string, value: string | nu
 `;
 }
 
-export const renderInputTextarea = (ns: string, propName: string, value: string | null, option: IOptText, filter = false) => {
+export const renderInputTextarea = (ns: string, propName: string, value: string | null, option: IOptText, _filter = false) => {
     return `
 <textarea
     class="${option.size || ""}" ${option.size ? `style="min-width: initial"` : ""}

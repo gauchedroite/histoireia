@@ -73,8 +73,8 @@ export const render = () => {
             ((<any>window).morphdom)(element, markup, {
                 getNodeKey: function (node: HTMLElement) { return node.id; },
                 onBeforeNodeAdded: function (node: HTMLElement) { return node; },
-                onNodeAdded: function (node: HTMLElement) { },
-                onBeforeElUpdated: function (fromEl: HTMLElement, toEl: HTMLElement) {
+                onNodeAdded: function (_node: HTMLElement) { },
+                onBeforeElUpdated: function (fromEl: HTMLElement, _toEl: HTMLElement) {
                     if (fromEl.matches("input[type=text]:focus")) return false;
                     if (fromEl.matches("input[type=number]:focus")) return false;
                     if (fromEl.matches("textarea:focus")) return false;
@@ -82,10 +82,10 @@ export const render = () => {
                     if (fromEl.hasAttribute("js-skip-render-not-class") && !fromEl.classList.contains(fromEl.getAttribute("js-skip-render-not-class")!)) return false;
                     return true;
                 },
-                onElUpdated: function (el: HTMLElement) { },
-                onBeforeNodeDiscarded: function (node: HTMLElement) { return true; },
-                onNodeDiscarded: function (node: HTMLElement) { },
-                onBeforeElChildrenUpdated: function (fromEl: HTMLElement, toEl: HTMLElement) { return true; }
+                onElUpdated: function (_el: HTMLElement) { },
+                onBeforeNodeDiscarded: function (_node: HTMLElement) { return true; },
+                onNodeDiscarded: function (_node: HTMLElement) { },
+                onBeforeElChildrenUpdated: function (_fromEl: HTMLElement, _toEl: HTMLElement) { return true; }
             });
         else
             element.outerHTML = markup;
@@ -150,7 +150,7 @@ const postRender = () => {
         renderStack.splice(newRootIndex, removeCount) // more versatile than renderStack.pop()
     }
 
-    const existsRenderStack = (id: string) => {
+    const existsRenderStack = (_id: string) => {
         return renderStack.findIndex(one => one == renderRoot) != -1
     }
 
@@ -203,8 +203,8 @@ export const renderPartial = (id: string, markup: string) => {
         ((<any>window).morphdom)(element, markup, {
             getNodeKey: function (node: HTMLElement) { return node.id; },
             onBeforeNodeAdded: function (node: HTMLElement) { return node; },
-            onNodeAdded: function (node: HTMLElement) { },
-            onBeforeElUpdated: function (fromEl: HTMLElement, toEl: HTMLElement) {
+            onNodeAdded: function (_node: HTMLElement) { },
+            onBeforeElUpdated: function (fromEl: HTMLElement, _toEl: HTMLElement) {
                 if (fromEl.matches("input[type=text]:focus")) return false;
                 if (fromEl.matches("input[type=number]:focus")) return false;
                 if (fromEl.matches("textarea:focus")) return false;
@@ -212,10 +212,10 @@ export const renderPartial = (id: string, markup: string) => {
                 if (fromEl.hasAttribute("js-skip-render-not-class") && !fromEl.classList.contains(fromEl.getAttribute("js-skip-render-not-class")!)) return false;
                 return true;
             },
-            onElUpdated: function (el: HTMLElement) { },
-            onBeforeNodeDiscarded: function (node: HTMLElement) { return true; },
-            onNodeDiscarded: function (node: HTMLElement) { },
-            onBeforeElChildrenUpdated: function (fromEl: HTMLElement, toEl: HTMLElement) { return true; }
+            onElUpdated: function (_el: HTMLElement) { },
+            onBeforeNodeDiscarded: function (_node: HTMLElement) { return true; },
+            onNodeDiscarded: function (_node: HTMLElement) { },
+            onBeforeElChildrenUpdated: function (_fromEl: HTMLElement, _toEl: HTMLElement) { return true; }
         });
 
         rendering = false;

@@ -38,18 +38,18 @@ const onresize = () => {
     document.body.classList.remove("portrait", "landscape");
     document.body.classList.add(portrait ? "portrait" : "landscape");
 };
-//addEventListener("resize", onresize);
-//onresize();
+addEventListener("resize", onresize);
+onresize();
 
 
 // Background shader
 const runner = new WebglRunner()
 setTimeout(async () => {
-    const shader_name = "star_nest_retro"
+    const shader_name = "_default__vertex_shader"
     const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
     const vertexShader = await (await window.fetch(`./assets_app/_default_vertex_shader.glsl`)).text()
     const fragmentShader = await (await window.fetch(`./assets_app/${shader_name}.glsl`)).text()
-    //runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
+    runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
 }, 0);
 
 // Pause the shader if were not on the login or the home pages

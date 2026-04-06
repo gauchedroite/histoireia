@@ -1,5 +1,3 @@
-import { parseArgs } from "util";
-
 interface IRollPbta {
     modifier: number
 }

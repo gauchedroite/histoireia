@@ -1,4 +1,4 @@
-import { IOpt, wrapAddon } from "./theme.js"
+import { IOpt } from "./theme.js"
 import * as Lookup from "../lookup.js"
 import * as Misc from "../misc.js"
 

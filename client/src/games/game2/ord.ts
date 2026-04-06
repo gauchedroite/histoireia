@@ -116,7 +116,7 @@ class OrdGame {
         }
         // Reset allow if nextid==0 or 1
         if (c.nextid === 0 || c.nextid === 1) {
-            for (const [id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
+            for (const [_id, s0] of this.situationsById) s0.allow = s0.origAllow ?? "";
             this.groupSituationCount = 0;
         }
 
