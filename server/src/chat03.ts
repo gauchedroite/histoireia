@@ -2,8 +2,9 @@ import type { Request, Response } from "express";
 import fs from "fs-extra";
 import path from "path";
 import { rollPbta, resolvePbta } from "./server_tools";
-import { assetsPath, lookupPath, toolsPath } from "./path-names";
-import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, LLMConfig, GameDefinition } from "./chat-interfaces";
+import { assetsPath, toolsPath } from "./path-names";
+import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, GameDefinition } from "./chat-interfaces";
+import { getLlm } from "./lookup";
 
 
 export const chat03 = async (req: Request, res: Response) => {
@@ -15,11 +16,7 @@ export const chat03 = async (req: Request, res: Response) => {
         const metaContent = await fs.readFile(gameMetaPath, "utf8");
         const gameMeta = JSON.parse(metaContent) as GameDefinition;
 
-        const llmid = gameMeta.llmid
-        const llmConfigPath = path.join(lookupPath, "llm.json");
-        const llmContent = await fs.readFile(llmConfigPath, "utf8");
-        const llmList = JSON.parse(llmContent) as LLMConfig[];
-        const llm = llmList.find(one => one.id === llmid);
+        const llm = getLlm(gameMeta.llmid);
         if (!llm) {
             res.status(500).json({ error: "LLM not found" });
             return;

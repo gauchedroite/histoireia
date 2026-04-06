@@ -5,6 +5,7 @@
     "main": "dist/server.js",
     "scripts": {
         "start": "node dist/server.js",
+        "test": "tsc && node --test dist/server.test.js",
         "dev": "npm run watch:tsc & npm run watch:node",
         "watch:tsc": "tsc -w",
         "watch:node": "node --watch dist/server.js",

@@ -4,11 +4,12 @@ import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
 import { chat03, chatExtra } from './chat';
-import { assetsPath, publicPath, usersPath, lookupPath } from './path-names';
-import { LLMConfig, GameDefinition, KindLookup, GameList } from './chat-interfaces';
+import { assetsPath, publicPath, usersPath } from './path-names';
+import { GameDefinition, GameList } from './chat-interfaces';
+import { getLlm, getKindList, getKind } from './lookup';
 
 
-const app = express();
+export const app = express();
 const port = 9340;
 
 function sanitizeParam(value: string): string | null {
@@ -67,10 +68,7 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         const index: GameList[] = [];
-
-        const kindPath = path.join(lookupPath, "kind.json");
-        const kindContent = await fs.readFile(kindPath, "utf8");
-        const kindList = JSON.parse(kindContent) as KindLookup[];
+        const kindList = getKindList();
 
         for (const entry of entries) {
             if (entry.isDirectory()) {
@@ -124,17 +122,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const metaContent = await fs.readFile(metadataPath, "utf8");
         const data = JSON.parse(metaContent) as GameDefinition;
 
-        const llmid = data.llmid
-        const llmConfigPath = path.join(lookupPath, "llm.json");
-        const llmContent = await fs.readFile(llmConfigPath, "utf8");
-        const llmList = JSON.parse(llmContent) as LLMConfig[];
-        const llm = llmList.find(one => one.id === llmid)!;
-
-        const kindid = data.kindid
-        const kindConfigPath = path.join(lookupPath, "kind.json");
-        const kindContent = await fs.readFile(kindConfigPath, "utf8");
-        const kindList = JSON.parse(kindContent) as KindLookup[];
-        const kind = kindList.find(one => one.id === kindid)!;
+        const llm = getLlm(data.llmid)!;
+        const kind = getKind(data.kindid)!;
 
         let prompt = ""
         if (kind.code == "llm") {
@@ -337,7 +326,9 @@ app.post("/upload-face", checkAuth, async (req: Request, res: Response) => {
 
 
 
-// Start server
-app.listen(port, "0.0.0.0", () => {
-    console.log(`Server is running on http://0.0.0.0:${port}`);
-});
+// Start server (skip when imported for testing)
+if (require.main === module) {
+    app.listen(port, "0.0.0.0", () => {
+        console.log(`Server is running on http://0.0.0.0:${port}`);
+    });
+}
