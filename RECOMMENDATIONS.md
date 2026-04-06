@@ -2,17 +2,9 @@
 
 ## Infrastructure
 
-### Add a lockfile
-
-No `package-lock.json` in either `client/` or `server/`. Run `npm install` in both and commit the lockfiles.
-
 ### Add minimal CI
 
 A GitHub Action running `tsc --noEmit` on both client and server catches type errors before they reach production.
-
-### Caddy hardcodes a LAN IP
-
-The `Caddyfile` reverse proxies to `192.168.50.199:9340`. Use `localhost:9340` instead.
 
 ### Add a linter
 
