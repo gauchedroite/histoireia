@@ -13,7 +13,7 @@ ID	GID	Allow	Title	Choice1	Consequence1	GID1	ID1	Allow1	Choice2	Consequence2	GID
 1007	1		Cafééé !!!	BOIRE !!	Overdose.		1		NON !!!	RÉVEILLÉE !!!				
 1008	1	yes	Journal.	Lire.	Titres.		1009		Ignorer.	Ennui.				
 1009	1		Sorcier.	Où ?	Tour.		1009		Quoi ?	Démon.		1001		
-1010	1	EXIT	Maison.	Quitter.	Forêt.	2			Rester.	Flemme.		1010		
+1010	1	EXIT	Maison.	Quitter.	Forêt.	2			Rester.	Paresse.		1010		
 1011	1	yes	Télévision.	Regarder.	Cartoons.		1012		Ennui.	Quête !				
 1012	1		Télévision.	Regarder.	Publicités.		1013		Ennui.	Quête !				
 1013	1		Télévision.	Regarder.	Informations.		1014		Ennui.	Quête !				

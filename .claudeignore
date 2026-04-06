@@ -1,0 +1,25 @@
+# Projects/folders I don't plan on updating (waste of tokens)
+public/assets/
+public/fontawesome710/
+public/images/
+public/js/
+public/lib/
+public/webfonts/
+server/dist/
+
+# Build artifacts, log and temp folders
+bin/
+obj/
+[Ll]og/
+
+# Dependencies
+**/node_modules/
+
+# IDE
+.vs/
+.vscode/
+.git/
+
+# Minified assets
+*.min.js
+*.min.css
