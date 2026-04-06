@@ -149,16 +149,20 @@ class State {
         const endpoint = App.apiurl(`chat/${base.gameid}`)
         const messages = this.pagesToMessages()
         
+        const authHeader = App.getAuthHeader();
         const response = await window.fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(authHeader ? { "Authorization": `Bearer ${authHeader}` } : {}),
+            },
             body: JSON.stringify(messages)
         })
-    
+
         if (!response.body) {
             throw new Error("No response from LLM endpoint");
         }
-    
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let answer = "";
@@ -179,16 +183,20 @@ class State {
         const endpoint = App.apiurl(`chat/${base.gameid}/${extra}`)
         const messages = this.pagesToMessages()
 
+        const authHeader = App.getAuthHeader();
         const response = await window.fetch(endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(authHeader ? { "Authorization": `Bearer ${authHeader}` } : {}),
+            },
             body: JSON.stringify(messages)
         })
-    
+
         if (!response.body) {
             throw new Error("No response from LLM endpoint");
         }
-    
+
         return await response.json();
     }
 }

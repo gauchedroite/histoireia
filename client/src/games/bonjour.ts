@@ -6,6 +6,7 @@ import { state } from "./state.js"
 export const NS = "GBONJOUR";
 
 let editing = false;
+let secret = "";
 
 
 const template = () => {
@@ -29,6 +30,7 @@ const template = () => {
     }
     else {
         const input = renderFieldText(NS, "username", state.username, "", <IOptText>{ required: true, minlength: 5 })
+        const pinInput = renderFieldText(NS, "secret", secret, "", <IOptText>{ required: true, password: true, placeholder: "Code secret" })
         const submit = `<button type="submit" onclick="${NS}.submit()"><i class="fa-light fa-check"></i></button>`
         return `
         <div class="app-content">
@@ -36,6 +38,7 @@ const template = () => {
                 <div class="bonjour">
                     <span>Bonjour!</span>
                     ${input}
+                    ${pinInput}
                     ${submit}
                 </div>
                 <a class="visual" href="#" onclick="return none;"></a>
@@ -61,7 +64,7 @@ export const fetch = (args: string[] | undefined) => {
     if (username != undefined && username.length > 5) {
         state.username = username
     }
-    editing = state.username == undefined || state.username.length == 0
+    editing = state.username == undefined || state.username.length == 0 || !sessionStorage.getItem("app_secret")
 
     App.prepareRender(NS, "Bonjour", "screen_bonjour")
     App.renderOnNextTick();
@@ -80,7 +83,7 @@ export const postRender = () => {
 
 export const onchange = (input: HTMLInputElement) => {
     state.username = Misc.fromInputText(`${NS}_username`, state.username)!;
-    console.log(state.username)
+    secret = Misc.fromInputText(`${NS}_secret`, secret)!;
     App.render();
 }
 
@@ -92,6 +95,7 @@ export const editName = (yesno: boolean) => {
 
 export const submit = () => {
     if (!Misc.html5Valid(NS)) return;
+    sessionStorage.setItem("app_secret", secret);
     editing = false
     App.renderOnNextTick()
 }

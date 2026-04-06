@@ -330,6 +330,10 @@ export const uiUpdateRequired = () => {
 
 
 
+export const getAuthHeader = (): string | null => {
+    return sessionStorage.getItem("app_secret");
+};
+
 export const apiurl = (url: string) => {
     return `${root.getDomain()}${api}${url}`;
 };
@@ -441,6 +445,7 @@ export const POST = (url: string, body: any) => {
             method: "post",
             headers: {
                 "Content-type": "application/json",
+                ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
             },
             credentials: "include",
             mode: "cors",
@@ -458,6 +463,7 @@ export const GET = (url: string) => {
             headers: {
                 "Cache-Control": "no-cache",
                 "Pragma": "no-cache",
+                ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
             },
             credentials: "include",
             mode: "cors",
@@ -473,6 +479,7 @@ export const PUT = (url: string, body: any) => {
             method: "put",
             headers: {
                 "Content-type": "application/json",
+                ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
             },
             credentials: "include",
             mode: "cors",
@@ -489,6 +496,7 @@ export const DELETE = (url: string, body: any) => {
             method: "delete",
             headers: {
                 "Content-type": "application/json",
+                ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
             },
             credentials: "include",
             mode: "cors",

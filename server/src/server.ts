@@ -11,6 +11,25 @@ import { LLMConfig, GameDefinition, KindLookup, GameList } from './chat-interfac
 const app = express();
 const port = 9340;
 
+function sanitizeParam(value: string): string | null {
+    return /^[a-z0-9]+$/.test(value) ? value : null;
+}
+
+const appSecret = process.env.APP_SECRET;
+
+function checkAuth(req: Request, res: Response, next: NextFunction) {
+    if (appSecret && req.headers.authorization !== `Bearer ${appSecret}`) {
+        res.status(401).json({ hasError: true, message: "Non autorisé" });
+        return;
+    }
+    next();
+}
+
+app.use("/stories", checkAuth);
+app.use("/stories-for", checkAuth);
+app.use("/users", checkAuth);
+app.use("/chat", checkAuth);
+
 
 
 
@@ -57,7 +76,8 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 // List stories
 app.get("/stories-for/:username", async (req: Request, res: Response) => {
-    let username = req.params.username;
+    let username = sanitizeParam(req.params.username);
+    if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         const index: GameList[] = [];
@@ -109,7 +129,8 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
 
 // Fetch a story
 app.get("/stories/:gameid", async (req: Request, res: Response) => {
-    let gameid = req.params.gameid;
+    let gameid = sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     let gameid_Path = path.join(assetsPath, gameid)
 
     try {
@@ -165,7 +186,8 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 // Update a story
 app.put("/stories/:gameid", async (req: Request, res: Response) => {
     const { title, bg_image, prompt, llmid, extra, author, justme, kindid } = req.body as GameDefinition
-    let gameid = req.params.gameid;
+    let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     let gameid_Path = path.join(assetsPath, gameid)
 
     if (gameid == "new") {
@@ -208,7 +230,8 @@ app.put("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Delete a story
 app.delete("/stories/:gameid", async (req: Request, res: Response) => {
-    const gameid = req.params.gameid;
+    const gameid = sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     const gameid_Path = path.join(assetsPath, gameid)
 
     try {
@@ -235,8 +258,10 @@ app.delete("/stories/:gameid", async (req: Request, res: Response) => {
 
 // Fetch story state of user
 app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
-    let username = req.params.username;
-    let gameid = req.params.gameid;
+    let username = sanitizeParam(req.params.username);
+    if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
+    let gameid = sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     let state_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
@@ -261,8 +286,10 @@ app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
 });
 
 app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
-    let username = req.params.username.toLowerCase();
-    let gameid = req.params.gameid.toLowerCase();
+    let username = sanitizeParam(req.params.username.toLowerCase());
+    if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
+    let gameid = sanitizeParam(req.params.gameid.toLowerCase());
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
 
     try {
@@ -281,23 +308,32 @@ app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
 
 // Execute story prompt
 app.post("/chat/:gameid", async (req: Request, res: Response) => {
-    //chat01(req, res)
-    //chat02(req, res)
+    if (!sanitizeParam(req.params.gameid)) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     chat03(req, res)
-    //chat04(req, res)
 });
 
 // Execute story extra
 app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
+    if (!sanitizeParam(req.params.gameid)) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
+    if (!sanitizeParam(req.params.extraid)) { res.status(400).json({ hasError: true, message: "Invalid extraid" }); return; }
     chatExtra(req, res)
 });
 
 
 
 // For later...
-app.post("/upload-face", async (req: Request, res: Response) => {
+app.post("/upload-face", checkAuth, async (req: Request, res: Response) => {
     const { filename: fileName, image } = req.body;
-    const filePath = path.join(publicPath, fileName);
+
+    // Validate filename: only alphanumeric, hyphens, underscores, and must end with .png
+    if (!fileName || !/^[a-zA-Z0-9_-]+\.png$/.test(fileName)) {
+        res.status(400).json({ hasError: true, message: "Invalid filename" });
+        return;
+    }
+
+    const uploadsDir = path.join(publicPath, "uploads");
+    await fs.ensureDir(uploadsDir);
+    const filePath = path.join(uploadsDir, fileName);
     const base64Data = image.replace(/^data:image\/png;base64,/, "");
 
     try {
