@@ -157,7 +157,7 @@ const groupSizesData: IGroupSize[] = [
     {group: 6, size: 3}
 ];
 
-async function main() {
+async function _main() {
     const url = `http://localhost:45145/dev-gd/story-ord/game_table.tsv`;
     const game = new OrdGame();
     await game.Initialize(url, groupSizesData);

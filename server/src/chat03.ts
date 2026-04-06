@@ -158,7 +158,7 @@ async function parseStreamAndCollectToolCalls(aiStream: globalThis.Response/*fet
                         }
                     }
                 }
-            } catch (err) {
+            } catch {
                 // Ignore and continue
             }
         }

@@ -99,12 +99,12 @@ export default class WebglRunner {
         gl.vertexAttribPointer(a_square, 3, gl.FLOAT, false, 0, 0);
 
         // Start the draw loop
-        var me = this;
+        const self = this; // eslint-disable-line @typescript-eslint/no-this-alias
         requestAnimationFrame(drawScene);
 
         // Draw scene
         function drawScene(now: number) {
-            if (me._pause) {
+            if (self._pause) {
                 requestAnimationFrame(drawScene);
                 return;
             }
@@ -127,7 +127,7 @@ export default class WebglRunner {
 
             // Set the resolution, time, and mouse uniforms
             gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-            gl.uniform1f(u_time, (now - me._paused) * 0.001);
+            gl.uniform1f(u_time, (now - self._paused) * 0.001);
             gl.uniform2f(u_mouse, 0, 0.95);
 
             // Set the texture uniform

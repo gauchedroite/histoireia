@@ -3,8 +3,6 @@ import { IOpt } from "./theme.js";
 
 export const NS = "App_ThemeText";
 
-declare const marked: any;
-
 
 export interface IOptText extends IOpt {
     minlength: number

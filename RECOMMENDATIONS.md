@@ -1,17 +1,5 @@
 # Recommendations for HistoireIA
 
-## Infrastructure
-
-### Add minimal CI
-
-A GitHub Action running `tsc --noEmit` on both client and server catches type errors before they reach production.
-
-### Add a linter
-
-No ESLint configuration exists. Start with `@typescript-eslint/recommended` to catch implicit `any` leaks and unsafe assignments.
-
----
-
 ## Nice to Have
 
 ### Add basic API tests

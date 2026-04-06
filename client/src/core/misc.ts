@@ -1,4 +1,5 @@
-﻿// @ts-nocheck
+﻿// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 
 declare const Toastify: any;
 declare const i18n: any;
@@ -13,7 +14,7 @@ let ESC_MAP = <any>{
     "'": "&#39;"
 };
 let tolerance = 0.00012; //for lat/lng fields
-let serverTimezoneOffset: number; //minutes
+let _serverTimezoneOffset: number; //minutes
 
 
 
@@ -24,7 +25,7 @@ const getTimezoneOffset = (timeZone = "UTC") => {
     return (utcDate.getTime() - tzDate.getTime()) / 60000;
 }
 
-serverTimezoneOffset = getTimezoneOffset((<any>window).APP.timeZone);
+_serverTimezoneOffset = getTimezoneOffset((<any>window).APP.timeZone);
 
 
 
@@ -370,7 +371,7 @@ export const fromInputDate = (id: string, defValue: Date | null = null) => {
         date.setFullYear(+parts[0], +parts[1] - 1, +parts[2]);
         return date;
     }
-    catch (error) {
+    catch {
         return null;
     }
 };
@@ -383,7 +384,7 @@ export const parseDateText = (value: string) => {
         date.setHours(0, 0, 0, 0);
         return date;
     }
-    catch (error) {
+    catch {
         return null;
     }
 };

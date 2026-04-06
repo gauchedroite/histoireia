@@ -1,4 +1,4 @@
-name: Typecheck
+name: Typecheck & Lint
 on: [push]
 jobs:
   check:
@@ -8,5 +8,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: cd client && npm ci && npx tsc --noEmit
-      - run: cd server && npm ci && npx tsc --noEmit
+      - run: cd client && npm ci && npx tsc --noEmit && npx eslint src/
+      - run: cd server && npm ci && npx tsc --noEmit && npx eslint src/
