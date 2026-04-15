@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import fs from "fs-extra";
 import path from "path";
-import { rollPbta, resolvePbta } from "./server_tools";
-import { assetsPath, toolsPath } from "./path-names";
+import { assetsPath } from "./path-names";
 import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, GameDefinition } from "./chat-interfaces";
 import { getLlm } from "./lookup";
+import { getToolDefinitions, callTool } from "./tool-registry";
 
 
 export const chat03 = async (req: Request, res: Response) => {
@@ -26,11 +26,7 @@ export const chat03 = async (req: Request, res: Response) => {
         const hasTools = llm.hasTools
 
         // Tools
-        const toolPath = path.join(toolsPath, "roll_pbta.json");
-        const toolContent = await fs.readFile(toolPath, "utf8");
-        const tools: string[] = [];
-        if (hasTools)
-            tools.push(JSON.parse(toolContent))
+        const tools = await getToolDefinitions(hasTools);
 
         // 2. Model config to switch between ollama and openai
         let endpoint = "http://localhost:11434/v1/chat/completions";
@@ -166,15 +162,7 @@ async function parseStreamAndCollectToolCalls(aiStream: globalThis.Response/*fet
 
 //--- 4. Tool executor ---//
 async function executeToolCall(tc: ToolFunctionCall): Promise<ToolResponseMessage> {
-    if (tc.function.name === "roll_pbta") {
-        const parsed = JSON.parse(tc.function.arguments);
-        const res = rollPbta(parsed);
-        return { role: "tool", content: JSON.stringify(res), tool_call_id: tc.id };
-    }
-    else if (tc.function.name === "resolve_pbta") {
-        const parsed = JSON.parse(tc.function.arguments);
-        const res = resolvePbta(parsed);
-        return { role: "tool", content: JSON.stringify(res), tool_call_id: tc.id };
-    }
-    return { role: "tool", content: "Unknown tool", tool_call_id: tc.id };
+    const args = JSON.parse(tc.function.arguments);
+    const result = await callTool(tc.function.name, args);
+    return { role: "tool", content: result, tool_call_id: tc.id };
 }

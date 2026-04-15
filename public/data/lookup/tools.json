@@ -1,0 +1,4 @@
+{
+  "roll_pbta": { "type": "local", "module": "pbta", "definition": "roll_pbta.json" },
+  "resolve_pbta": { "type": "local", "module": "pbta", "definition": "resolve_pbta.json" }
+}
