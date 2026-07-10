@@ -29,12 +29,12 @@ export const chat03 = async (req: Request, res: Response) => {
         const tools = await getToolDefinitions(hasTools);
 
         // 2. Model config to switch between ollama and openai
-        let endpoint = "http://localhost:11434/v1/chat/completions";
+        let endpoint = "http://192.168.50.199:11434/v1/chat/completions";
         let apiKey: string | undefined;
         //
         if (api === "openai") {
-            endpoint = "https://api.openai.com/v1/chat/completions";
-            apiKey = process.env.OPENAI_API_KEY;
+            endpoint = "https://openrouter.ai/api/v1/chat/completions";
+            apiKey = process.env.OPENROUTER_API_KEY;
         }
 
         // 3. Streaming headers

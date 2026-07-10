@@ -32,7 +32,7 @@ Caddy
 
 Express server
 - echo -n -e "\033]0;Express Server\007"
-- export OPENAI_API_KEY={openai api key}
+- export OPENROUTER_API_KEY={openrouter api key}
 - cd dev/histoireia/server && npm run dev
 
 Typescript compiler

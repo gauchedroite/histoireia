@@ -35,7 +35,7 @@
         "id": 5,
         "description": "gpt-4-turbo",
         "provider": "openai",
-        "model": "gpt-4-turbo",
+        "model": "openai/gpt-4-turbo",
         "hasTools": true,
         "hasJsonSchema": false
     },
@@ -43,7 +43,7 @@
         "id": 6,
         "description": "gpt-4o",
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "openai/gpt-4o",
         "hasTools": true,
         "hasJsonSchema": true
     },
@@ -51,7 +51,7 @@
         "id": 7,
         "description": "gpt-4o-mini",
         "provider": "openai",
-        "model": "gpt-4o-mini",
+        "model": "openai/gpt-4o-mini",
         "hasTools": true,
         "hasJsonSchema": true
     },

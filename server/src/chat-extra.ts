@@ -41,14 +41,15 @@ export const chatExtra = async (req: Request, res: Response) => {
         let api_key = null
         //
         if (api == "openai") {
-            endpoint = "https://api.openai.com/v1/chat/completions"
-            api_key = process.env.OPENAI_API_KEY
+            endpoint = "https://openrouter.ai/api/v1/chat/completions"
+            api_key = process.env.OPENROUTER_API_KEY
         }
 
+        const hasApiKey = !!api_key;
         const response = await fetch(endpoint, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${api_key}`,
+                ...(hasApiKey ? { "Authorization": `Bearer ${api_key}` } : {}),
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
