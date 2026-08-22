@@ -1,39 +1,35 @@
-/* Editor — standalone desktop admin stylesheet.
-   Decoupled from the story engine (css/index.css). Desktop-only by design. */
+/* Editor — standalone desktop admin. No theme: browser defaults + layout only. */
 
-:root {
-    --white-bgc: whitesmoke;
-    --accent-bgc: peru;
-    --color-white: papayawhip;
-    --light-bgc: floralwhite;
-    --border: rgba(0, 0, 0, .2);
-    --border-radius: 4px;
+html { user-select: text; }
+body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; }
+
+.ed-wrap { max-width: 720px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
+
+.ed-header { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0 1rem; }
+.ed-header h1, .ed-header h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.ed-spacer { flex: 1; }
+.ed-header code { opacity: 0.5; font-size: 0.8em; }
+
+.ed-table { width: 100%; border-collapse: collapse; }
+.ed-table th, .ed-table td { text-align: left; padding: 0.4rem 0.3rem; border-bottom: 1px solid #ccc; vertical-align: top; }
+.ed-table th { border-bottom-width: 2px; font-weight: 600; }
+.ed-table a { cursor: pointer; text-decoration: none; }
+.ed-table a:hover { text-decoration: underline; }
+
+.ed-error { padding: 0.5rem 0; font-weight: 600; }
+
+.ed-form { display: grid; gap: 1rem; }
+.ed-form label { display: block; }
+.ed-form input, .ed-form textarea, .ed-form select {
+    display: block; width: 100%; box-sizing: border-box; margin-top: 0.25rem; font: inherit; padding: 0.3rem 0.4rem;
 }
-
-html { user-select: text; -webkit-user-select: text; }
-body { background: var(--white-bgc); }
-* { scrollbar-width: auto; }
-*::-webkit-scrollbar { display: block; }
-
-.ed-wrap { max-width: 900px; margin: 0 auto; padding: 1rem; }
-.ed-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; gap: 1rem; }
-.ed-header h1 { font-size: 1.4rem; }
-.ed-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-.ed-table th, .ed-table td { text-align: left; padding: 0.45rem 0.3rem; border-bottom: 1px solid var(--border); }
-.ed-table a { color: var(--accent-bgc); font-weight: 600; }
-.badge { font-size: 75%; background: var(--light-bgc); padding: 1px 6px; border-radius: 4px; }
-.badge-user { background: #e0e7ff; }
-.ed-content { padding: 0.5rem 0; }
-.ed-error { color: firebrick; padding: 0.5rem 0; }
-
-.button { display: inline-block; width: auto; margin: 0; text-decoration: none; cursor: pointer; }
-.button.danger { color: firebrick; }
-.button.save { background: var(--accent-bgc); color: var(--color-white); border: none; }
+.ed-form textarea { font-family: ui-monospace, SFMono-Regular, monospace; resize: vertical; }
+.ed-actions { margin-top: 0.5rem; }
 
 @media (max-width: 768px) {
     #app_root > * { display: none; }
     #app_root::before {
         content: "L'éditeur est disponible sur ordinateur uniquement.";
-        display: block; padding: 2rem; text-align: center; color: firebrick; font-size: 1.2rem;
+        display: block; padding: 2rem; text-align: center; font-size: 1.2rem;
     }
 }
