@@ -64,6 +64,9 @@ Each game lives in `public/assets/<gameid>/` with:
 ## Conventions
 
 - **Never commit unless explicitly instructed.** Make changes, leave them staged or unstaged, and let the user review.
+- When the user reports a compile/watch error you don't reproduce, believe the report — don't dismiss it. The dev `tsc -w` watcher runs incrementally from a cached graph and can surface errors a one-shot `npx tsc` in a fresh process won't reproduce. Investigate the reported file/line, don't re-run and declare "clean for me."
+- New client `.ts` files with no `import`/`export` are global scripts — their top-level names leak globally and collide with other global scripts (TS6200). Add `export {}` to make any new top-level file a module, isolating its scope.
+- **Per-page CSS overrides:** `app.ts` sets `document.body.id = context.toLowerCase()` on each screen (e.g. `gnew`, `menu`, `story`), so `body#<id>` scopes rules to that page alone. Prefer a page-scoped rule (e.g. `#gnew { .app-header { text-align: left; } }` in `public/css/<page>.css`, `@import`-ed by `index.css`) over inline styles or a one-off class — leaves the global rule intact everywhere else.
 - All UI text and game content is in French
 - Game IDs are random 8-letter strings (e.g. `aviwujef`, `calogonu`)
 - User state is file-based: `public/data/users/{username}_{gameid}_state.json`

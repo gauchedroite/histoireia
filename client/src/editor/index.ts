@@ -205,3 +205,5 @@ const init = async () => {
 };
 
 void init();
+
+export {};
