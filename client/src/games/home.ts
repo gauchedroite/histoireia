@@ -39,7 +39,7 @@ const pageTemplate = (form: string) => {
     </div>
 </div>
 <div class="app-footer">
-    <a href="#/editor/new">
+    <a href="#/newgame">
         <div><i class="fa-solid fa-plus"></i>&nbsp;Ajouter un livre</div>
     </a>
     <a href="#" onclick="window.location.back();return false;">

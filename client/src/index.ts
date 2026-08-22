@@ -58,7 +58,7 @@ window.addEventListener("hashchange", () => {
     if (hash.length == 0)
         hash = `#/`;
 
-    if (hash.startsWith("#/editor") || hash.startsWith("#/story"))
+    if (hash.startsWith("#/newgame") || hash.startsWith("#/story"))
         runner?.pause()
     else
         runner?.resume()

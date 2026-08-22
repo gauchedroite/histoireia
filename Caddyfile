@@ -25,6 +25,19 @@ lebaudy.gauchedroite.com {
 	# node must listen to 0.0.0.0
 	# The reverse proxy must target 192.168.50.199
 	#
+	#
+	# Admin editor (editor.html + /editor/* API).
+	# Security is handled HERE, outside the Express app: the /editor/* endpoints
+	# have NO Express auth by design. Uncomment and set credentials to restrict the
+	# editor to admins. (Use `caddy hash-password` to generate the hash.)
+	#
+	# handle /histoireia/editor* {
+	# 	basic_auth {
+	# 		admin <hashed-password>
+	# 	}
+	# 	reverse_proxy localhost:9340
+	# }
+
 	handle_path /histoireia* {
 		reverse_proxy localhost:9340
 	}

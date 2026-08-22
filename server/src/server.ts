@@ -78,15 +78,17 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
                     const metadataPath = path.join(folderPath, "metadata.json");
                     const fileContent = await fs.readFile(metadataPath, "utf8");
                     const data = JSON.parse(fileContent) as GameDefinition;
-                    const hidden = data.justme && data.author != username;
                     const kind = kindList.find(one => one.id == data.kindid)
+                    // ponytail: library = user's own instances (author==username) OR shared games (justme=false with an author).
+                    // Templates (no author) are excluded — they live in the "new game" dropdown only.
+                    const inLibrary = data.author === username || (data.justme === false && !!data.author);
 
-                    if (!hidden && data.code && data.title) {
+                    if (inLibrary && data.code && data.title) {
                         index.push({
                             code: data.code,
                             title: data.title,
                             bg_image: data.bg_image,
-                            bg_url: (data.bg_image ? `assets/billy/${data.bg_image}` : ""),
+                            bg_url: (data.bg_image ? `assets/${data.code}/${data.bg_image}` : ""),
                             promptfile: `${data.code}.txt`,
                             kind_id: kind?.id,
                             kind_fa: kind?.fa
@@ -111,46 +113,48 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
     }
 });
 
-// Fetch a story
+// Shared reader for one game definition (metadata + prompt/data.tsv). Used by the
+// user play endpoint and the admin editor endpoint.
+async function readGameDefinition(gameid: string): Promise<GameDefinition> {
+    const gameid_Path = path.join(assetsPath, gameid);
+    const data = JSON.parse(await fs.readFile(path.join(gameid_Path, "metadata.json"), "utf8")) as GameDefinition;
+    const kind = getKind(data.kindid)!;
+    const contentFile = kind.code === "llm" ? "prompt.txt" : "data.tsv";
+    const prompt = await fs.readFile(path.join(gameid_Path, contentFile), "utf8");
+    const llm = getLlm(data.llmid ?? 1);
+    return {
+        code: data.code,
+        title: data.title,
+        bg_image: data.bg_image,
+        bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
+        prompt,
+        llmid: data.llmid ?? 1,
+        extra: data.extra,
+        author: data.author,
+        justme: data.justme,
+        hasJsonSchema: llm?.hasJsonSchema ?? false,
+        kindid: data.kindid
+    };
+}
+
+// Generate an unused random gameid folder name.
+async function createUniqueGameid(): Promise<{ gameid: string; gameid_Path: string }> {
+    while (true) {
+        const gameid = createFunName();
+        const gameid_Path = path.join(assetsPath, gameid);
+        if (!fs.existsSync(gameid_Path))
+            return { gameid, gameid_Path };
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+// Fetch a story (user side, for playing)
 app.get("/stories/:gameid", async (req: Request, res: Response) => {
     let gameid = sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    let gameid_Path = path.join(assetsPath, gameid)
-
     try {
-        const metadataPath = path.join(gameid_Path, "metadata.json");
-        const metaContent = await fs.readFile(metadataPath, "utf8");
-        const data = JSON.parse(metaContent) as GameDefinition;
-
-        const llm = getLlm(data.llmid)!;
-        const kind = getKind(data.kindid)!;
-
-        let prompt = ""
-        if (kind.code == "llm") {
-            const promptPath = path.join(gameid_Path, "prompt.txt");
-            prompt = await fs.readFile(promptPath, "utf8");
-        }
-        else {
-            const dataPath = path.join(gameid_Path, "data.tsv");
-            prompt = await fs.readFile(dataPath, "utf8");
-        }
-
-        const _game_definition: GameDefinition = {
-            code: data.code,
-            title: data.title,
-            bg_image: data.bg_image,
-            bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
-            prompt,
-            llmid: data.llmid ?? 1,
-            extra: data.extra,
-            author: data.author,
-            justme: data.justme,
-            hasJsonSchema: llm.hasJsonSchema,
-            kindid: data.kindid
-        }
-
-        console.log(`GET /stories/${gameid}`)
-        res.json(_game_definition);
+        console.log(`GET /stories/${gameid}`);
+        res.json(await readGameDefinition(gameid));
     }
     catch (err) {
         console.error(`GET /stories/${gameid}`, err);
@@ -158,73 +162,166 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
-// Update a story
-app.put("/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, extra, author, justme, kindid } = req.body as GameDefinition
-    let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
-    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    let gameid_Path = path.join(assetsPath, gameid)
-
-    if (gameid == "new") {
-        while (true) {
-            gameid = createFunName()
-            gameid_Path = path.join(assetsPath, gameid)
-
-            if (!fs.existsSync(gameid_Path))
-                break
-
-            await new Promise(resolve => setTimeout(resolve, 1000))
-        }
-
-        await fs.mkdir(gameid_Path)
-    }
-
+// List admin-defined templates (no author) for the user "new game" dropdown.
+// Protected by checkAuth (user must be logged in).
+app.get("/templates", checkAuth, async (_req: Request, res: Response) => {
     try {
-        const game = <GameDefinition>{ code: gameid, title, bg_image, llmid: llmid ?? 1, extra, author, justme, kindid }
-
-        const gameid_jsonPath = path.join(gameid_Path, "metadata.json");
-        await fs.writeFile(gameid_jsonPath, JSON.stringify(game));
-
-        if (kindid == 1) {
-            const promptPath = path.join(gameid_Path, "prompt.txt");
-            await fs.writeFile(promptPath, prompt);
+        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
+        const templates: { code: string; title: string; kindid: number }[] = [];
+        for (const entry of entries) {
+            if (!entry.isDirectory()) continue;
+            try {
+                const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
+                if (!meta.author && meta.code && meta.title)
+                    templates.push({ code: meta.code, title: meta.title, kindid: meta.kindid });
+            }
+            catch { /* skip malformed folder */ }
         }
-        else {
-            const dataPath = path.join(gameid_Path, "data.tsv");
-            await fs.writeFile(dataPath, prompt);
+        templates.sort((a, b) => a.title.localeCompare(b.title));
+        res.json(templates);
+    }
+    catch (err) {
+        console.error(`GET /templates`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir les modèles!" });
+    }
+});
+
+// Create a new game instance from a template: copies the prompt/data into a new
+// folder owned by the user. The user never chooses the model — it is inherited
+// from the admin's template. Protected by the /stories checkAuth blanket.
+app.post("/stories/from-template", async (req: Request, res: Response) => {
+    const { templateid, username } = req.body as { templateid: string; username: string };
+    const uname = sanitizeParam(username);
+    const tid = sanitizeParam(templateid);
+    if (!uname || !tid) { res.status(400).json({ hasError: true, message: "Invalid template or username" }); return; }
+
+    const templatePath = path.join(assetsPath, tid);
+    try {
+        const meta = JSON.parse(await fs.readFile(path.join(templatePath, "metadata.json"), "utf8")) as GameDefinition;
+        const kind = getKind(meta.kindid);
+        const contentFile = kind?.code === "llm" ? "prompt.txt" : "data.tsv";
+
+        const { gameid, gameid_Path } = await createUniqueGameid();
+        await fs.mkdir(gameid_Path);
+
+        await fs.copy(path.join(templatePath, contentFile), path.join(gameid_Path, contentFile));
+        if (meta.bg_image) {
+            const imgSrc = path.join(templatePath, meta.bg_image);
+            if (fs.existsSync(imgSrc)) await fs.copy(imgSrc, path.join(gameid_Path, meta.bg_image));
         }
 
-        console.log(`PUT /stories/${gameid}`);
+        // ponytail: instance is user-owned; model inherited from admin's template (user never sets it)
+        const instance = {
+            code: gameid, title: meta.title, bg_image: meta.bg_image,
+            llmid: meta.llmid ?? 1, extra: meta.extra ?? null, kindid: meta.kindid,
+            author: uname, justme: true
+        };
+        await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(instance));
+
+        console.log(`POST /stories/from-template -> ${gameid} (from ${tid}, user ${uname})`);
         res.json({ gameid });
     }
     catch (err) {
-        console.error(`PUT /stories/${gameid}`, err);
+        console.error(`POST /stories/from-template`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de créer l'histoire!" });
+    }
+});
+
+// ---------------------------------------------------------------------------
+// Admin editor API. NO Express auth here — security is handled outside the app
+// (e.g. Caddy basic_auth / IP allowlist on /histoireia/editor*). See Caddyfile.
+// ---------------------------------------------------------------------------
+
+// List every game for the admin editor
+app.get("/editor/stories", async (_req: Request, res: Response) => {
+    try {
+        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
+        const games: { code: string; title: string; kindid: number; author?: string; template: boolean }[] = [];
+        for (const entry of entries) {
+            if (!entry.isDirectory()) continue;
+            try {
+                const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
+                if (meta.code && meta.title)
+                    games.push({ code: meta.code, title: meta.title, kindid: meta.kindid, author: meta.author, template: !meta.author });
+            }
+            catch { /* skip malformed folder */ }
+        }
+        games.sort((a, b) => a.title.localeCompare(b.title));
+        res.json(games);
+    }
+    catch (err) {
+        console.error(`GET /editor/stories`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir la liste!" });
+    }
+});
+
+// Fetch one game for editing (admin)
+app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
+    const gameid = sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
+    try {
+        res.json(await readGameDefinition(gameid));
+    }
+    catch (err) {
+        console.error(`GET /editor/stories/${gameid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'ouvrir le livre!" });
+    }
+});
+
+// Create / update a story (admin). Templates have no author/justme.
+app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
+    const { title, bg_image, prompt, llmid, extra, kindid } = req.body as GameDefinition;
+    let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
+
+    let gameid_Path: string;
+    if (gameid === "new") {
+        const created = await createUniqueGameid();
+        gameid = created.gameid;
+        gameid_Path = created.gameid_Path;
+        await fs.mkdir(gameid_Path);
+    }
+    else {
+        gameid_Path = path.join(assetsPath, gameid);
+    }
+
+    try {
+        const kind = getKind(kindid);
+        // ponytail: templates are admin-owned, never user-owned → no author/justme written
+        const game = { code: gameid, title, bg_image, llmid: llmid ?? 1, extra: extra ?? null, kindid };
+        await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
+
+        if (kind?.code === "llm")
+            await fs.writeFile(path.join(gameid_Path, "prompt.txt"), prompt ?? "");
+        else
+            await fs.writeFile(path.join(gameid_Path, "data.tsv"), prompt ?? "");
+
+        console.log(`PUT /editor/stories/${gameid}`);
+        res.json({ gameid });
+    }
+    catch (err) {
+        console.error(`PUT /editor/stories/${gameid}`, err);
         res.status(500).json({ hasError: true, message: "Impossible de mettre à jour le livre!" });
     }
 });
 
-// Delete a story
-app.delete("/stories/:gameid", async (req: Request, res: Response) => {
+// Delete a story (admin)
+app.delete("/editor/stories/:gameid", async (req: Request, res: Response) => {
     const gameid = sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    const gameid_Path = path.join(assetsPath, gameid)
+    const gameid_Path = path.join(assetsPath, gameid);
 
     try {
         const files = await fs.readdir(gameid_Path);
-
-        // Delete each file in folder
         for (const file of files) {
-            const filePath = path.join(gameid_Path, file);
-            await fs.unlink(filePath);
+            await fs.unlink(path.join(gameid_Path, file));
         }
-
-        // After deleting all files, remove the folder
         await fs.rmdir(gameid_Path);
-        console.log(`DELETE /stories/${gameid}`);
+        console.log(`DELETE /editor/stories/${gameid}`);
         res.status(204).end();
     }
     catch (err) {
-        console.error(`DELETE /stories/${gameid}`, err);
+        console.error(`DELETE /editor/stories/${gameid}`, err);
         res.status(500).json({ hasError: true, message: "Impossible d'effacer le livre!" });
     }
 });

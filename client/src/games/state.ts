@@ -21,8 +21,8 @@ export interface GameDefinition {
     kindid: number | null
     kindid_text: string
     extra: string | null
-    author: string
-    justme: boolean
+    author?: string
+    justme?: boolean
     hasJsonSchema: boolean
 }
 
@@ -92,29 +92,15 @@ class State {
         return this._game_definition
     }
 
-    newStory () {
-        this._game_definition = <GameDefinition> {
-            code: "new",
-            title: "Nouveau!",
-            bg_image: "",
-            prompt: "Tu es un assistant utile.",
-            author: this.username,
-            justme: true,
-            extra: null
-        }
-
-        this._gameid = this._game_definition.code!
+    async fetchTemplatesAsync () {
+        return await App.GET(`templates`) as any as { code: string; title: string; kindid: number }[]
     }
 
-    async saveStoryAsync(game_definition: any) {
+    // Create a new game instance owned by this user, by copying a template's
+    // prompt. The user never chooses the model (inherited from the admin's template).
+    async fromTemplateAsync (templateid: string) {
         this.last_Index_url = null
-        this._game_definition = game_definition
-        return App.PUT(`stories/${this.gameid}`, game_definition)
-    }
-
-    async deleteStoryAsync() {
-        this.last_Index_url = null
-        return App.DELETE(`stories/${this.gameid}`, {})
+        return await App.POST(`stories/from-template`, { templateid, username: this.username }) as any as { gameid: string }
     }
 }
 
