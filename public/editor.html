@@ -7,37 +7,8 @@
 
     <link rel="stylesheet" href="fontawesome710/css/all.min.css">
     <link rel="stylesheet" href="lib/toastify.min.css">
-    <link rel="stylesheet" href="css/index.css">
-    <style>
-        /* Desktop admin layout. The editor is intended for desktop use only. */
-        html { user-select: text; -webkit-user-select: text; }
-        body { background: var(--white-bgc); }
-        * { scrollbar-width: auto; }
-        *::-webkit-scrollbar { display: block; }
-
-        .ed-wrap { max-width: 900px; margin: 0 auto; padding: 1rem; }
-        .ed-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; gap: 1rem; }
-        .ed-header h1 { font-size: 1.4rem; }
-        .ed-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
-        .ed-table th, .ed-table td { text-align: left; padding: 0.45rem 0.3rem; border-bottom: 1px solid var(--border); }
-        .ed-table a { color: var(--accent-bgc); font-weight: 600; }
-        .badge { font-size: 75%; background: var(--light-bgc); padding: 1px 6px; border-radius: 4px; }
-        .badge-user { background: #e0e7ff; }
-        .ed-content { padding: 0.5rem 0; }
-        .ed-error { color: firebrick; padding: 0.5rem 0; }
-
-        .button { display: inline-block; width: auto; margin: 0; text-decoration: none; cursor: pointer; }
-        .button.danger { color: firebrick; }
-        .button.save { background: var(--accent-bgc); color: var(--color-white); border: none; }
-
-        @media (max-width: 768px) {
-            #app_root > * { display: none; }
-            #app_root::before {
-                content: "L'éditeur est disponible sur ordinateur uniquement.";
-                display: block; padding: 2rem; text-align: center; color: firebrick; font-size: 1.2rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
 <body>
     <div id="app_root"></div>
