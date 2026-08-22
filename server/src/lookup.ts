@@ -15,7 +15,7 @@ function loadSync() {
 loadSync();
 
 // Reload on file change
-fs.watch(lookupPath, (_event, filename) => {
+const lookupWatcher = fs.watch(lookupPath, (_event, filename) => {
     if (filename === "llm.json" || filename === "kind.json") {
         try {
             loadSync();
@@ -24,6 +24,11 @@ fs.watch(lookupPath, (_event, filename) => {
         }
     }
 });
+
+// Close the config watcher (used by tests to let the process exit)
+export function stopLookupWatcher() {
+    lookupWatcher.close();
+}
 
 export function getLlmList(): LLMConfig[] {
     return llmList;

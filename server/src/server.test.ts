@@ -3,6 +3,7 @@ import assert from "node:assert";
 import fs from "fs-extra";
 import path from "path";
 import { app } from "./server";
+import { stopLookupWatcher } from "./lookup";
 import { usersPath } from "./path-names";
 import type { Server } from "http";
 
@@ -18,7 +19,10 @@ before(() => {
 
 after(() => {
     return new Promise<void>((resolve) => {
-        server.close(() => resolve());
+        server.close(() => {
+            stopLookupWatcher();
+            resolve();
+        });
     });
 });
 
@@ -56,11 +60,11 @@ describe("GET /stories/:gameid", () => {
 });
 
 describe("GET /users/:username/:gameid", () => {
-    it("returns empty object for nonexistent state", async () => {
+    it("returns empty array for nonexistent state", async () => {
         const res = await fetch(`${BASE}/users/nobodyhere/billy`);
         assert.strictEqual(res.status, 200);
         const body = await res.json();
-        assert.deepStrictEqual(body, "{}");
+        assert.deepStrictEqual(body, []);
     });
 
     it("rejects invalid username", async () => {

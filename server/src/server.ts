@@ -326,7 +326,7 @@ app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
     if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
     let gameid = sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    let state_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
+    let state_Path = path.join(usersPath, `${username}/${gameid}_state.json`)
 
     try {
         let state: any = null;
@@ -354,7 +354,7 @@ app.put("/users/:username/:gameid", async (req: Request, res: Response) => {
     if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
     let gameid = sanitizeParam(req.params.gameid.toLowerCase());
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    let pages_Path = path.join(usersPath, `${username}/${username}_${gameid}_state.json`)
+    let pages_Path = path.join(usersPath, `${username}/${gameid}_state.json`)
 
     try {
         await fs.ensureDir(path.dirname(pages_Path));
