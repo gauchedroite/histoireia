@@ -317,6 +317,26 @@ app.delete("/editor/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
+// Upload the title-page image (admin). Raw body; filename from query.
+// ponytail: no multer — express.raw on the route, filename in the query string.
+app.post("/editor/stories/:gameid/image", express.raw({ type: "*/*", limit: "10mb" }), async (req: Request, res: Response) => {
+    const gameid = sanitizeParam(req.params.gameid);
+    if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
+    const filename = (req.query.filename as string ?? "").toLowerCase();
+    if (!/^[a-z0-9._-]+\.(jpg|jpeg|png|gif|webp)$/.test(filename)) { res.status(400).json({ hasError: true, message: "Invalid filename" }); return; }
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) { res.status(400).json({ hasError: true, message: "No image data" }); return; }
+    try {
+        const gameid_Path = path.join(assetsPath, gameid);
+        await fs.writeFile(path.join(gameid_Path, filename), req.body);
+        console.log(`POST /editor/stories/${gameid}/image -> ${filename}`);
+        res.json({ filename });
+    }
+    catch (err) {
+        console.error(`POST /editor/stories/${gameid}/image`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de téléverser l'image!" });
+    }
+});
+
 
 // ---------------------------------------------------------------------------
 // LLM config editor API. Same no-Express-auth rule as /editor/stories — gated

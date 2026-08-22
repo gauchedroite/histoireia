@@ -110,6 +110,7 @@ const renderEdit = () => {
             <label>Type d'histoire${kindField}</label>
             ${bodyFields}
             <label>Image de la page titre<input name="bg_image" value="${escapeHtml(g.bg_image ?? "")}" maxlength="32"></label>
+            ${isNew ? `<div class="ed-hint">Enregistre d'abord l'histoire pour téléverser une image.</div>` : `<label>Téléverser une image<input type="file" name="bg_image_file" accept="image/*"></label>`}
             <div class="ed-actions"><button type="submit">Enregistrer</button></div>
         </form>
     </div>`;
@@ -120,6 +121,8 @@ const renderEdit = () => {
         form.addEventListener("submit", e => { e.preventDefault(); void save(); });
         const kindSel = form.querySelector("[data-kind]") as HTMLSelectElement | null;
         if (kindSel) kindSel.addEventListener("change", () => { syncForm(); renderEdit(); });
+        const fileInput = form.elements.namedItem("bg_image_file") as HTMLInputElement | null;
+        if (fileInput) fileInput.addEventListener("change", () => { const f = fileInput.files?.[0]; if (f) void uploadImage(f); });
     }
 };
 
@@ -162,6 +165,25 @@ const save = async () => {
         history.back();   // popstate → fetchList (refreshed list reflects the change)
     } catch {
         error = "Impossible d'enregistrer.";
+        renderEdit();
+    }
+};
+
+// ponytail: raw octet-stream body, filename in the query — no multipart/form-data lib.
+const uploadImage = async (file: File) => {
+    if (!editing || isNew) return;
+    try {
+        const buf = await file.arrayBuffer();
+        const res = await fetch(`editor/stories/${gameid}/image?filename=${encodeURIComponent(file.name)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/octet-stream" },
+            body: buf,
+        });
+        if (!res.ok) throw new Error(`${res.status}`);
+        editing.bg_image = (await res.json() as { filename: string }).filename;
+        renderEdit();
+    } catch {
+        error = "Impossible de téléverser l'image.";
         renderEdit();
     }
 };
