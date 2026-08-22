@@ -20,7 +20,6 @@ export interface GameDefinition {
     llmid_text: string
     kindid: number | null
     kindid_text: string
-    extra: string | null
     hasJsonSchema: boolean
 }
 

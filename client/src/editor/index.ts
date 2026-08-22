@@ -13,7 +13,7 @@ type Llm = { id: number; description: string };
 type Summary = { code: string; title: string; kindid: number };
 type GameDef = {
     code: string; title: string; bg_image: string | null; prompt: string;
-    llmid: number; extra: string | null; kindid: number;
+    llmid: number; kindid: number;
 };
 
 const root = document.getElementById("app_root") as HTMLElement;
@@ -81,7 +81,6 @@ const newGame = (): GameDef => ({
     bg_image: null,
     prompt: "Tu es un assistant utile.",
     llmid: llms[0]?.id ?? 1,
-    extra: null,
     kindid: kinds.find(k => k.code === "llm")?.id ?? kinds[0]?.id ?? 1,
 });
 
@@ -95,7 +94,6 @@ const renderEdit = () => {
     const bodyFields = isAdv
         ? `<label>Données (TSV)<textarea name="prompt" rows="18" required>${escapeHtml(g.prompt ?? "")}</textarea></label>`
         : `<label>Prompt<textarea name="prompt" rows="14" required maxlength="8192">${escapeHtml(g.prompt ?? "")}</textarea></label>
-           <label>Extra<input name="extra" value="${escapeHtml(g.extra ?? "")}"></label>
            <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>`;
 
     root.innerHTML = `<div class="ed-wrap">
@@ -135,7 +133,6 @@ const syncForm = () => {
     g.title = val("title");
     g.prompt = val("prompt");
     g.bg_image = val("bg_image") || null;
-    g.extra = val("extra") || null;
     const kindSel = form.elements.namedItem("kindid") as HTMLSelectElement | null;
     const llmSel = form.elements.namedItem("llmid") as HTMLSelectElement | null;
     if (kindSel) g.kindid = Number(kindSel.value);

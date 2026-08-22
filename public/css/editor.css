@@ -26,6 +26,9 @@ body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; margin: 0;
 .ed-form textarea { font-family: ui-monospace, SFMono-Regular, monospace; resize: vertical; }
 .ed-actions { margin-top: 0.5rem; }
 
+.ed-form label:has(input[type="checkbox"]) { display: flex; align-items: center; gap: 0.4rem; }
+.ed-form label:has(input[type="checkbox"]) input { width: auto; margin: 0; }
+
 @media (max-width: 768px) {
     #app_root > * { display: none; }
     #app_root::before {

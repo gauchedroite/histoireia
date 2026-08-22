@@ -4,8 +4,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import { createFunName } from './funny-name';
 import { chat03, chatExtra } from './chat';
-import { assetsPath, publicPath, usersPath } from './path-names';
-import { GameDefinition, GameList } from './chat-interfaces';
+import { assetsPath, lookupPath, publicPath, usersPath } from './path-names';
+import { GameDefinition, GameList, LLMConfig } from './chat-interfaces';
 import { getLlm, getKindList, getKind } from './lookup';
 
 
@@ -125,7 +125,6 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
         prompt,
         llmid: data.llmid ?? 1,
-        extra: data.extra,
         hasJsonSchema: llm?.hasJsonSchema ?? false,
         kindid: data.kindid
     };
@@ -207,7 +206,7 @@ app.post("/stories/from-template", async (req: Request, res: Response) => {
         // ponytail: model inherited from the cloned game (user never sets it)
         const instance = {
             code: gameid, title: meta.title, bg_image: meta.bg_image,
-            llmid: meta.llmid ?? 1, extra: meta.extra ?? null, kindid: meta.kindid
+            llmid: meta.llmid ?? 1, kindid: meta.kindid
         };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(instance));
 
@@ -263,7 +262,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, extra, kindid } = req.body as GameDefinition;
+    const { title, bg_image, prompt, llmid, kindid } = req.body as GameDefinition;
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -280,7 +279,7 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        const game = { code: gameid, title, bg_image, llmid: llmid ?? 1, extra: extra ?? null, kindid };
+        const game = { code: gameid, title, bg_image, llmid: llmid ?? 1, kindid };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
         if (kind?.code === "llm")
@@ -315,6 +314,73 @@ app.delete("/editor/stories/:gameid", async (req: Request, res: Response) => {
     catch (err) {
         console.error(`DELETE /editor/stories/${gameid}`, err);
         res.status(500).json({ hasError: true, message: "Impossible d'effacer le livre!" });
+    }
+});
+
+
+// ---------------------------------------------------------------------------
+// LLM config editor API. Same no-Express-auth rule as /editor/stories — gated
+// by Caddy on /histoireia/editor*. Edits public/data/lookup/llm.json directly;
+// the fs.watch in lookup.ts reloads the in-memory list on change.
+// ---------------------------------------------------------------------------
+
+app.get("/editor/llm", async (_req: Request, res: Response) => {
+    try {
+        const list: LLMConfig[] = JSON.parse(await fs.readFile(path.join(lookupPath, "llm.json"), "utf8"));
+        list.sort((a, b) => a.id - b.id);
+        res.json(list);
+    }
+    catch (err) {
+        console.error("GET /editor/llm", err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir les LLM!" });
+    }
+});
+
+// Create (id "new") / update an LLM (admin).
+app.put("/editor/llm/:id", async (req: Request, res: Response) => {
+    const idParam = req.params.id === "new" ? "new" : sanitizeParam(req.params.id);
+    if (!idParam) { res.status(400).json({ hasError: true, message: "Invalid id" }); return; }
+    const entry = req.body as LLMConfig;
+    const llmPath = path.join(lookupPath, "llm.json");
+    try {
+        const list: LLMConfig[] = JSON.parse(await fs.readFile(llmPath, "utf8"));
+        if (idParam === "new") {
+            entry.id = list.reduce((m, l) => Math.max(m, l.id), 0) + 1;
+            list.push(entry);
+        }
+        else {
+            const i = list.findIndex(l => l.id === Number(idParam));
+            if (i < 0) { res.status(404).json({ hasError: true, message: "LLM introuvable" }); return; }
+            entry.id = Number(idParam);
+            list[i] = entry;
+        }
+        await fs.writeFile(llmPath, JSON.stringify(list, null, 4));
+        console.log(`PUT /editor/llm/${idParam} -> ${entry.id}`);
+        res.json({ id: entry.id });
+    }
+    catch (err) {
+        console.error(`PUT /editor/llm/${idParam}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour le LLM!" });
+    }
+});
+
+// Delete an LLM (admin)
+app.delete("/editor/llm/:id", async (req: Request, res: Response) => {
+    const idParam = sanitizeParam(req.params.id);
+    if (!idParam) { res.status(400).json({ hasError: true, message: "Invalid id" }); return; }
+    const llmPath = path.join(lookupPath, "llm.json");
+    try {
+        const list: LLMConfig[] = JSON.parse(await fs.readFile(llmPath, "utf8"));
+        const i = list.findIndex(l => l.id === Number(idParam));
+        if (i < 0) { res.status(404).json({ hasError: true, message: "LLM introuvable" }); return; }
+        list.splice(i, 1);
+        await fs.writeFile(llmPath, JSON.stringify(list, null, 4));
+        console.log(`DELETE /editor/llm/${idParam}`);
+        res.status(204).end();
+    }
+    catch (err) {
+        console.error(`DELETE /editor/llm/${idParam}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'effacer le LLM!" });
     }
 });
 
@@ -380,7 +446,8 @@ app.post("/chat/:gameid", async (req: Request, res: Response) => {
 // Execute story extra
 app.post("/chat/:gameid/:extraid", async (req: Request, res: Response) => {
     if (!sanitizeParam(req.params.gameid)) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    if (!sanitizeParam(req.params.extraid)) { res.status(400).json({ hasError: true, message: "Invalid extraid" }); return; }
+    // ponytail: extraid names a file in public/data/chat-extra/ (e.g. 3_choix.json); allow underscore
+    if (!/^[a-z0-9_]+$/.test(req.params.extraid)) { res.status(400).json({ hasError: true, message: "Invalid extraid" }); return; }
     chatExtra(req, res)
 });
 

@@ -31,6 +31,7 @@ export interface ToolResponseMessage {
 
 export type LLMConfig = {
     id: number
+    description: string
     provider: string // e.g. 'openai'
     model: string // e.g. 'gpt-4o'
     hasTools: boolean
@@ -52,7 +53,6 @@ export interface GameDefinition {
     prompt: string
     llmid: number
     kindid: number
-    extra?: string | null
     hasJsonSchema: boolean
 }
 
