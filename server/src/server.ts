@@ -341,7 +341,7 @@ app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
 
         let stateContent: string;
         if (!fs.existsSync(state_Path)) {
-            state = "{}";
+            state = [];
         }
         else {
             stateContent = await fs.readFile(state_Path, "utf8");
