@@ -53,8 +53,6 @@ export interface GameDefinition {
     llmid: number
     kindid: number
     extra?: string | null
-    author?: string
-    justme?: boolean
     hasJsonSchema: boolean
 }
 

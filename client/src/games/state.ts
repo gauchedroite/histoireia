@@ -21,8 +21,6 @@ export interface GameDefinition {
     kindid: number | null
     kindid_text: string
     extra: string | null
-    author?: string
-    justme?: boolean
     hasJsonSchema: boolean
 }
 

@@ -10,7 +10,7 @@
 
 type Kind = { id: number; code: string; description: string };
 type Llm = { id: number; description: string };
-type Summary = { code: string; title: string; kindid: number; author?: string; template: boolean };
+type Summary = { code: string; title: string; kindid: number };
 type GameDef = {
     code: string; title: string; bg_image: string | null; prompt: string;
     llmid: number; extra: string | null; kindid: number;
@@ -49,7 +49,6 @@ const renderList = (games: Summary[]) => {
         <tr>
             <td><a href="#" data-open="${escapeHtml(g.code)}">${escapeHtml(g.title)}</a></td>
             <td>${escapeHtml(kindText(g.kindid))}</td>
-            <td>${g.template ? "modèle" : escapeHtml(g.author ?? "")}</td>
         </tr>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
@@ -59,7 +58,7 @@ const renderList = (games: Summary[]) => {
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
         <table class="ed-table">
-            <thead><tr><th>Titre</th><th>Type</th><th>Propriétaire</th></tr></thead>
+            <thead><tr><th>Titre</th><th>Type</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
     </div>`;

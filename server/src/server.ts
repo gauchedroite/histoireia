@@ -79,11 +79,7 @@ app.get("/stories-for/:username", async (req: Request, res: Response) => {
                     const fileContent = await fs.readFile(metadataPath, "utf8");
                     const data = JSON.parse(fileContent) as GameDefinition;
                     const kind = kindList.find(one => one.id == data.kindid)
-                    // ponytail: library = user's own instances (author==username) OR shared games (justme=false with an author).
-                    // Templates (no author) are excluded — they live in the "new game" dropdown only.
-                    const inLibrary = data.author === username || (data.justme === false && !!data.author);
-
-                    if (inLibrary && data.code && data.title) {
+                    if (data.code && data.title) {
                         index.push({
                             code: data.code,
                             title: data.title,
@@ -130,8 +126,6 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         prompt,
         llmid: data.llmid ?? 1,
         extra: data.extra,
-        author: data.author,
-        justme: data.justme,
         hasJsonSchema: llm?.hasJsonSchema ?? false,
         kindid: data.kindid
     };
@@ -162,7 +156,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
-// List admin-defined templates (no author) for the user "new game" dropdown.
+// List all games as cloneable templates for the user "new game" dropdown.
 // Protected by checkAuth (user must be logged in).
 app.get("/templates", checkAuth, async (_req: Request, res: Response) => {
     try {
@@ -172,7 +166,7 @@ app.get("/templates", checkAuth, async (_req: Request, res: Response) => {
             if (!entry.isDirectory()) continue;
             try {
                 const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
-                if (!meta.author && meta.code && meta.title)
+                if (meta.code && meta.title)
                     templates.push({ code: meta.code, title: meta.title, kindid: meta.kindid });
             }
             catch { /* skip malformed folder */ }
@@ -210,11 +204,10 @@ app.post("/stories/from-template", async (req: Request, res: Response) => {
             if (fs.existsSync(imgSrc)) await fs.copy(imgSrc, path.join(gameid_Path, meta.bg_image));
         }
 
-        // ponytail: instance is user-owned; model inherited from admin's template (user never sets it)
+        // ponytail: model inherited from the cloned game (user never sets it)
         const instance = {
             code: gameid, title: meta.title, bg_image: meta.bg_image,
-            llmid: meta.llmid ?? 1, extra: meta.extra ?? null, kindid: meta.kindid,
-            author: uname, justme: true
+            llmid: meta.llmid ?? 1, extra: meta.extra ?? null, kindid: meta.kindid
         };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(instance));
 
@@ -236,13 +229,13 @@ app.post("/stories/from-template", async (req: Request, res: Response) => {
 app.get("/editor/stories", async (_req: Request, res: Response) => {
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
-        const games: { code: string; title: string; kindid: number; author?: string; template: boolean }[] = [];
+        const games: { code: string; title: string; kindid: number }[] = [];
         for (const entry of entries) {
             if (!entry.isDirectory()) continue;
             try {
                 const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
                 if (meta.code && meta.title)
-                    games.push({ code: meta.code, title: meta.title, kindid: meta.kindid, author: meta.author, template: !meta.author });
+                    games.push({ code: meta.code, title: meta.title, kindid: meta.kindid });
             }
             catch { /* skip malformed folder */ }
         }
@@ -268,7 +261,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
-// Create / update a story (admin). Templates have no author/justme.
+// Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
     const { title, bg_image, prompt, llmid, extra, kindid } = req.body as GameDefinition;
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
@@ -287,7 +280,6 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        // ponytail: templates are admin-owned, never user-owned → no author/justme written
         const game = { code: gameid, title, bg_image, llmid: llmid ?? 1, extra: extra ?? null, kindid };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
