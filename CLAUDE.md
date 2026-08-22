@@ -57,12 +57,13 @@ Production build: `cd client && npm run live` (outputs to `../live/`).
 ## Game Content
 
 Each game lives in `public/assets/<gameid>/` with:
-- `metadata.json` — title, author, LLM config, game kind (llm or adv)
+- `metadata.json` — title, LLM config, game kind (llm or adv)
 - `prompt.txt` — system prompt for LLM
 - Optional: background images, `data.tsv` for data-driven adventures
 
 ## Conventions
 
+- **Never commit unless explicitly instructed.** Make changes, leave them staged or unstaged, and let the user review.
 - All UI text and game content is in French
 - Game IDs are random 8-letter strings (e.g. `aviwujef`, `calogonu`)
 - User state is file-based: `public/data/users/{username}_{gameid}_state.json`
