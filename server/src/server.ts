@@ -190,7 +190,9 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
     try {
         if (fs.existsSync(path.join(assetsPath, gameid, "metadata.json"))) {
             console.log(`GET /stories/${gameid}`);
-            res.json(await readGameDefinition(gameid));
+            const def = await readGameDefinition(gameid);
+            def.isInstance = false;
+            res.json(def);
             return;
         }
         const username = sanitizeParam(req.query.user as string);
@@ -201,6 +203,7 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
         const def = await readGameDefinition(inst.templateid);
         def.code = gameid;       // instance id (used in URLs)
         def.title = inst.title;  // instance display title ("Samuel de Champlain (2)")
+        def.isInstance = true;
         console.log(`GET /stories/${gameid} (instance of ${inst.templateid}, user ${username})`);
         res.json(def);
     }
@@ -253,6 +256,29 @@ app.post("/users/:username/instances", async (req: Request, res: Response) => {
     catch (err) {
         console.error(`POST /users/${username}/instances`, err);
         res.status(500).json({ hasError: true, message: "Impossible de créer l'histoire!" });
+    }
+});
+
+// Delete a user's instance (and its state file if any). Templates are shared
+// definitions deleted via the admin editor — this endpoint is instance-only.
+// Protected by the /users checkAuth blanket.
+app.delete("/users/:username/instances/:instanceid", async (req: Request, res: Response) => {
+    let username = sanitizeParam(req.params.username);
+    let instanceid = sanitizeParam(req.params.instanceid);
+    if (!username || !instanceid) { res.status(400).json({ hasError: true, message: "Invalid username or instance id" }); return; }
+    const userDir = path.join(usersPath, username);
+    const instPath = path.join(userDir, `${instanceid}_instance.json`);
+    if (!fs.existsSync(instPath)) { res.status(404).json({ hasError: true, message: "Histoire introuvable" }); return; }
+    try {
+        await fs.unlink(instPath);
+        const statePath = path.join(userDir, `${instanceid}_state.json`);
+        if (fs.existsSync(statePath)) await fs.unlink(statePath);
+        console.log(`DELETE /users/${username}/instances/${instanceid}`);
+        res.status(204).end();
+    }
+    catch (err) {
+        console.error(`DELETE /users/${username}/instances/${instanceid}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'effacer l'histoire!" });
     }
 });
 

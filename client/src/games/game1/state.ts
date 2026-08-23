@@ -147,6 +147,10 @@ class State {
         return base.addInstanceAsync(fromGameid)
     }
 
+    async deleteInstanceAsync (instanceid: string) {
+        return base.deleteInstanceAsync(instanceid)
+    }
+
 
 
     async chatAsync(streamUpdater?: (message: string) => void) {

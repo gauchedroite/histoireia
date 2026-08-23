@@ -47,6 +47,8 @@ const formTemplate = () => {
 
         action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer l'histoire?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
         action(`#" onclick="${NS}.addInstance();return false;`, "Ajouter une histoire", `<i class="fa-thin fa-book-sparkles"></i>`)
+        if (mystate.isInstance)
+            action(`#" onclick="${NS}.openModal('delete');return false;`, "Effacer cette histoire", `<i class="fa-thin fa-trash-can"></i>`)
     }
     add("</div>")
     return rows.join("")
@@ -56,16 +58,21 @@ const layout_Modal = () => {
     if (modalWhat == undefined)
         return ""
 
+    const isDelete = modalWhat == 'delete'
+    const title = isDelete ? "Effacer l'histoire" : "Recommencer l'histoire"
+    const text = isDelete ? "Cette action est irréversible." : "Es-tu certain ?"
+    const confirmIcon = isDelete ? `<i class="fa-regular fa-trash"></i>` : `<i class="fa-regular fa-check"></i>`
+
     return `
     <div class="modal-overlay modal-overlay-visible" onclick="${NS}.cancelModal()"></div>
     <div class="modal" style="display: block; margin-top: -62px;">
         <div class="modal-inner">
-            <div class="modal-title"><b>Recommencer l'histoire</b></div>
-            <div class="modal-text">Es-tu certain ?</div>
+            <div class="modal-title"><b>${title}</b></div>
+            <div class="modal-text">${text}</div>
         </div>
         <div class="modal-buttons modal-buttons-2">
             <span class="modal-button" onclick="${NS}.cancelModal()">Non</span>
-            <span class="modal-button modal-button-bold" onclick="${NS}.executeModal()"><i class="fa-regular fa-check"></i>&nbsp;Oui</span>
+            <span class="modal-button modal-button-bold" onclick="${NS}.executeModal()">${confirmIcon}&nbsp;Oui</span>
         </div>
     </div>
 `
@@ -141,7 +148,15 @@ export const cancelModal = () => {
 }
 
 export const executeModal = () => {
+    const what = modalWhat
     modalWhat = null
+    if (what == 'delete') {
+        App.transitionUI();
+        state.deleteInstanceAsync(gameid)
+            .then(() => { Misc.toastSuccess("Histoire effacée!"); Router.goto(`#/home`); })
+            .catch(App.render);
+        return;
+    }
     App.renderOnNextTick()
     Router.goto(`#/story/${gameid}/new`)
 }

@@ -491,17 +491,20 @@ export const PUT = (url: string, body: any) => {
 };
 
 export const DELETE = (url: string, body: any) => {
-    return fetchWithRetry(apiurl(url),
-        {
-            method: "delete",
-            headers: {
-                "Content-type": "application/json",
-                ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
-            },
-            credentials: "include",
-            mode: "cors",
-            body: JSON.stringify(body, replacer)
-        })
+    // ponytail: omit body when null — bodyParser.json rejects JSON.stringify(null) ("null")
+    const init: RequestInit = {
+        method: "delete",
+        headers: {
+            ...(getAuthHeader() ? { "Authorization": `Bearer ${getAuthHeader()}` } : {}),
+        },
+        credentials: "include",
+        mode: "cors",
+    };
+    if (body != null) {
+        (init.headers as Record<string, string>)["Content-type"] = "application/json";
+        init.body = JSON.stringify(body, replacer);
+    }
+    return fetchWithRetry(apiurl(url), init)
         .then(handleFetch)
         .then(parseJson as any)
         .catch(catchFetch);

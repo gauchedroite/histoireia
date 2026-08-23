@@ -54,6 +54,7 @@ export interface GameDefinition {
     llmid: number
     kindid: number
     hasJsonSchema: boolean
+    isInstance?: boolean
 }
 
 export interface GameList {

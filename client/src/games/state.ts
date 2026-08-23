@@ -22,6 +22,7 @@ export interface GameDefinition {
     kindid: number | null
     kindid_text: string
     hasJsonSchema: boolean
+    isInstance?: boolean
 }
 
 
@@ -96,6 +97,13 @@ class State {
     async addInstanceAsync (fromGameid: string) {
         this.last_Index_url = null
         return await App.POST(`users/${this.username}/instances`, { from: fromGameid }) as any as { instanceid: string }
+    }
+
+    // Delete a user's instance (and its state). Instance-only — templates are
+    // shared and deleted via the admin editor.
+    async deleteInstanceAsync (instanceid: string) {
+        this.last_Index_url = null
+        await App.DELETE(`users/${this.username}/instances/${instanceid}`, null)
     }
 }
 
