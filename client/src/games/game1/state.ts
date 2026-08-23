@@ -143,10 +143,14 @@ class State {
         return base.fetchGameDefinitionAsync(gameid)
     }
 
+    async addInstanceAsync (fromGameid: string) {
+        return base.addInstanceAsync(fromGameid)
+    }
+
 
 
     async chatAsync(streamUpdater?: (message: string) => void) {
-        const endpoint = App.apiurl(`chat/${base.gameid}`)
+        const endpoint = App.apiurl(`chat/${base.gameid}?user=${base.username}`)
         const messages = this.pagesToMessages()
         
         const authHeader = App.getAuthHeader();
@@ -180,7 +184,7 @@ class State {
     }
 
     async chatExtraAsync(extra: string) {
-        const endpoint = App.apiurl(`chat/${base.gameid}/${extra}`)
+        const endpoint = App.apiurl(`chat/${base.gameid}/${extra}?user=${base.username}`)
         const messages = this.pagesToMessages()
 
         const authHeader = App.getAuthHeader();

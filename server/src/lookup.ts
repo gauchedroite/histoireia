@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { lookupPath } from "./path-names";
+import { lookupPath, assetsPath, usersPath } from "./path-names";
 import type { LLMConfig, KindLookup } from "./chat-interfaces";
 
 let llmList: LLMConfig[] = [];
@@ -44,4 +44,17 @@ export function getKindList(): KindLookup[] {
 
 export function getKind(id: number): KindLookup | undefined {
     return kindList.find(one => one.id === id);
+}
+
+// Resolve a gameid (template or per-user instance) to its template id.
+// Templates live in assets/{id}; instances carry their templateid in
+// data/users/{username}/{id}_instance.json. Returns null when unresolvable.
+export async function resolveTemplateId(gameid: string, username?: string): Promise<string | null> {
+    if (fs.existsSync(path.join(assetsPath, gameid, "metadata.json")))
+        return gameid;
+    if (!username) return null;
+    const instPath = path.join(usersPath, username, `${gameid}_instance.json`);
+    if (!fs.existsSync(instPath)) return null;
+    const inst = JSON.parse(await fs.readFile(instPath, "utf8"));
+    return (inst.templateid as string) ?? null;
 }

@@ -64,4 +64,5 @@ export interface GameList {
     promptfile: string
     kind_id: number | undefined
     kind_fa: string | undefined
+    started: boolean
 }

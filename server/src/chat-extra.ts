@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import fs from 'fs-extra';
 import path from 'path';
 import { assetsPath, extraPath } from './path-names';
-import { getLlm } from './lookup';
+import { getLlm, resolveTemplateId } from './lookup';
 
 
 interface Extra {
@@ -13,12 +13,13 @@ interface Extra {
 export const chatExtra = async (req: Request, res: Response) => {
     const gameid = req.params.gameid;
     const extraid = req.params.extraid;
+    const username = (req.query.user as string || "").toLowerCase();
     try {
         const messages = req.body as any
 
-        let gameid_Path = path.join(assetsPath, gameid)
-        const metadataPath = path.join(gameid_Path, "metadata.json");
-        const metaContent = await fs.readFile(metadataPath, "utf8");
+        const templateid = await resolveTemplateId(gameid, username);
+        if (!templateid) { res.status(404).json({ hasError: true, message: "Livre introuvable" }); return; }
+        const metaContent = await fs.readFile(path.join(assetsPath, templateid, "metadata.json"), "utf8");
         const game = JSON.parse(metaContent);
 
         const llm = getLlm(game.llmid)!;

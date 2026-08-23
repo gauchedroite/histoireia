@@ -8,6 +8,7 @@ export interface GameList {
     promptfile: string
     kind_id: number
     kind_fa: string
+    started: boolean
 }
 
 export interface GameDefinition {
@@ -85,19 +86,16 @@ class State {
         }
 
         this._gameid = gameid
-        this._game_definition = await App.GET(`stories/${gameid}`) as unknown as GameDefinition
+        this._game_definition = await App.GET(`stories/${gameid}?user=${this.username}`) as unknown as GameDefinition
         return this._game_definition
     }
 
-    async fetchTemplatesAsync () {
-        return await App.GET(`templates`) as any as { code: string; title: string; kindid: number }[]
-    }
-
-    // Create a new game instance owned by this user, by copying a template's
-    // prompt. The user never chooses the model (inherited from the admin's template).
-    async fromTemplateAsync (templateid: string) {
+    // Create a new blank instance of a game for this user — a private copy that
+    // references a template (prompt/llmid/kind stay in the template; the model is
+    // inherited, the user never chooses it). State is created on first play, not here.
+    async addInstanceAsync (fromGameid: string) {
         this.last_Index_url = null
-        return await App.POST(`stories/from-template`, { templateid, username: this.username }) as any as { gameid: string }
+        return await App.POST(`users/${this.username}/instances`, { from: fromGameid }) as any as { instanceid: string }
     }
 }
 

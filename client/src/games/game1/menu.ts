@@ -45,7 +45,8 @@ const formTemplate = () => {
 
         state.pages().forEach((one, index) => page(index, (index == 0 ? mystate.title! : one.user)))
 
-        action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer le livre?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
+        action(`#" onclick="${NS}.openModal('sitid');return false;`, "Recommencer l'histoire?", `<i class="fa-thin fa-arrow-rotate-left"></i>`)
+        action(`#" onclick="${NS}.addInstance();return false;`, "Ajouter une histoire", `<i class="fa-thin fa-book-sparkles"></i>`)
     }
     add("</div>")
     return rows.join("")
@@ -143,4 +144,17 @@ export const executeModal = () => {
     modalWhat = null
     App.renderOnNextTick()
     Router.goto(`#/story/${gameid}/new`)
+}
+
+// Create a new blank instance of the current game for this user, then jump to
+// its menu ("Commencer la lecture"). The instance is private to the user.
+export const addInstance = () => {
+    if (gameid == "") return;
+    App.transitionUI();
+    state.addInstanceAsync(gameid)
+        .then((payload: { instanceid: string }) => {
+            Misc.toastSuccess("Histoire ajoutée à ta bibliothèque!");
+            Router.goto(`#/menu/${payload.instanceid}`);
+        })
+        .catch(App.render);
 }

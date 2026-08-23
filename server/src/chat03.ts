@@ -3,18 +3,19 @@ import fs from "fs-extra";
 import path from "path";
 import { assetsPath } from "./path-names";
 import type { ChatMessage, ToolFunctionCall, ToolResponseMessage, GameDefinition } from "./chat-interfaces";
-import { getLlm } from "./lookup";
+import { getLlm, resolveTemplateId } from "./lookup";
 import { getToolDefinitions, callTool } from "./tool-registry";
 
 
 export const chat03 = async (req: Request, res: Response) => {
     const gameid = req.params.gameid as string;
+    const username = (req.query.user as string || "").toLowerCase();
     try {
         const messages = req.body as ChatMessage[];
 
-        const gameMetaPath = path.join(assetsPath, gameid, "metadata.json");
-        const metaContent = await fs.readFile(gameMetaPath, "utf8");
-        const gameMeta = JSON.parse(metaContent) as GameDefinition;
+        const templateid = await resolveTemplateId(gameid, username);
+        if (!templateid) { res.status(404).json({ error: "Livre introuvable" }); return; }
+        const gameMeta = JSON.parse(await fs.readFile(path.join(assetsPath, templateid, "metadata.json"), "utf8")) as GameDefinition;
 
         const llm = getLlm(gameMeta.llmid);
         if (!llm) {

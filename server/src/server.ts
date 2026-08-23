@@ -6,7 +6,7 @@ import { createFunName } from './funny-name';
 import { chat03, chatExtra } from './chat';
 import { assetsPath, lookupPath, publicPath, usersPath } from './path-names';
 import { GameDefinition, GameList, LLMConfig } from './chat-interfaces';
-import { getLlm, getKindList, getKind } from './lookup';
+import { getLlm, getKindList, getKind, resolveTemplateId } from './lookup';
 
 
 export const app = express();
@@ -61,50 +61,73 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 
 
-// List stories
+// List stories for a user: shared templates (in assets/) plus this user's
+// private instances (data/users/{user}/*_instance.json). Instances are not
+// visible to other users — they live in the user's own folder.
 app.get("/stories-for/:username", async (req: Request, res: Response) => {
     let username = sanitizeParam(req.params.username);
     if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
     try {
-        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
-        const index: GameList[] = [];
         const kindList = getKindList();
+        const index: GameList[] = [];
 
+        // Templates (shared definitions)
+        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
         for (const entry of entries) {
-            if (entry.isDirectory()) {
-                const folderPath = path.join(assetsPath, entry.name);
+            if (!entry.isDirectory()) continue;
+            try {
+                const data = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
+                const kind = kindList.find(one => one.id == data.kindid);
+                if (data.code && data.title) {
+                    index.push({
+                        code: data.code,
+                        title: data.title,
+                        bg_image: data.bg_image,
+                        bg_url: (data.bg_image ? `assets/${data.code}/${data.bg_image}` : ""),
+                        promptfile: `${data.code}.txt`,
+                        kind_id: kind?.id,
+                        kind_fa: kind?.fa,
+                        started: fs.existsSync(path.join(usersPath, username, `${data.code}_state.json`))
+                    });
+                }
+            }
+            catch (err) {
+                console.error(`GET /stories-for: skipping malformed template ${entry.name}`, err);
+            }
+        }
 
+        // Per-user instances (private copies of a template)
+        const userDir = path.join(usersPath, username);
+        if (fs.existsSync(userDir)) {
+            for (const file of await fs.readdir(userDir)) {
+                if (!file.endsWith("_instance.json")) continue;
                 try {
-                    const metadataPath = path.join(folderPath, "metadata.json");
-                    const fileContent = await fs.readFile(metadataPath, "utf8");
-                    const data = JSON.parse(fileContent) as GameDefinition;
-                    const kind = kindList.find(one => one.id == data.kindid)
-                    if (data.code && data.title) {
-                        index.push({
-                            code: data.code,
-                            title: data.title,
-                            bg_image: data.bg_image,
-                            bg_url: (data.bg_image ? `assets/${data.code}/${data.bg_image}` : ""),
-                            promptfile: `${data.code}.txt`,
-                            kind_id: kind?.id,
-                            kind_fa: kind?.fa
-                        });
-                    }
+                    const inst = JSON.parse(await fs.readFile(path.join(userDir, file), "utf8"));
+                    const tplMeta = JSON.parse(await fs.readFile(path.join(assetsPath, inst.templateid, "metadata.json"), "utf8")) as GameDefinition;
+                    const kind = kindList.find(one => one.id == tplMeta.kindid);
+                    const instanceid = file.replace(/_instance\.json$/, "");
+                    index.push({
+                        code: instanceid,
+                        title: inst.title,
+                        bg_image: tplMeta.bg_image,
+                        bg_url: (tplMeta.bg_image ? `assets/${inst.templateid}/${tplMeta.bg_image}` : ""),
+                        promptfile: "",
+                        kind_id: kind?.id,
+                        kind_fa: kind?.fa,
+                        started: fs.existsSync(path.join(userDir, `${instanceid}_state.json`))
+                    });
                 }
                 catch (err) {
-                    console.error(`GET /stories Error: processing folder ${entry.name}`, err);
-                    res.status(500).json({ hasError: true, message: `Impossible de trouver le livre '${entry.name}'` });
-                    return;
+                    console.error(`GET /stories-for: skipping malformed instance ${file}`, err);
                 }
             }
         }
 
-        index.sort((a, b) => (a.title).localeCompare(b.title))
-
+        index.sort((a, b) => (a.title).localeCompare(b.title));
         res.json(index);
     }
     catch (err) {
-        console.error(`GET /stories Error: scanning directory`, err);
+        console.error(`GET /stories-for/${username}`, err);
         res.status(500).json({ hasError: true, message: "Impossible d'obtenir la liste de livre!" });
     }
 });
@@ -130,7 +153,7 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
     };
 }
 
-// Generate an unused random gameid folder name.
+// Generate an unused random gameid folder name (for the admin editor).
 async function createUniqueGameid(): Promise<{ gameid: string; gameid_Path: string }> {
     while (true) {
         const gameid = createFunName();
@@ -141,13 +164,45 @@ async function createUniqueGameid(): Promise<{ gameid: string; gameid_Path: stri
     }
 }
 
-// Fetch a story (user side, for playing)
+// Fresh unique instance id for a user: not a template folder, and not an
+// existing instance or state file in the user's folder. State files are keyed
+// by the URL id, so an instance id must never collide with a template the user
+// has already played (whose state file would then be overwritten).
+async function createUniqueInstanceId(username: string): Promise<string> {
+    const userDir = path.join(usersPath, username);
+    while (true) {
+        const id = createFunName();
+        const taken =
+            fs.existsSync(path.join(assetsPath, id, "metadata.json")) ||
+            fs.existsSync(path.join(userDir, `${id}_instance.json`)) ||
+            fs.existsSync(path.join(userDir, `${id}_state.json`));
+        if (!taken) return id;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+// Fetch a story (user side, for playing). gameid may be a template (in assets/)
+// or a per-user instance (data/users/{user}/{id}_instance.json), resolved to its
+// template for the prompt/llmid/kind, with the instance's display title.
 app.get("/stories/:gameid", async (req: Request, res: Response) => {
     let gameid = sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
     try {
-        console.log(`GET /stories/${gameid}`);
-        res.json(await readGameDefinition(gameid));
+        if (fs.existsSync(path.join(assetsPath, gameid, "metadata.json"))) {
+            console.log(`GET /stories/${gameid}`);
+            res.json(await readGameDefinition(gameid));
+            return;
+        }
+        const username = sanitizeParam(req.query.user as string);
+        if (!username) { res.status(404).json({ hasError: true, message: "Livre introuvable" }); return; }
+        const instPath = path.join(usersPath, username, `${gameid}_instance.json`);
+        if (!fs.existsSync(instPath)) { res.status(404).json({ hasError: true, message: "Livre introuvable" }); return; }
+        const inst = JSON.parse(await fs.readFile(instPath, "utf8"));
+        const def = await readGameDefinition(inst.templateid);
+        def.code = gameid;       // instance id (used in URLs)
+        def.title = inst.title;  // instance display title ("Samuel de Champlain (2)")
+        console.log(`GET /stories/${gameid} (instance of ${inst.templateid}, user ${username})`);
+        res.json(def);
     }
     catch (err) {
         console.error(`GET /stories/${gameid}`, err);
@@ -155,66 +210,48 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
     }
 });
 
-// List all games as cloneable templates for the user "new game" dropdown.
-// Protected by checkAuth (user must be logged in).
-app.get("/templates", checkAuth, async (_req: Request, res: Response) => {
+// Create a new blank instance of a game for a user, by reference to a template.
+// Copies nothing — the instance just records its templateid + a display title
+// ("<template title> (N)"); the prompt/llmid/kind stay in the template. The state
+// file is created on first play (GET /users/:username/:gameid returns [] when
+// absent). Protected by the /users checkAuth blanket. The model is inherited
+// from the template — the user never chooses it.
+app.post("/users/:username/instances", async (req: Request, res: Response) => {
+    const { from } = req.body as { from: string };
+    let username = sanitizeParam(req.params.username);
+    let fromId = sanitizeParam(from);
+    if (!username || !fromId) { res.status(400).json({ hasError: true, message: "Invalid username or game id" }); return; }
+
     try {
-        const entries = await fs.readdir(assetsPath, { withFileTypes: true });
-        const templates: { code: string; title: string; kindid: number }[] = [];
-        for (const entry of entries) {
-            if (!entry.isDirectory()) continue;
+        const templateid = await resolveTemplateId(fromId, username);
+        if (!templateid) { res.status(404).json({ hasError: true, message: "Livre introuvable" }); return; }
+        const meta = JSON.parse(await fs.readFile(path.join(assetsPath, templateid, "metadata.json"), "utf8")) as GameDefinition;
+
+        const userDir = path.join(usersPath, username);
+        await fs.ensureDir(userDir);
+
+        // First copy is "(2)" — the template is the implicit "(1)".
+        let maxIndex = 1;
+        for (const file of await fs.readdir(userDir)) {
+            if (!file.endsWith("_instance.json")) continue;
             try {
-                const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
-                if (meta.code && meta.title)
-                    templates.push({ code: meta.code, title: meta.title, kindid: meta.kindid });
+                const other = JSON.parse(await fs.readFile(path.join(userDir, file), "utf8"));
+                if (other.templateid === templateid && typeof other.index === "number" && other.index > maxIndex)
+                    maxIndex = other.index;
             }
-            catch { /* skip malformed folder */ }
+            catch { /* ignore corrupt instance file */ }
         }
-        templates.sort((a, b) => a.title.localeCompare(b.title));
-        res.json(templates);
+        const newIndex = maxIndex + 1;
+
+        const instanceid = await createUniqueInstanceId(username);
+        const instance = { templateid, title: `${meta.title} (${newIndex})`, index: newIndex };
+        await fs.writeFile(path.join(userDir, `${instanceid}_instance.json`), JSON.stringify(instance));
+
+        console.log(`POST /users/${username}/instances -> ${instanceid} (from ${templateid}, copy ${newIndex})`);
+        res.json({ instanceid });
     }
     catch (err) {
-        console.error(`GET /templates`, err);
-        res.status(500).json({ hasError: true, message: "Impossible d'obtenir les modèles!" });
-    }
-});
-
-// Create a new game instance from a template: copies the prompt/data into a new
-// folder owned by the user. The user never chooses the model — it is inherited
-// from the admin's template. Protected by the /stories checkAuth blanket.
-app.post("/stories/from-template", async (req: Request, res: Response) => {
-    const { templateid, username } = req.body as { templateid: string; username: string };
-    const uname = sanitizeParam(username);
-    const tid = sanitizeParam(templateid);
-    if (!uname || !tid) { res.status(400).json({ hasError: true, message: "Invalid template or username" }); return; }
-
-    const templatePath = path.join(assetsPath, tid);
-    try {
-        const meta = JSON.parse(await fs.readFile(path.join(templatePath, "metadata.json"), "utf8")) as GameDefinition;
-        const kind = getKind(meta.kindid);
-        const contentFile = kind?.code === "llm" ? "prompt.txt" : "data.tsv";
-
-        const { gameid, gameid_Path } = await createUniqueGameid();
-        await fs.mkdir(gameid_Path);
-
-        await fs.copy(path.join(templatePath, contentFile), path.join(gameid_Path, contentFile));
-        if (meta.bg_image) {
-            const imgSrc = path.join(templatePath, meta.bg_image);
-            if (fs.existsSync(imgSrc)) await fs.copy(imgSrc, path.join(gameid_Path, meta.bg_image));
-        }
-
-        // ponytail: model inherited from the cloned game (user never sets it)
-        const instance = {
-            code: gameid, title: meta.title, bg_image: meta.bg_image,
-            llmid: meta.llmid ?? 1, kindid: meta.kindid
-        };
-        await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(instance));
-
-        console.log(`POST /stories/from-template -> ${gameid} (from ${tid}, user ${uname})`);
-        res.json({ gameid });
-    }
-    catch (err) {
-        console.error(`POST /stories/from-template`, err);
+        console.error(`POST /users/${username}/instances`, err);
         res.status(500).json({ hasError: true, message: "Impossible de créer l'histoire!" });
     }
 });

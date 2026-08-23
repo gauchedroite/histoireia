@@ -5,7 +5,6 @@ import * as menu from "./game1/menu.js"
 import * as menu2 from "./game2/menu.js"
 import * as story from "./game1/story.js"
 import * as story2 from "./game2/story.js"
-import * as newgame from "./newgame.js"
 import * as bonjour from "./bonjour.js"
 
 
@@ -14,7 +13,6 @@ import * as bonjour from "./bonjour.js"
 (window as any)[menu2.NS] = menu2;
 (window as any)[story.NS] = story;
 (window as any)[story2.NS] = story2;
-(window as any)[newgame.NS] = newgame;
 (window as any)[bonjour.NS] = bonjour;
 
 
@@ -32,7 +30,6 @@ export const startup = () => {
     router.addRoute("^#/menu/?(.*)$", params => menu.fetch(params));
     router.addRoute("^#/story2/?(.*)$", params => story2.fetch(params));
     router.addRoute("^#/story/?(.*)$", params => story.fetch(params));
-    router.addRoute("^#/newgame/?$", () => newgame.fetch());
     router.addRoute("^#/bonjour/?(.*)$", params => bonjour.fetch(params));
 }
 
@@ -43,7 +40,6 @@ export const render = () => {
     ${menu2.render()}
     ${story.render()}
     ${story2.render()}
-    ${newgame.render()}
     ${bonjour.render()}
 `
 }
@@ -54,6 +50,5 @@ export const postRender = () => {
     menu2.postRender();
     story.postRender();
     story2.postRender();
-    newgame.postRender();
     bonjour.postRender();
 }

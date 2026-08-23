@@ -19,7 +19,7 @@ const formTemplate = (list: GameList[]) => {
         return `<a href="#/${menu}/${item.code}">
             <div>
                 <div>${item.title}</div>
-                <i class="${item.kind_fa ?? "fa-thin fa-book"}"></i>
+                <i class="fa-thin ${item.started ? "fa-book" : "fa-book-sparkles"}"></i>
             </div>
         </a>`
     })
@@ -39,9 +39,6 @@ const pageTemplate = (form: string) => {
     </div>
 </div>
 <div class="app-footer">
-    <a href="#/newgame">
-        <div><i class="fa-solid fa-plus"></i>&nbsp;Ajouter un livre</div>
-    </a>
     <a href="#" onclick="window.location.back();return false;">
         <div><i class="fa-regular fa-user-alien"></i></i>&nbsp;Bonjour!</div>
     </a>
