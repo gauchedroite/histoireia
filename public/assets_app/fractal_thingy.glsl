@@ -33,4 +33,5 @@ void mainImage( out vec4 c, vec2 p ) {
 
 void main(void) {
     mainImage(gl_FragColor, gl_FragCoord.xy);
+    gl_FragColor.a = 1.0;
 }

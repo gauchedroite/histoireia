@@ -474,6 +474,53 @@ app.delete("/editor/llm/:id", async (req: Request, res: Response) => {
 });
 
 
+// ---------------------------------------------------------------------------
+// Background shader picker API. Same no-Express-auth rule as /editor/stories —
+// gated by Caddy on /histoireia/editor*. Selection is persisted in
+// public/data/lookup/shader.json as { "name": "<fragment-shader-stem>" }.
+// The fragment shaders live in public/assets_app/*.glsl; the vertex shader
+// (_default_vertex_shader.glsl) is shared and not selectable.
+// ---------------------------------------------------------------------------
+const shaderConfigPath = path.join(lookupPath, "shader.json");
+const defaultShaderName = "_default__vertex_shader";
+
+app.get("/editor/shaders", async (_req: Request, res: Response) => {
+    try {
+        const files = (await fs.readdir(path.join(publicPath, "assets_app")))
+            .filter(f => f.endsWith(".glsl") && f !== "_default_vertex_shader.glsl")
+            .map(f => f.slice(0, -5)); // drop .glsl -> stem
+        files.sort();
+        let current = defaultShaderName;
+        try {
+            const cfg = JSON.parse(await fs.readFile(shaderConfigPath, "utf8"));
+            if (typeof cfg.name === "string") current = cfg.name;
+        } catch { /* no config yet -> default */ }
+        res.json({ current, shaders: files });
+    }
+    catch (err) {
+        console.error("GET /editor/shaders", err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir les shaders!" });
+    }
+});
+
+app.put("/editor/shaders", async (req: Request, res: Response) => {
+    const name = typeof req.body?.name === "string" ? req.body.name : null;
+    if (!name || !/^[a-z0-9_]+$/.test(name)) {
+        res.status(400).json({ hasError: true, message: "Nom de shader invalide" });
+        return;
+    }
+    try {
+        await fs.writeFile(shaderConfigPath, JSON.stringify({ name }, null, 4));
+        console.log(`PUT /editor/shaders -> ${name}`);
+        res.json({ name });
+    }
+    catch (err) {
+        console.error("PUT /editor/shaders", err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour le shader!" });
+    }
+});
+
+
 
 // Update the first `user` message (the system prompt snapshot) in every
 // user state file tied to this template: direct plays ({gameid}_state.json)

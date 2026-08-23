@@ -58,7 +58,19 @@ export default class WebglRunner {
 
         // Attach the fragment shader
         var fs = gl.createShader(gl.FRAGMENT_SHADER)!;
-        gl.shaderSource(fs, fstext);
+        var frag = fstext;
+        // ShaderToy implicitly provides iChannel0; shaders ported from there
+        // often reference it without declaring the uniform. Inject the
+        // declaration when we're binding a texture and it's missing, so the
+        // shader compiles instead of throwing "undeclared identifier".
+        if (imagepath && /iChannel0/.test(frag) && !/uniform\s+sampler2D\s+iChannel0/.test(frag))
+            frag = "uniform sampler2D iChannel0;\n" + frag;
+        // ShaderToy runs WebGL2 where texture() exists; WebGL1 (our context)
+        // only has texture2D(). Rewrite bare texture( -> texture2D( so GLSL
+        // ES 1.00 shaders compile. Won't touch textureLod/textureGrad (those
+        // need the matching WebGL1 extension, not a rename).
+        frag = frag.replace(/\btexture\(/g, "texture2D(");
+        gl.shaderSource(fs, frag);
         gl.compileShader(fs);
         if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
             return console.log("Could not compile fragment shader: "+ gl.getShaderInfoLog(fs));

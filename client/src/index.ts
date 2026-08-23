@@ -42,13 +42,20 @@ addEventListener("resize", onresize);
 onresize();
 
 
-// Background shader
+// Background shader. The active fragment shader is chosen in option.html
+// (admin) and persisted in data/lookup/shader.json; we read that static file
+// so the user app never touches the Caddy-gated /editor/* endpoints.
+const DEFAULT_SHADER = "_default__vertex_shader";
 const runner = new WebglRunner()
 setTimeout(async () => {
-    const shader_name = "_default__vertex_shader"
     const canvas = document.getElementById("app_canvas")! as HTMLCanvasElement
     const vertexShader = await (await window.fetch(`./assets_app/_default_vertex_shader.glsl`)).text()
-    const fragmentShader = await (await window.fetch(`./assets_app/${shader_name}.glsl`)).text()
+    let shaderName = DEFAULT_SHADER;
+    try {
+        const cfg = await (await window.fetch(`./data/lookup/shader.json`, { cache: "no-cache" })).json();
+        if (typeof cfg?.name === "string") shaderName = cfg.name;
+    } catch { /* no config yet -> default */ }
+    const fragmentShader = await (await window.fetch(`./assets_app/${shaderName}.glsl`)).text()
     runner.run(canvas, fragmentShader, vertexShader, "./images/stars-512x512.jpg")
 }, 0);
 
