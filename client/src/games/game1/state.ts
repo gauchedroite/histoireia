@@ -27,7 +27,6 @@ export interface IChoice {
 
 class State {
     private _pages: IPage[] = []
-    private last_StorySoFar_url: string | null = null
 
 
     constructor() {
@@ -41,27 +40,16 @@ class State {
     //
     // Managing the state
     //
+    // Always fetch fresh — the URL cache never invalidated, so a running SPA
+    // kept the pre-edit pages[0].user (system prompt) and chatted with the
+    // old prompt even after the admin updated the state file on disk.
     async fetchStorySoFarAsync (gameid?: string) {
         if (gameid != undefined)
             base.gameid = gameid
 
         const url = `users/${base.username}/${base.gameid}`
-
-        if (url != this.last_StorySoFar_url) {
-            return App.GET(url)
-            .then((payload: any) => {
-                this.last_StorySoFar_url = url
-                this._pages = payload;
-                return this._pages
-            })
-        }
-        else {
-            return Promise
-                .resolve()
-                .then(_ => {
-                    return this._pages
-                })
-        }
+        this._pages = await App.GET(url) as any
+        return this._pages
     }
 
     async addUserMessageAsync (content: string, pageno: number) {

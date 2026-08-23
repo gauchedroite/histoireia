@@ -14,6 +14,7 @@ type Summary = { code: string; title: string; kindid: number };
 type GameDef = {
     code: string; title: string; bg_image: string | null; prompt: string;
     llmid: number; kindid: number;
+    update_users?: boolean;
 };
 
 const root = document.getElementById("app_root") as HTMLElement;
@@ -94,7 +95,8 @@ const renderEdit = () => {
     const bodyFields = isAdv
         ? `<label>Données (TSV)<textarea name="prompt" rows="18" required>${escapeHtml(g.prompt ?? "")}</textarea></label>`
         : `<label>Prompt<textarea name="prompt" rows="14" required maxlength="8192">${escapeHtml(g.prompt ?? "")}</textarea></label>
-           <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>`;
+           <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>
+           <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users ? " checked" : ""}> Mettre à jour les histoires des usagers</label>`;
 
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
@@ -138,8 +140,10 @@ const syncForm = () => {
     g.bg_image = val("bg_image") || null;
     const kindSel = form.elements.namedItem("kindid") as HTMLSelectElement | null;
     const llmSel = form.elements.namedItem("llmid") as HTMLSelectElement | null;
+    const updateUsers = form.elements.namedItem("update_users") as HTMLInputElement | null;
     if (kindSel) g.kindid = Number(kindSel.value);
     if (llmSel) g.llmid = Number(llmSel.value);
+    if (updateUsers) g.update_users = updateUsers.checked;
 };
 
 const openStory = async (id: string) => {

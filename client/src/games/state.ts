@@ -81,11 +81,10 @@ class State {
         }
     }
 
+    // Always fetch fresh — caching by gameid left a running SPA stale after an
+    // admin prompt edit, and resetMessagesAsync() would write the cached
+    // (old) prompt back to the state file, clobbering the server-side update.
     async fetchGameDefinitionAsync (gameid: string) {
-        if (this._gameid == gameid) {
-            return this._game_definition
-        }
-
         this._gameid = gameid
         this._game_definition = await App.GET(`stories/${gameid}?user=${this.username}`) as unknown as GameDefinition
         return this._game_definition

@@ -325,7 +325,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, kindid } = req.body as GameDefinition;
+    const { title, bg_image, prompt, llmid, kindid, update_users } = req.body as GameDefinition & { update_users?: boolean };
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -349,6 +349,12 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
             await fs.writeFile(path.join(gameid_Path, "prompt.txt"), prompt ?? "");
         else
             await fs.writeFile(path.join(gameid_Path, "data.tsv"), prompt ?? "");
+
+        // Update the saved system prompt (first `user` message) in every user
+        // state file for this story — direct plays and instance copies alike.
+        // ponytail: O(users × instances) scan; fine for a single-admin editor.
+        if (update_users && kind?.code === "llm")
+            await updateUserStates(gameid, prompt ?? "");
 
         console.log(`PUT /editor/stories/${gameid}`);
         res.json({ gameid });
@@ -468,6 +474,43 @@ app.delete("/editor/llm/:id", async (req: Request, res: Response) => {
 });
 
 
+
+// Update the first `user` message (the system prompt snapshot) in every
+// user state file tied to this template: direct plays ({gameid}_state.json)
+// and instance copies ({instanceid}_state.json where the instance's
+// templateid === gameid). Called from the admin editor when the author asks
+// to propagate a prompt edit to in-progress games.
+async function updateUserStates(gameid: string, prompt: string) {
+    const userDirs = await fs.readdir(usersPath, { withFileTypes: true });
+    for (const userEntry of userDirs) {
+        if (!userEntry.isDirectory()) continue;
+        const userDir = path.join(usersPath, userEntry.name);
+
+        // State-file ids belonging to this template: the direct id, plus any
+        // instance id whose _instance.json records this templateid.
+        const stateIds = new Set<string>([gameid]);
+        for (const file of await fs.readdir(userDir)) {
+            if (!file.endsWith("_instance.json")) continue;
+            try {
+                const inst = JSON.parse(await fs.readFile(path.join(userDir, file), "utf8"));
+                if (inst.templateid === gameid)
+                    stateIds.add(file.replace(/_instance\.json$/, ""));
+            } catch { /* skip corrupt instance file */ }
+        }
+
+        for (const id of stateIds) {
+            const statePath = path.join(userDir, `${id}_state.json`);
+            if (!fs.existsSync(statePath)) continue;
+            try {
+                const state = JSON.parse(await fs.readFile(statePath, "utf8"));
+                if (Array.isArray(state) && state.length > 0 && state[0] && typeof state[0] === "object" && "user" in state[0]) {
+                    state[0].user = prompt;
+                    await fs.writeFile(statePath, JSON.stringify(state));
+                }
+            } catch { /* skip corrupt state file */ }
+        }
+    }
+}
 
 // Fetch story state of user
 app.get("/users/:username/:gameid", async (req: Request, res: Response) => {
