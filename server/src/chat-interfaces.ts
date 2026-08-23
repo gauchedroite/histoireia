@@ -50,6 +50,7 @@ export interface GameDefinition {
     title: string
     bg_url: string
     bg_image: string | null
+    music: string | null
     prompt: string
     llmid: number
     kindid: number

@@ -12,7 +12,7 @@ type Kind = { id: number; code: string; description: string };
 type Llm = { id: number; description: string };
 type Summary = { code: string; title: string; kindid: number; llmid: number };
 type GameDef = {
-    code: string; title: string; bg_image: string | null; prompt: string;
+    code: string; title: string; bg_image: string | null; music: string | null; prompt: string;
     llmid: number; kindid: number;
     update_users?: boolean;
 };
@@ -29,6 +29,7 @@ const api = {
 
 let kinds: Kind[] = [];
 let llms: Llm[] = [];
+let musicFiles: string[] = [];
 let advKindId = 0;
 let editing: GameDef | null = null;
 let gameid = "";
@@ -46,6 +47,9 @@ const llmOptions = (selected: number) =>
     llms.map(l => `<option value="${l.id}"${l.id === selected ? " selected" : ""}>${escapeHtml(l.description)}</option>`).join("");
 
 // ---------- list ----------
+const musicOptions = (selected: string | null) =>
+    [`<option value=""${!selected ? " selected" : ""}>Aucune</option>`,
+        ...musicFiles.map(f => `<option value="${escapeHtml(f)}"${f === selected ? " selected" : ""}>${escapeHtml(f)}</option>`)].join("");
 const renderList = (games: Summary[]) => {
     const rows = games.map(g => `
         <tr>
@@ -83,6 +87,7 @@ const newGame = (): GameDef => ({
     code: "new",
     title: "Nouvelle histoire",
     bg_image: null,
+    music: null,
     prompt: "Tu es un assistant utile.",
     llmid: llms[0]?.id ?? 1,
     kindid: kinds.find(k => k.code === "llm")?.id ?? kinds[0]?.id ?? 1,
@@ -115,6 +120,7 @@ const renderEdit = () => {
             <label>Type d'histoire${kindField}</label>
             ${bodyFields}
             <label>Image de la page titre<input name="bg_image" value="${escapeHtml(g.bg_image ?? "")}" maxlength="32"></label>
+            <label>Musique<select name="music">${musicOptions(g.music)}</select></label>
             ${isNew ? `<div class="ed-hint">Enregistre d'abord l'histoire pour téléverser une image.</div>` : `<label>Téléverser une image<input type="file" name="bg_image_file" accept="image/*"></label>`}
             <div class="ed-actions"><button type="submit">Enregistrer</button></div>
         </form>
@@ -141,6 +147,7 @@ const syncForm = () => {
     g.title = val("title");
     g.prompt = val("prompt");
     g.bg_image = val("bg_image") || null;
+    g.music = val("music") || null;
     const kindSel = form.elements.namedItem("kindid") as HTMLSelectElement | null;
     const llmSel = form.elements.namedItem("llmid") as HTMLSelectElement | null;
     const updateUsers = form.elements.namedItem("update_users") as HTMLInputElement | null;
@@ -225,9 +232,10 @@ document.addEventListener("click", e => {
 window.addEventListener("popstate", () => { void fetchList(); });
 
 const init = async () => {
-    [kinds, llms] = await Promise.all([
+    [kinds, llms, musicFiles] = await Promise.all([
         api.get<Kind[]>("data/lookup/kind.json"),
         api.get<Llm[]>("data/lookup/llm.json"),
+        api.get<{ files: string[] }>("editor/music").then(r => r.files),
     ]);
     advKindId = kinds.find(k => k.code === "adv")?.id ?? 0;
     await fetchList();

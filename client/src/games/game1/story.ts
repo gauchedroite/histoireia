@@ -19,6 +19,22 @@ let editable = false
 let helping = false
 let choices: IChoice[];
 
+// Background music for the story screen. Looping <audio>, started when the
+// story context is active and the game has a music file, stopped on leave.
+// ponytail: one module-level element, no player UI — add controls if needed.
+let audio: HTMLAudioElement | null = null;
+const stopMusic = () => { if (audio) { audio.pause(); audio = null; } };
+const ensureMusic = (file: string | null) => {
+    if (!file) { stopMusic(); return; }
+    const src = App.url(`assets_app/music/${encodeURIComponent(file)}`);
+    if (audio && audio.dataset.src === src) { if (audio.paused) void audio.play().catch(() => {}); return; }
+    stopMusic();
+    audio = new Audio(src);
+    audio.loop = true;
+    audio.dataset.src = src;
+    void audio.play().catch(() => {});
+};
+
 
 
 const formTemplate = () => {
@@ -170,7 +186,8 @@ export const fetch = (args: string[] | undefined) => {
 }
 
 export const render = () => {
-    if (!App.inContext(NS)) return "";
+    if (!App.inContext(NS)) { stopMusic(); return ""; }
+    ensureMusic(mystate?.music ?? null);
 
     const form = formTemplate()
     return pageTemplate(form)

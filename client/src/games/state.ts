@@ -16,6 +16,7 @@ export interface GameDefinition {
     title: string | null
     bg_url: string | null
     bg_image: string | null
+    music: string | null
     prompt: string | null
     llmid: number | null
     llmid_text: string

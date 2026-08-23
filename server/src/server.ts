@@ -146,6 +146,7 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         title: data.title,
         bg_image: data.bg_image,
         bg_url: (data.bg_image ? `assets/${gameid}/${data.bg_image}` : ""),
+        music: data.music ?? null,
         prompt,
         llmid: data.llmid ?? 1,
         hasJsonSchema: llm?.hasJsonSchema ?? false,
@@ -325,7 +326,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, prompt, llmid, kindid, update_users } = req.body as GameDefinition & { update_users?: boolean };
+    const { title, bg_image, music, prompt, llmid, kindid, update_users } = req.body as GameDefinition & { update_users?: boolean };
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -342,7 +343,7 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        const game = { code: gameid, title, bg_image, llmid: llmid ?? 1, kindid };
+        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
         if (kind?.code === "llm")
