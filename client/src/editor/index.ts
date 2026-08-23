@@ -57,6 +57,7 @@ const renderList = (games: Summary[]) => {
         <header class="ed-header">
             <h1>Éditeur</h1>
             <span class="ed-spacer"></span>
+            <a href="admin.html">Admin</a>
             <button type="button" data-act="new">Nouvelle histoire</button>
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}

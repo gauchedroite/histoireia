@@ -27,6 +27,7 @@ const render = () => {
         <header class="ed-header">
             <h1>Shader d'arrière-plan</h1>
             <span class="ed-spacer"></span>
+            <a href="admin.html">Admin</a>
             <a href="index.html">← Retour</a>
         </header>
         ${error ? `<div class="ed-error">${error}</div>` : ""}

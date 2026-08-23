@@ -478,7 +478,7 @@ app.delete("/editor/llm/:id", async (req: Request, res: Response) => {
 // Background shader picker API. Same no-Express-auth rule as /editor/stories —
 // gated by Caddy on /histoireia/editor*. Selection is persisted in
 // public/data/lookup/shader.json as { "name": "<fragment-shader-stem>" }.
-// The fragment shaders live in public/assets_app/*.glsl; the vertex shader
+// The fragment shaders live in public/assets_app/shader/*.glsl; the vertex shader
 // (_default_vertex_shader.glsl) is shared and not selectable.
 // ---------------------------------------------------------------------------
 const shaderConfigPath = path.join(lookupPath, "shader.json");
@@ -486,7 +486,7 @@ const defaultShaderName = "_default__vertex_shader";
 
 app.get("/editor/shaders", async (_req: Request, res: Response) => {
     try {
-        const files = (await fs.readdir(path.join(publicPath, "assets_app")))
+        const files = (await fs.readdir(path.join(publicPath, "assets_app", "shader")))
             .filter(f => f.endsWith(".glsl") && f !== "_default_vertex_shader.glsl")
             .map(f => f.slice(0, -5)); // drop .glsl -> stem
         files.sort();

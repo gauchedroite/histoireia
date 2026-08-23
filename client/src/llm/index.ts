@@ -43,6 +43,7 @@ const renderList = () => {
         <header class="ed-header">
             <h1>LLM</h1>
             <span class="ed-spacer"></span>
+            <a href="admin.html">Admin</a>
             <button type="button" data-act="new">Nouveau LLM</button>
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
