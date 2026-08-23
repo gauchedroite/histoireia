@@ -566,7 +566,7 @@ app.put("/editor/shaders", async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 const musicDir = path.join(publicPath, "assets_app", "music");
 const musicExt = /\.(mp3|wav|ogg|oga|m4a|aac|flac|opus)$/i;
-const musicName = /^[a-z0-9._ -]+$/;
+const musicName = /^[a-z0-9._() -]+$/;
 
 app.get("/editor/music", async (_req: Request, res: Response) => {
     try {
