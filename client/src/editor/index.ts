@@ -10,7 +10,7 @@
 
 type Kind = { id: number; code: string; description: string };
 type Llm = { id: number; description: string };
-type Summary = { code: string; title: string; kindid: number };
+type Summary = { code: string; title: string; kindid: number; llmid: number };
 type GameDef = {
     code: string; title: string; bg_image: string | null; prompt: string;
     llmid: number; kindid: number;
@@ -41,6 +41,7 @@ const escapeHtml = (s: string): string =>
 const kindText = (id: number): string => kinds.find(k => k.id === id)?.description ?? "";
 const kindOptions = (selected: number) =>
     kinds.map(k => `<option value="${k.id}"${k.id === selected ? " selected" : ""}>${escapeHtml(k.description)}</option>`).join("");
+const llmText = (id: number): string => llms.find(l => l.id === id)?.description ?? "";
 const llmOptions = (selected: number) =>
     llms.map(l => `<option value="${l.id}"${l.id === selected ? " selected" : ""}>${escapeHtml(l.description)}</option>`).join("");
 
@@ -50,6 +51,7 @@ const renderList = (games: Summary[]) => {
         <tr>
             <td><a href="#" data-open="${escapeHtml(g.code)}">${escapeHtml(g.title)}</a></td>
             <td>${escapeHtml(kindText(g.kindid))}</td>
+            <td>${g.kindid === advKindId ? "" : escapeHtml(llmText(g.llmid))}</td>
         </tr>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
@@ -59,7 +61,7 @@ const renderList = (games: Summary[]) => {
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
         <table class="ed-table">
-            <thead><tr><th>Titre</th><th>Type</th></tr></thead>
+            <thead><tr><th>Titre</th><th>Type</th><th>LLM</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
     </div>`;

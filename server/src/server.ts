@@ -291,13 +291,13 @@ app.delete("/users/:username/instances/:instanceid", async (req: Request, res: R
 app.get("/editor/stories", async (_req: Request, res: Response) => {
     try {
         const entries = await fs.readdir(assetsPath, { withFileTypes: true });
-        const games: { code: string; title: string; kindid: number }[] = [];
+        const games: { code: string; title: string; kindid: number; llmid: number }[] = [];
         for (const entry of entries) {
             if (!entry.isDirectory()) continue;
             try {
                 const meta = JSON.parse(await fs.readFile(path.join(assetsPath, entry.name, "metadata.json"), "utf8")) as GameDefinition;
                 if (meta.code && meta.title)
-                    games.push({ code: meta.code, title: meta.title, kindid: meta.kindid });
+                    games.push({ code: meta.code, title: meta.title, kindid: meta.kindid, llmid: meta.llmid ?? 1 });
             }
             catch { /* skip malformed folder */ }
         }
