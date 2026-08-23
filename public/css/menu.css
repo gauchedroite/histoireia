@@ -1,5 +1,10 @@
 
 #screen_menu {
+    .app-header > :nth-child(2) {
+        text-align: right;
+        width: auto;
+    }
+
     .app-content {
         height: calc(var(--height) - var(--header-height) - var(--sait) - var(--saib));
         padding: 0;

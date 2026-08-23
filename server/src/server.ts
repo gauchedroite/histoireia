@@ -283,6 +283,42 @@ app.delete("/users/:username/instances/:instanceid", async (req: Request, res: R
     }
 });
 
+// Per-user favorites list (gameids). Mirror of the state-file pattern: GET
+// returns string[], PUT overwrites it. Single favorites.json per user dir.
+// Protected by the /users checkAuth blanket.
+app.get("/users/:username/favorites", async (req: Request, res: Response) => {
+    const username = sanitizeParam(req.params.username);
+    if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
+    try {
+        const favPath = path.join(usersPath, username, "favorites.json");
+        let list: string[] = [];
+        if (fs.existsSync(favPath)) list = JSON.parse(await fs.readFile(favPath, "utf8"));
+        res.json(list);
+    }
+    catch (err) {
+        console.error(`GET /users/${username}/favorites`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de lire les favoris!" });
+    }
+});
+
+app.put("/users/:username/favorites", async (req: Request, res: Response) => {
+    const username = sanitizeParam(req.params.username);
+    if (!username) { res.status(400).json({ hasError: true, message: "Invalid username" }); return; }
+    try {
+        const list = (Array.isArray(req.body) ? req.body : [])
+            .filter((g: unknown) => typeof g === "string" && /^[a-z0-9]+$/.test(g));
+        const userDir = path.join(usersPath, username);
+        await fs.ensureDir(userDir);
+        await fs.writeFile(path.join(userDir, "favorites.json"), JSON.stringify(list));
+        console.log(`PUT /users/${username}/favorites (${list.length})`);
+        res.json(list);
+    }
+    catch (err) {
+        console.error(`PUT /users/${username}/favorites`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'enregistrer les favoris!" });
+    }
+});
+
 // ---------------------------------------------------------------------------
 // Admin editor API. NO Express auth here — security is handled outside the app
 // (e.g. Caddy basic_auth / IP allowlist on /histoireia/editor*). See Caddyfile.

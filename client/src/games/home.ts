@@ -12,14 +12,26 @@ export const NS = "GHOME";
 // });
 
 
+let favorites: string[] = []
+const fetchFavoritesAsync = () =>
+    App.GET(`users/${state.username}/favorites`).then((list: any) => { favorites = Array.isArray(list) ? list : [] })
+
 const formTemplate = (list: GameList[]) => {
-    const games = list.map(item => {
+    const sorted = list.slice().sort((a, b) => {
+        const fa = favorites.includes(a.code) ? 1 : 0
+        const fb = favorites.includes(b.code) ? 1 : 0
+        return fb - fa
+    })
+    const games = sorted.map(item => {
         const menu = item.kind_id == LUID_KIND_ADV ? `menu2` : `menu`;
+        const icon = favorites.includes(item.code)
+            ? `fa-solid fa-heart`
+            : `fa-thin ${item.started ? "fa-book" : "fa-book-sparkles"}`
         
         return `<a href="#/${menu}/${item.code}">
             <div>
                 <div>${item.title}</div>
-                <i class="fa-thin ${item.started ? "fa-book" : "fa-book-sparkles"}"></i>
+                <i class="${icon}"></i>
             </div>
         </a>`
     })
@@ -50,7 +62,7 @@ const pageTemplate = (form: string) => {
 
 export const fetch = async (_args: string[] | undefined) => {
     App.prepareRender(NS, "Home", "screen_home")
-    state.fetchIndexAsync()
+    Promise.all([state.fetchIndexAsync(), fetchFavoritesAsync()])
         .then(App.untransitionUI)
         .then(App.render)
         .catch(App.render);

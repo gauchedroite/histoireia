@@ -36,6 +36,10 @@ class State {
         return base.usernameCapitalized
     }
 
+    get username() {
+        return base.username
+    }
+
     
     //
     // Managing the state

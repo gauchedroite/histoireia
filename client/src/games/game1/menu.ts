@@ -13,6 +13,18 @@ let gameid = ""
 let lastPage = 0;
 let modalWhat: string | null = null
 
+let favorites: string[] = []
+const isFavorite = () => favorites.includes(gameid)
+export const toggleFavorite = () => {
+    const i = favorites.indexOf(gameid)
+    if (i >= 0) favorites.splice(i, 1); else favorites.push(gameid)
+    App.renderOnNextTick()
+    App.PUT(`users/${state.username}/favorites`, favorites).catch(App.render)
+}
+const fetchFavoritesAsync = () =>
+    App.GET(`users/${state.username}/favorites`).then((list: any) => { favorites = Array.isArray(list) ? list : [] })
+
+
 
 
 const formTemplate = () => {
@@ -84,6 +96,9 @@ const pageTemplate = (form: string, modal: string) => {
     <a href="#/home">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;Bibliothèque de ${state.usernameCapitalized}
     </a>
+    <a href="#" onclick="${NS}.toggleFavorite();return false;">
+        <i class="${isFavorite() ? "fa-solid" : "fa-thin"} fa-heart"></i>
+    </a>
 </div>
 <div class="app-content">
     ${form}
@@ -101,7 +116,8 @@ export const fetch = (args: string[] | undefined) => {
     Promise.all
         ([
             state.fetchGameDefinitionAsync(gameid),
-            state.fetchStorySoFarAsync(gameid)
+            state.fetchStorySoFarAsync(gameid),
+            fetchFavoritesAsync()
         ])
         .then(payloads => {
             mystate = Misc.clone(payloads[0]) as GameDefinition
