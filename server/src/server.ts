@@ -521,6 +521,66 @@ app.put("/editor/shaders", async (req: Request, res: Response) => {
 });
 
 
+// ---------------------------------------------------------------------------
+// Music library (admin). Files live in public/assets_app/music/* and are
+// served statically at /assets_app/music/<file>. Same no-Express-auth rule
+// as the rest of /editor* — gated by Caddy.
+// ponytail: no multer — express.raw on the route, filename in the query string.
+// ---------------------------------------------------------------------------
+const musicDir = path.join(publicPath, "assets_app", "music");
+const musicExt = /\.(mp3|wav|ogg|oga|m4a|aac|flac|opus)$/i;
+const musicName = /^[a-z0-9._ -]+$/;
+
+app.get("/editor/music", async (_req: Request, res: Response) => {
+    try {
+        await fs.ensureDir(musicDir);
+        const files = (await fs.readdir(musicDir)).filter(f => musicExt.test(f));
+        files.sort();
+        res.json({ files });
+    }
+    catch (err) {
+        console.error("GET /editor/music", err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir la liste de musique!" });
+    }
+});
+
+app.post("/editor/music", express.raw({ type: "*/*", limit: "50mb" }), async (req: Request, res: Response) => {
+    const filename = (req.query.filename as string ?? "").toLowerCase();
+    if (!musicName.test(filename) || !musicExt.test(filename)) {
+        res.status(400).json({ hasError: true, message: "Nom de fichier invalide" }); return;
+    }
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        res.status(400).json({ hasError: true, message: "Aucune donnée reçue" }); return;
+    }
+    try {
+        await fs.ensureDir(musicDir);
+        await fs.writeFile(path.join(musicDir, filename), req.body);
+        console.log(`POST /editor/music -> ${filename}`);
+        res.json({ filename });
+    }
+    catch (err) {
+        console.error("POST /editor/music", err);
+        res.status(500).json({ hasError: true, message: "Impossible de téléverser le fichier!" });
+    }
+});
+
+app.delete("/editor/music/:filename", async (req: Request, res: Response) => {
+    const filename = (req.params.filename ?? "").toLowerCase();
+    if (!musicName.test(filename) || !musicExt.test(filename)) {
+        res.status(400).json({ hasError: true, message: "Nom de fichier invalide" }); return;
+    }
+    try {
+        await fs.remove(path.join(musicDir, filename));
+        console.log(`DELETE /editor/music/${filename}`);
+        res.json({ filename });
+    }
+    catch (err) {
+        console.error(`DELETE /editor/music/${filename}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de supprimer le fichier!" });
+    }
+});
+
+
 
 // Update the first `user` message (the system prompt snapshot) in every
 // user state file tied to this template: direct plays ({gameid}_state.json)

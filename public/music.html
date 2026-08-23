@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Musique — HistoireIA</title>
+    <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+    <div class="ed-wrap">
+        <div class="ed-header">
+            <h1>Musique</h1>
+            <div class="ed-spacer"></div>
+            <a href="admin.html">← Admin</a>
+        </div>
+
+        <div class="ed-form">
+            <label>
+                Téléverser un fichier
+                <input type="file" id="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.opus">
+            </label>
+            <div class="ed-actions">
+                <button id="upload" type="button">Téléverser</button>
+                <span id="status" class="ed-hint"></span>
+            </div>
+        </div>
+
+        <div id="error" class="ed-error"></div>
+
+        <h2>Fichiers</h2>
+        <table class="ed-table">
+            <thead><tr><th>Nom</th><th></th></tr></thead>
+            <tbody id="list"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const list = document.getElementById("list");
+        const error = document.getElementById("error");
+        const status = document.getElementById("status");
+        const fileInput = document.getElementById("file");
+        const uploadBtn = document.getElementById("upload");
+
+        async function refresh() {
+            error.textContent = "";
+            list.innerHTML = "";
+            try {
+                const res = await fetch("editor/music");
+                const data = await res.json();
+                if (data.hasError) { error.textContent = data.message; return; }
+                for (const name of data.files) {
+                    const tr = document.createElement("tr");
+                    const a = document.createElement("a");
+                    a.href = "assets_app/music/" + encodeURIComponent(name);
+                    a.textContent = name;
+                    a.target = "_blank";
+                    const tdName = document.createElement("td"); tdName.appendChild(a);
+                    const del = document.createElement("a"); del.textContent = "supprimer";
+                    del.onclick = async (e) => {
+                        e.preventDefault();
+                        if (!confirm("Supprimer " + name + " ?")) return;
+                        const r = await fetch("editor/music/" + encodeURIComponent(name), { method: "DELETE" });
+                        if (!r.ok) { error.textContent = "Échec de la suppression"; return; }
+                        refresh();
+                    };
+                    const tdDel = document.createElement("td"); tdDel.appendChild(del);
+                    tr.append(tdName, tdDel);
+                    list.appendChild(tr);
+                }
+            } catch (err) {
+                error.textContent = "Impossible de charger la liste";
+            }
+        }
+
+        uploadBtn.onclick = async () => {
+            const file = fileInput.files[0];
+            if (!file) { error.textContent = "Choisissez un fichier"; return; }
+            error.textContent = ""; status.textContent = "Téléversement…";
+            try {
+                const res = await fetch("editor/music?filename=" + encodeURIComponent(file.name), {
+                    method: "POST",
+                    body: file
+                });
+                const data = await res.json();
+                if (data.hasError || !res.ok) { error.textContent = data.message || "Échec"; status.textContent = ""; return; }
+                fileInput.value = "";
+                status.textContent = "OK";
+                refresh();
+            } catch (err) {
+                error.textContent = "Échec du téléversement";
+            } finally {
+                setTimeout(() => status.textContent = "", 2000);
+            }
+        };
+
+        refresh();
+    </script>
+</body>
+</html>
