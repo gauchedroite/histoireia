@@ -26,6 +26,77 @@ let choices: IChoice[];
 // ponytail: one module-level element, no player UI — add controls if needed.
 let audio: HTMLAudioElement | null = null;
 const stopMusic = () => { if (audio) { audio.pause(); audio = null; } };
+
+let voiceOn = localStorage.getItem("gstory_voice") === "1";
+let listening = false;
+let voicePrimed = false;
+let frVoice: SpeechSynthesisVoice | null = null;
+const pickVoice = () => {
+    // iOS loads voices async and often refuses to speak without an explicit voice.
+    frVoice = speechSynthesis.getVoices().find(v => v.lang === "fr-CA")
+        ?? speechSynthesis.getVoices().find(v => v.lang.startsWith("fr")) ?? null;
+};
+if ("speechSynthesis" in window) {
+    pickVoice();
+    speechSynthesis.onvoiceschanged = pickVoice;
+}
+let recognition: any = null;
+const primeVoice = () => {
+    if (voicePrimed || !("speechSynthesis" in window)) return;
+    const silent = new SpeechSynthesisUtterance(" ");
+    silent.volume = 0;
+    speechSynthesis.speak(silent);
+    voicePrimed = true;
+};
+const stripMarkdown = (s: string) => s.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_>`]/g, "");
+const speak = (text: string) => {
+    if (!voiceOn || !text || !("speechSynthesis" in window)) return;
+    primeVoice();
+    speechSynthesis.cancel();
+    setTimeout(() => {
+        // ponytail: sentence-chunked queue — iOS silently drops or truncates long
+        // utterances (~15s cap); add a proper player UI if chunk gaps annoy.
+        const sentences = stripMarkdown(text).match(/[^.!?\n]+[.!?]*/g) ?? [text];
+        let chunk = "";
+        for (const sentence of sentences) {
+            if (chunk && chunk.length + sentence.length > 180) {
+                const utter = new SpeechSynthesisUtterance(chunk.trim());
+                utter.lang = "fr-CA";
+                if (frVoice) utter.voice = frVoice;
+                speechSynthesis.speak(utter);
+                chunk = "";
+            }
+            chunk += sentence;
+        }
+        if (chunk.trim()) {
+            const utter = new SpeechSynthesisUtterance(chunk);
+            utter.lang = "fr-CA";
+            if (frVoice) utter.voice = frVoice;
+            speechSynthesis.speak(utter);
+        }
+    }, 50);
+};
+export const toggleVoice = () => {
+    voiceOn = !voiceOn;
+    localStorage.setItem("gstory_voice", voiceOn ? "1" : "0");
+    if (voiceOn) primeVoice(); else speechSynthesis.cancel();
+    App.render();
+};
+export const listen = () => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) { alert("La dictée n'est pas disponible sur ce navigateur."); return; }
+    if (listening) { recognition?.abort(); recognition = null; listening = false; App.render(); return; }
+    recognition = new SR();
+    recognition.lang = "fr-CA";
+    recognition.onstart = () => { listening = true; App.render(); };
+    recognition.onresult = (e: any) => {
+        const ta = document.getElementById(`${NS}_next_user_text`) as HTMLTextAreaElement | null;
+        if (ta) { ta.value = e.results[0][0].transcript; oninput(ta); }
+    };
+    recognition.onend = () => { listening = false; App.render(); };
+    recognition.onerror = (e: any) => console.error("Dictée:", e.error);
+    recognition.start();
+};
 const ensureMusic = (file: string | null) => {
     if (!file) { stopMusic(); return; }
     const src = App.url(`assets_app/music/${encodeURIComponent(file)}`);
@@ -60,9 +131,10 @@ const formTemplate = () => {
         }
 
         const submit = `<button type="submit" onclick="${NS}.submit()" ${submitDisabled ? "disabled" : ""}><i class="fa-light fa-arrow-up"></i></button>`
+        const mic = `<button type="button" class="${listening ? "listening" : ""}" onclick="${NS}.listen()"><i class="fa-light fa-microphone"></i></button>`
         const label = `<div class="ask">
                 <div><b>À toi, ${state.usernameCapitalized} :</b></div>
-                <div>${help} ${submit}</div>
+                <div>${help} ${mic} ${submit}</div>
             </div>`
         add(label)
 
@@ -97,6 +169,9 @@ const pageTemplate = (form: string) => {
 <div class="app-header">
     <a class="js-waitable-2" href="#/menu/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
+    </a>
+    <a class="js-waitable-2" href="#" onclick="${NS}.toggleVoice();return false;">
+        <i class="fa-thin ${voiceOn ? "fa-volume" : "fa-volume-xmark"}"></i>
     </a>
     <a class="js-waitable-2" href="#" onclick="${NS}.toggleEditable();return false;">
         <i class="fa-thin ${editable ? "fa-pen-slash" : "fa-pen-to-square"}"></i>
@@ -139,6 +214,7 @@ const render_and_fetch_more = async () => {
         try {
             assistant_text = await state.chatAsync(streamUpdater)
             await state.setAssistantMessageAsync(assistant_text, pageno)
+            speak(assistant_text)
         }
         catch (err) {
             assistant_text = "Le serveur ne répond pas. Vérifie qu'Ollama est bien démarré."
@@ -190,7 +266,7 @@ export const fetch = (args: string[] | undefined) => {
 }
 
 export const render = () => {
-    if (!App.inContext(NS)) { stopMusic(); return ""; }
+    if (!App.inContext(NS)) { stopMusic(); speechSynthesis?.cancel(); return ""; }
     ensureMusic(mystate?.music ?? null);
 
     const form = formTemplate()
@@ -206,12 +282,12 @@ const getFormState = () => {
     next_user_text = Misc.fromInputText(`${NS}_next_user_text`, next_user_text);
 }
 
-export const onchange = (_input: HTMLInputElement) => {
+export const onchange = (_input: HTMLInputElement | HTMLTextAreaElement) => {
     getFormState();
     App.render();
 }
 
-export const oninput = (_input: HTMLInputElement) => {
+export const oninput = (_input: HTMLInputElement | HTMLTextAreaElement) => {
     getFormState();
     App.render();
 }
@@ -222,7 +298,18 @@ export const oninput = (_input: HTMLInputElement) => {
 // numbered list in the LLM text. ponytail: line-based regex, no markdown AST —
 // keeps the last matching line, which is the latest list containing that number.
 const expandNumber = (input: string, llmText: string | null): string => {
-    const n = input.trim();
+    const trimmed = input.trim();
+    const words = trimmed.split(/\s+/);
+    // A short phrase (≤10 words) ending with a number, number word (un…dix), or
+    // letter a–j (trailing punctuation stripped): that token is the choice, the
+    // rest is discarded. Only 1–10 are valid.
+    const last = words[words.length - 1].replace(/[.,;:!?)]+$/, "").toLowerCase();
+    const numberWords: Record<string, number> = { un: 1, une: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10 };
+    let n: string;
+    if (words.length <= 10 && /^[a-j]$/i.test(last)) n = String(last.charCodeAt(0) - 96);
+    else if (words.length <= 10 && /^\d+$/.test(last) && +last >= 1 && +last <= 10) n = last;
+    else if (words.length <= 10 && last in numberWords) n = String(numberWords[last]);
+    else n = trimmed;
     if (!/^\d+$/.test(n) || !llmText) return input;
     let result: string | null = null;
     for (const line of llmText.split("\n")) {
