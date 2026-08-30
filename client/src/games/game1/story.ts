@@ -3,6 +3,7 @@ import * as Router from "../../core/router.js"
 import * as Misc from "../../core/misc.js"
 import * as Theme from "../../core/theme/theme.js"
 import { marked } from "marked"
+marked.use({ breaks: true })   // single \n → <br>, like the old <br> rendering
 import { state, GameDefinition, IChoice } from "./state.js"
 
 export const NS = "GSTORY";
@@ -217,8 +218,22 @@ export const oninput = (_input: HTMLInputElement) => {
 
 
 
+// If the user just typed a number, replace it with that item from the LAST
+// numbered list in the LLM text. ponytail: line-based regex, no markdown AST —
+// keeps the last matching line, which is the latest list containing that number.
+const expandNumber = (input: string, llmText: string | null): string => {
+    const n = input.trim();
+    if (!/^\d+$/.test(n) || !llmText) return input;
+    let result: string | null = null;
+    for (const line of llmText.split("\n")) {
+        const m = line.match(/^\s*\**\s*(\d+)\s*[.):]\s*\**\s*(.+)/);
+        if (m && m[1] === n) result = m[2].replace(/\*\*/g, "").replace(/^#+\s*/, "").trim();
+    }
+    return result ?? input;
+}
+
 export const submit = async (_input: HTMLInputElement) => {
-    await state.addUserMessageAsync(next_user_text!, pageno)
+    await state.addUserMessageAsync(expandNumber(next_user_text!, assistant_text), pageno)
 
     next_user_text = null
     assistant_text = null
