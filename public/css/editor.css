@@ -17,6 +17,7 @@ body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; margin: 0;
 .ed-table a:hover { text-decoration: underline; }
 
 .ed-error { padding: 0.5rem 0; font-weight: 600; }
+.ed-ok { padding: 0.5rem 0; font-weight: 600; color: #2e7d32; }
 .ed-hint { opacity: 0.6; font-size: 0.85em; }
 
 .ed-form { display: grid; gap: 1rem; }

@@ -35,6 +35,7 @@ let editing: GameDef | null = null;
 let gameid = "";
 let isNew = false;
 let error = "";
+let saved = "";
 
 const escapeHtml = (s: string): string =>
     s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
@@ -91,6 +92,7 @@ const newGame = (): GameDef => ({
     prompt: "Tu es un assistant utile.",
     llmid: llms[0]?.id ?? 1,
     kindid: kinds.find(k => k.code === "llm")?.id ?? kinds[0]?.id ?? 1,
+    update_users: true,
 });
 
 const renderEdit = () => {
@@ -104,7 +106,7 @@ const renderEdit = () => {
         ? `<label>Données (TSV)<textarea name="prompt" rows="18" required>${escapeHtml(g.prompt ?? "")}</textarea></label>`
         : `<label>Prompt<textarea name="prompt" rows="14" required maxlength="8192">${escapeHtml(g.prompt ?? "")}</textarea></label>
            <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>
-           <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users ? " checked" : ""}> Mettre à jour les histoires des usagers</label>`;
+           <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour les histoires des usagers</label>`;
 
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
@@ -115,6 +117,7 @@ const renderEdit = () => {
             ${isNew ? "" : `<button type="button" data-act="delete">Effacer</button>`}
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
+        ${saved ? `<div class="ed-ok">${escapeHtml(saved)}</div>` : ""}
         <form class="ed-form">
             <label>Titre<input name="title" value="${escapeHtml(g.title ?? "")}" required maxlength="32"></label>
             <label>Type d'histoire${kindField}</label>
@@ -126,6 +129,7 @@ const renderEdit = () => {
         </form>
     </div>`;
     error = "";
+    saved = "";
 
     const form = root.querySelector("form.ed-form") as HTMLFormElement | null;
     if (form) {
@@ -175,8 +179,14 @@ const save = async () => {
     const form = root.querySelector("form.ed-form") as HTMLFormElement | null;
     if (form && !form.checkValidity()) { form.reportValidity(); return; }
     try {
-        await api.put(`editor/stories/${gameid}`, editing);
-        history.back();   // popstate → fetchList (refreshed list reflects the change)
+        const res = await api.put<{ gameid: string }>(`editor/stories/${gameid}`, editing);
+        if (isNew) {   // adopt the server-generated id so further saves update, not duplicate
+            gameid = res.gameid;
+            editing.code = gameid;
+            isNew = false;
+        }
+        saved = "Enregistré.";
+        renderEdit();
     } catch {
         error = "Impossible d'enregistrer.";
         renderEdit();
