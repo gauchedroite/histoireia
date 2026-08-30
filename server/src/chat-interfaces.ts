@@ -56,6 +56,9 @@ export interface GameDefinition {
     kindid: number
     hasJsonSchema: boolean
     isInstance?: boolean
+    use_tts?: boolean
+    tts_model?: string | null
+    tts_voice?: string | null
 }
 
 export interface GameList {

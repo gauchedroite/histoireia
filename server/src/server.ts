@@ -28,6 +28,7 @@ function checkAuth(req: Request, res: Response, next: NextFunction) {
 
 app.use("/stories", checkAuth);
 app.use("/stories-for", checkAuth);
+app.use("/tts", checkAuth);
 app.use("/users", checkAuth);
 app.use("/chat", checkAuth);
 
@@ -150,7 +151,10 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         prompt,
         llmid: data.llmid ?? 1,
         hasJsonSchema: llm?.hasJsonSchema ?? false,
-        kindid: data.kindid
+        kindid: data.kindid,
+        use_tts: data.use_tts ?? false,
+        tts_model: data.tts_model ?? null,
+        tts_voice: data.tts_voice ?? null
     };
 }
 
@@ -220,6 +224,30 @@ app.get("/stories/:gameid", async (req: Request, res: Response) => {
 // file is created on first play (GET /users/:username/:gameid returns [] when
 // absent). Protected by the /users checkAuth blanket. The model is inherited
 // from the template — the user never chooses it.
+// ponytail: buffered, not streamed — TTS clips are small and one-shot.
+// OpenRouter TTS endpoint (OpenAI-compatible, raw audio bytes back).
+app.post("/tts", express.json(), async (req: Request, res: Response) => {
+    const { text: rawText, model, voice } = req.body as { text?: string; model?: string; voice?: string };
+    const text = String(rawText ?? "").slice(0, 4096);
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) { res.status(500).json({ hasError: true, message: "OPENROUTER_API_KEY non configurée" }); return; }
+    if (!text || !model) { res.status(400).json({ hasError: true, message: "texte ou modèle manquant" }); return; }
+    try {
+        const r = await fetch("https://openrouter.ai/api/v1/audio/speech", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ model, input: text, voice: voice || "alloy", response_format: "mp3" }),
+        });
+        if (!r.ok) throw new Error(`OpenRouter TTS ${r.status}: ${(await r.text()).slice(0, 200)}`);
+        res.setHeader("Content-Type", r.headers.get("content-type") ?? "audio/mpeg");
+        res.send(Buffer.from(await r.arrayBuffer()));
+    }
+    catch (err) {
+        console.error("POST /tts", err);
+        res.status(500).json({ hasError: true, message: "TTS impossible" });
+    }
+});
+
 app.post("/users/:username/instances", async (req: Request, res: Response) => {
     const { from } = req.body as { from: string };
     let username = sanitizeParam(req.params.username);
@@ -362,7 +390,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, music, prompt, llmid, kindid, update_users } = req.body as GameDefinition & { update_users?: boolean };
+    const { title, bg_image, music, prompt, llmid, kindid, update_users, use_tts, tts_model, tts_voice } = req.body as GameDefinition & { update_users?: boolean };
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -379,7 +407,7 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid };
+        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid, use_tts: !!use_tts, tts_model: tts_model || null, tts_voice: tts_voice || null };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
         if (kind?.code === "llm")

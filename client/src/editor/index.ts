@@ -15,6 +15,9 @@ type GameDef = {
     code: string; title: string; bg_image: string | null; music: string | null; prompt: string;
     llmid: number; kindid: number;
     update_users?: boolean;
+    use_tts?: boolean;
+    tts_model?: string;
+    tts_voice?: string;
 };
 
 const root = document.getElementById("app_root") as HTMLElement;
@@ -106,7 +109,10 @@ const renderEdit = () => {
         ? `<label>Données (TSV)<textarea name="prompt" rows="18" required>${escapeHtml(g.prompt ?? "")}</textarea></label>`
         : `<label>Prompt<textarea name="prompt" rows="14" required maxlength="8192">${escapeHtml(g.prompt ?? "")}</textarea></label>
            <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>
-           <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour les histoires des usagers</label>`;
+           <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour les histoires des usagers</label>
+           <label class="ed-check"><input type="checkbox" name="use_tts"${g.use_tts ? " checked" : ""}> Utiliser la synthèse vocale (TTS)</label>
+           <label data-tts-model ${g.use_tts ? "" : "hidden"}>Modèle TTS<input name="tts_model" value="${escapeHtml(g.tts_model ?? "")}" placeholder="microsoft/mai-voice-2-flash" maxlength="64"></label>
+           <label data-tts-voice ${g.use_tts ? "" : "hidden"}>Voix TTS<input name="tts_voice" value="${escapeHtml(g.tts_voice ?? "")}" placeholder="fr-FR-Vivienne:MAI-Voice-2" maxlength="64"></label>`;
 
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
@@ -136,6 +142,9 @@ const renderEdit = () => {
         form.addEventListener("submit", e => { e.preventDefault(); void save(); });
         const kindSel = form.querySelector("[data-kind]") as HTMLSelectElement | null;
         if (kindSel) kindSel.addEventListener("change", () => { syncForm(); renderEdit(); });
+        const ttsCheck = form.elements.namedItem("use_tts") as HTMLInputElement | null;
+        const ttsModel = form.querySelector("[data-tts-model]") as HTMLElement | null;
+        if (ttsCheck && ttsModel) ttsCheck.addEventListener("change", () => { ttsModel.hidden = !ttsCheck.checked; });
         const fileInput = form.elements.namedItem("bg_image_file") as HTMLInputElement | null;
         if (fileInput) fileInput.addEventListener("change", () => { const f = fileInput.files?.[0]; if (f) void uploadImage(f); });
     }
@@ -155,9 +164,15 @@ const syncForm = () => {
     const kindSel = form.elements.namedItem("kindid") as HTMLSelectElement | null;
     const llmSel = form.elements.namedItem("llmid") as HTMLSelectElement | null;
     const updateUsers = form.elements.namedItem("update_users") as HTMLInputElement | null;
+    const useTts = form.elements.namedItem("use_tts") as HTMLInputElement | null;
+    const ttsModel = form.elements.namedItem("tts_model") as HTMLInputElement | null;
+    const ttsVoice = form.elements.namedItem("tts_voice") as HTMLInputElement | null;
     if (kindSel) g.kindid = Number(kindSel.value);
     if (llmSel) g.llmid = Number(llmSel.value);
     if (updateUsers) g.update_users = updateUsers.checked;
+    if (useTts) g.use_tts = useTts.checked;
+    if (ttsModel) g.tts_model = ttsModel.value.trim();
+    if (ttsVoice) g.tts_voice = ttsVoice.value.trim();
 };
 
 const openStory = async (id: string) => {

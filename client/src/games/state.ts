@@ -24,6 +24,9 @@ export interface GameDefinition {
     kindid_text: string
     hasJsonSchema: boolean
     isInstance?: boolean
+    use_tts?: boolean
+    tts_model?: string | null
+    tts_voice?: string | null
 }
 
 

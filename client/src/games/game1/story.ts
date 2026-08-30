@@ -49,7 +49,41 @@ const primeVoice = () => {
     voicePrimed = true;
 };
 const stripMarkdown = (s: string) => s.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_>`]/g, "");
-const speak = (text: string) => {
+// GPT-4o TTS via the server proxy (POST /tts) — used when the story has use_tts.
+// ponytail: one shared element — iOS only allows play() on an element that was
+// already unlocked by playing audio inside a user gesture (see ttsUnlock).
+const ttsAudio = new Audio();
+const stopTts = () => { ttsAudio.pause(); };
+let ttsPage = -1;   // which page the loaded clip belongs to
+["play", "pause", "ended"].forEach(ev => ttsAudio.addEventListener(ev, () => App.render()));
+// Tiny silent mp3, played during a header-button tap to unlock TTS audio on iOS.
+const ttsUnlock = () => {
+    ttsAudio.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQxAADB8AhSmxhIIEVCSiJrDCQBTcu3UrAIwUdkRgQbFAZC1CQEwTJ9mjRvBA4UOLD8nKVOWfh+UlK3z/177OXrfOdKl7pyn3Xf//WreyTRUoAWgBgkOAGbZHBgG1OF6zM82DWbZaUmMBptgQhGjsyYqc9ae9XFz280948NMBWInljyzsNRFLPWdnZGWrddDsjK1unuSrVN9jJsK8KuQtQCtMBjCEtImISdNKJOopIpBFpNSMbIHCSRpRR5iakjTiyzLhchUUBwCgyKiweBv/7UsQbg8isVNoMPMjAAAA0gAAABEVFGmgqK////9bP/6XCykxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq";
+    ttsAudio.play().catch(() => {});
+};
+const speakAi = async (text: string) => {
+    stopTts();
+    try {
+        const r = await window.fetch(App.apiurl("tts"), {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                ...(App.getAuthHeader() ? { "Authorization": `Bearer ${App.getAuthHeader()}` } : {}),
+            },
+            credentials: "include",
+            body: JSON.stringify({ text: stripMarkdown(text), model: mystate?.tts_model, voice: mystate?.tts_voice }),
+        });
+        if (!r.ok) throw new Error(`${r.status}`);
+        ttsPage = pageno;
+        ttsAudio.src = URL.createObjectURL(await r.blob());
+        void ttsAudio.play().catch(err => console.error("TTS play:", err));
+    }
+    catch (err) {
+        console.error("TTS:", err);
+        speakBrowser(text);   // fallback to browser speech synthesis
+    }
+};
+const speakBrowser = (text: string) => {
     if (!voiceOn || !text || !("speechSynthesis" in window)) return;
     primeVoice();
     speechSynthesis.cancel();
@@ -76,10 +110,34 @@ const speak = (text: string) => {
         }
     }, 50);
 };
+const speak = (text: string) => {
+    if (!voiceOn || !text) return;
+    if (mystate?.use_tts) { void speakAi(text); return; }
+    speakBrowser(text);
+};
+// Header buttons: play/pause toggle + replay, current page only.
+export const ttsToggle = () => {
+    if (!ttsAudio.paused) { ttsAudio.pause(); }
+    else if (ttsAudio.src && ttsPage === pageno && !ttsAudio.ended) {
+        if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); }
+        void ttsAudio.play().catch(err => console.error("TTS play:", err));
+    }
+    else if (assistant_text) speak(assistant_text);
+    App.render();
+};
+export const ttsReplay = () => {
+    if (ttsAudio.src && ttsPage === pageno) {
+        if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); ttsUnlock(); }
+        ttsAudio.currentTime = 0;
+        void ttsAudio.play().catch(err => console.error("TTS replay:", err));
+    }
+    else if (assistant_text) speak(assistant_text);
+    App.render();
+};
 export const toggleVoice = () => {
     voiceOn = !voiceOn;
     localStorage.setItem("gstory_voice", voiceOn ? "1" : "0");
-    if (voiceOn) primeVoice(); else speechSynthesis.cancel();
+    if (voiceOn) { primeVoice(); ttsUnlock(); } else { speechSynthesis.cancel(); stopTts(); }
     App.render();
 };
 export const listen = () => {
@@ -173,6 +231,12 @@ const pageTemplate = (form: string) => {
     <a class="js-waitable-2" href="#" onclick="${NS}.toggleVoice();return false;">
         <i class="fa-thin ${voiceOn ? "fa-volume" : "fa-volume-xmark"}"></i>
     </a>
+    <a class="js-waitable-2" href="#" onclick="${NS}.ttsToggle();return false;" title="Lire / pause">
+        <i class="fa-thin ${!ttsAudio.paused && !ttsAudio.ended ? "fa-pause" : "fa-play"}"></i>
+    </a>
+    <a class="js-waitable-2" href="#" onclick="${NS}.ttsReplay();return false;" title="Rejouer">
+        <i class="fa-thin fa-rotate-right"></i>
+    </a>
     <a class="js-waitable-2" href="#" onclick="${NS}.toggleEditable();return false;">
         <i class="fa-thin ${editable ? "fa-pen-slash" : "fa-pen-to-square"}"></i>
     </a>
@@ -214,7 +278,6 @@ const render_and_fetch_more = async () => {
         try {
             assistant_text = await state.chatAsync(streamUpdater)
             await state.setAssistantMessageAsync(assistant_text, pageno)
-            speak(assistant_text)
         }
         catch (err) {
             assistant_text = "Le serveur ne répond pas. Vérifie qu'Ollama est bien démarré."
@@ -229,6 +292,7 @@ const render_and_fetch_more = async () => {
 }
 
 export const fetch = (args: string[] | undefined) => {
+    stopTts();   // leaving a page stops its narration
     gameid = (args ? args[0] : "");
     pageno = +(args ? (args[1] != undefined ? args[1] : "new") : "new");
     isNew = isNaN(pageno)
@@ -266,7 +330,7 @@ export const fetch = (args: string[] | undefined) => {
 }
 
 export const render = () => {
-    if (!App.inContext(NS)) { stopMusic(); speechSynthesis?.cancel(); return ""; }
+    if (!App.inContext(NS)) { stopMusic(); stopTts(); speechSynthesis?.cancel(); return ""; }
     ensureMusic(mystate?.music ?? null);
 
     const form = formTemplate()
