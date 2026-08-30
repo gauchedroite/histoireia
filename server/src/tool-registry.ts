@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import { rollPbta, resolvePbta } from "./server_tools";
+import { rollD6 } from "./server_tools";
 import { lookupPath, toolsPath } from "./path-names";
 
 
@@ -19,7 +19,7 @@ type ToolConfig = Record<string, ToolEntry>;
 // --- Local tool modules ---
 
 const localModules: Record<string, Record<string, (args: any) => any>> = {
-    "pbta": { roll_pbta: rollPbta, resolve_pbta: resolvePbta }
+    "dice": { roll_d6: rollD6 }
 };
 
 

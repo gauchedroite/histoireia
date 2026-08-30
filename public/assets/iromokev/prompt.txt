@@ -1,0 +1,130 @@
+# Dominus — The Pale Spire
+## Game Reference Document
+
+### Setting
+A desert trading city of thieves. At its heart rises a windowless tower of pale stone — the Spire of Vorath — where a white-bearded sorcerer keeps a priceless, pulse-glowing jewel called the Pale Heart. Within the spire, chained by sorcery, dwells a tusked, four-armed being born beyond the stars, whom thieves whisper of as the Grey Sage. By night, thieves scale the wall; beasts pad in the walled garden; and a great grey spider haunts the high chambers.
+
+---
+
+## Plot Lists
+
+### 1. "Something happened."
+1. The Pale Heart was stolen.
+2. Vorath summoned something hungry.
+3. Thieves vanished near the spire.
+4. The grey sage fell silent.
+5. Garden beasts broke their chains.
+6. Blood stained the ivory stairs.
+
+### 2. "You need to..."
+1. recover the Pale Heart from Vorath's chamber
+2. free the grey sage from his chains of light
+3. slay the grey spinner that guards the stair
+4. silence the sorcerer before his ritual completes
+5. climb the spire before the moon sets
+6. break the binding circle that holds the star-being
+
+### 3. "or else..."
+1. your soul will be devoured.
+2. Vorath will wear your skin.
+3. beasts will tear you apart.
+4. you will rot in chains.
+5. the spinner will feed tonight.
+6. your name will be forgotten.
+
+---
+
+## Character List
+
+1. Frost-reach raider — climbing, broadsword — carves bone trinkets
+2. Silver-coast burglar — grappling, quiet kills — keeps hunting falcons
+3. Warren pickpocket — sleight of hand, lockpicks — plays the reed flute
+4. Desert sell-sword — spearfighting, endurance — dices for coin
+5. Escaped apprentice — wards, dead scripts — paints star charts
+6. Spire beast-handler — whips, beast-lore — trains a pet mongoose
+
+---
+
+## Scene Lists
+
+### 1. Place
+1. The Crooked Tankard — smoke-stained tavern where thieves broker deals in the Warren.
+2. The Ivory Gate — the spire's only door, sealed with sorcerer's marks.
+3. The Garden of Beasts — walled grove where lions pad between topiary.
+4. The Sheer Wall — windowless pale stone, climbed by rope and luck.
+5. The Web Chamber — a high hall draped in grey silk and old bones.
+6. The Heart Sanctum — Vorath's peak room, lit by the gem's pulse.
+
+### 2. Character (NPC)
+1. Darios of the Silver Coast — agile master thief, boasts too loudly, carries silk rope.
+2. Vorath the Pale — gaunt, white-bearded sorcerer, eyes like cold embers.
+3. Ghanoor the Grey Sage — tusked, four-armed, star-born, bound by chains of light.
+4. Ysska the Fence — one-eyed Warren woman who buys what no one will name.
+5. Karsh the Beast-Keeper — scarred handler who walks among the garden lions.
+6. The Moon-Drunk Seer — blind old man who raves of a god in the tower.
+
+### 3. Event
+1. A garden lion slips its leash and pads into the alley.
+2. A rival thief plummets from the wall with a scream.
+3. The Pale Heart flares; the spire glows like a lit candle.
+4. A voice without a body offers gold for your silence.
+5. Chains of light flicker as something vast stirs above.
+6. City guards torch the Warren, sealing the quarter.
+
+---
+
+## Idea Bank Lists
+
+### 1. Subject
+1. A dead thief's final scrawl.
+2. The star-being's lost homeland.
+3. The sorcerer's one weakness.
+4. A name inscribed in the chains.
+5. The gem's true cost to its bearer.
+6. A tunnel beneath the spire.
+
+### 2. Action
+1. Scaling a sheer wall by moonlight.
+2. Striking a bargain in the dark.
+3. Lying to a sorcerer's face.
+4. Severing a chain of light.
+5. Listening to a captive god weep.
+6. Fleeing through a torchlit alley.
+
+### 3. Item
+1. Silk grappling rope, woven in the Silver Isles.
+2. Vial of nightshade resin — sleep or death.
+3. Bone amulet etched with a star chart.
+4. A key of tarnished silver, cold to the touch.
+5. A skin of sour desert wine.
+6. A splinter chipped from the Pale Heart.
+
+### 4. Quality
+1. Silent as a dropped feather.
+2. Quick as a desert viper.
+3. Older than the stars.
+4. Cruel as a bored god.
+5. Hungry beyond all reason.
+6. False as a thief's oath.
+
+### 5. Weapon
+1. Notched broadsword of frost-reach steel.
+2. Coil of silk strangler's cord.
+3. Balanced throwing knife, roof-forged.
+4. Ash-handled guard's spear.
+5. Beast-handler's barbed whip.
+6. Splinter of star-glass, bane of spells.
+
+---
+
+## Dominus Game Rules
+
+- **Setup**: pick/roll a PC from the Character list + name, roll the 3 Plot lists for your first plot.
+- **Story**: pick/roll a Place from the Scene lists; on entering a new scene, roll a die → 3 or less = NPC encounter, 4+ = Event. Move scenes when the old one resolves.
+- **Challenge**: roll a die; 4+ succeeds. Advantage = roll 2 dice keep high; disadvantage = roll 2 dice keep low.
+- **Dilemma**: A/B style binary, roll d6 → 3 or less = option 1, 4+ = option 2.
+- **Idea Bank**: roll for extra detail on a Place/Character/Event from the Idea Bank lists.
+
+## Output format
+- Output using markdown
+- Respond in French

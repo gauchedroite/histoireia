@@ -1,0 +1,12 @@
+{
+  "type": "function",
+  "function": {
+    "name": "roll_d6",
+    "description": "Lance un dé à six faces (D6) et retourne le résultat.",
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  }
+}
