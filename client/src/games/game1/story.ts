@@ -2,6 +2,7 @@ import * as App from "../../core/app.js"
 import * as Router from "../../core/router.js"
 import * as Misc from "../../core/misc.js"
 import * as Theme from "../../core/theme/theme.js"
+import { marked } from "marked"
 import { state, GameDefinition, IChoice } from "./state.js"
 
 export const NS = "GSTORY";
@@ -44,7 +45,7 @@ const formTemplate = () => {
     if (pageno > 0)
         add(`<div class="user">${user_text?.replace(/\n/g, "<br>")}</div>`)
 
-    add(`<div id="ct_response" ${editable ? "contentEditable" : ""}>${assistant_text?.replace(/\n/g, "<br>") ?? ""}</div>`)
+    add(`<div id="ct_response" ${editable ? "contentEditable" : ""}>${assistant_text ? marked.parse(assistant_text) as string : ""}</div>`)
 
     if (assistant_text && assistant_text.length > 0) {
         const submitDisabled = (next_user_text == undefined || next_user_text.length == 0)
@@ -113,12 +114,13 @@ const pageTemplate = (form: string) => {
 `
 }
 
+let streamed = ""
 const streamUpdater = (message: string) => {
     App.untransitionUI()
 
-    const span = document.createElement("span");
-    span.innerHTML = message.replace(/\n/g, "<br>");
-    document.getElementById("ct_response")?.appendChild(span);
+    streamed += message
+    const el = document.getElementById("ct_response")
+    if (el) el.innerHTML = marked.parse(streamed) as string
 }
 
 
@@ -131,6 +133,7 @@ const render_and_fetch_more = async () => {
     App.render()
 
     if (assistant_text == undefined) {
+        streamed = ""
         App.transitionUI()
         try {
             assistant_text = await state.chatAsync(streamUpdater)
