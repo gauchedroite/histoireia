@@ -127,4 +127,5 @@ A desert trading city of thieves. At its heart rises a windowless tower of pale 
 
 ## Output format
 - Output using markdown
+- Present player choices in an ordered list
 - Respond in French
