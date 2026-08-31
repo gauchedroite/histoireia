@@ -3,5 +3,15 @@
         "id": 1,
         "description": "microsoft/mai-voice-2-flash",
         "model": "microsoft/mai-voice-2-flash"
+    },
+    {
+        "id": 2,
+        "description": "deepgram/aura-2",
+        "model": "deepgram/aura-2"
+    },
+    {
+        "id": 3,
+        "description": "x-ai/grok-voice-tts-1.0",
+        "model": "x-ai/grok-voice-tts-1.0"
     }
 ]
