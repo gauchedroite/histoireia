@@ -18,6 +18,8 @@ type GameDef = {
     use_tts?: boolean;
     tts_model?: string;
     tts_voice?: string;
+    editable_by_player?: boolean;
+    disable_music?: boolean;
 };
 
 const root = document.getElementById("app_root") as HTMLElement;
@@ -96,6 +98,8 @@ const newGame = (): GameDef => ({
     llmid: llms[0]?.id ?? 1,
     kindid: kinds.find(k => k.code === "llm")?.id ?? kinds[0]?.id ?? 1,
     update_users: true,
+    editable_by_player: false,
+    disable_music: false,
 });
 
 const renderEdit = () => {
@@ -110,6 +114,8 @@ const renderEdit = () => {
         : `<label>Prompt<textarea name="prompt" rows="14" required maxlength="8192">${escapeHtml(g.prompt ?? "")}</textarea></label>
            <label>LLM (modèle)<select name="llmid" required>${llmOptions(g.llmid)}</select></label>
            <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour les histoires des usagers</label>
+           <label class="ed-check"><input type="checkbox" name="editable_by_player"${g.editable_by_player ? " checked" : ""}> Permettre au joueur de modifier le texte</label>
+           <label class="ed-check"><input type="checkbox" name="disable_music"${g.disable_music ? " checked" : ""}> Désactiver la musique</label>
            <label class="ed-check"><input type="checkbox" name="use_tts"${g.use_tts ? " checked" : ""}> Utiliser la synthèse vocale (TTS)</label>
            <label data-tts-model ${g.use_tts ? "" : "hidden"}>Modèle TTS<input name="tts_model" value="${escapeHtml(g.tts_model ?? "")}" placeholder="microsoft/mai-voice-2-flash" maxlength="64"></label>
            <label data-tts-voice ${g.use_tts ? "" : "hidden"}>Voix TTS<input name="tts_voice" value="${escapeHtml(g.tts_voice ?? "")}" placeholder="fr-FR-Vivienne:MAI-Voice-2" maxlength="64"></label>`;
@@ -164,12 +170,16 @@ const syncForm = () => {
     const kindSel = form.elements.namedItem("kindid") as HTMLSelectElement | null;
     const llmSel = form.elements.namedItem("llmid") as HTMLSelectElement | null;
     const updateUsers = form.elements.namedItem("update_users") as HTMLInputElement | null;
+    const editableByPlayer = form.elements.namedItem("editable_by_player") as HTMLInputElement | null;
+    const disableMusic = form.elements.namedItem("disable_music") as HTMLInputElement | null;
     const useTts = form.elements.namedItem("use_tts") as HTMLInputElement | null;
     const ttsModel = form.elements.namedItem("tts_model") as HTMLInputElement | null;
     const ttsVoice = form.elements.namedItem("tts_voice") as HTMLInputElement | null;
     if (kindSel) g.kindid = Number(kindSel.value);
     if (llmSel) g.llmid = Number(llmSel.value);
     if (updateUsers) g.update_users = updateUsers.checked;
+    if (editableByPlayer) g.editable_by_player = editableByPlayer.checked;
+    if (disableMusic) g.disable_music = disableMusic.checked;
     if (useTts) g.use_tts = useTts.checked;
     if (ttsModel) g.tts_model = ttsModel.value.trim();
     if (ttsVoice) g.tts_voice = ttsVoice.value.trim();

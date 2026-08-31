@@ -59,6 +59,8 @@ export interface GameDefinition {
     use_tts?: boolean
     tts_model?: string | null
     tts_voice?: string | null
+    editable_by_player?: boolean
+    disable_music?: boolean
 }
 
 export interface GameList {

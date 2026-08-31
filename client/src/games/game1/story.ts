@@ -25,7 +25,16 @@ let choices: IChoice[];
 // story context is active and the game has a music file, stopped on leave.
 // ponytail: one module-level element, no player UI — add controls if needed.
 let audio: HTMLAudioElement | null = null;
+let musicPlaying = true;
 const stopMusic = () => { if (audio) { audio.pause(); audio = null; } };
+export const musicToggle = () => {
+    musicPlaying = !musicPlaying;
+    if (audio) {
+        if (musicPlaying) void audio.play().catch(() => {});
+        else audio.pause();
+    }
+    App.render();
+};
 
 let voiceOn = localStorage.getItem("gstory_voice") === "1";
 let listening = false;
@@ -53,8 +62,9 @@ const stripMarkdown = (s: string) => s.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").r
 // ponytail: one shared element — iOS only allows play() on an element that was
 // already unlocked by playing audio inside a user gesture (see ttsUnlock).
 const ttsAudio = new Audio();
-const stopTts = () => { ttsAudio.pause(); };
+const stopTts = () => { ttsLoading = false; ttsAudio.pause(); };
 let ttsPage = -1;   // which page the loaded clip belongs to
+let ttsLoading = false;
 ["play", "pause", "ended"].forEach(ev => ttsAudio.addEventListener(ev, () => App.render()));
 // Tiny silent mp3, played during a header-button tap to unlock TTS audio on iOS.
 const ttsUnlock = () => {
@@ -62,7 +72,9 @@ const ttsUnlock = () => {
     ttsAudio.play().catch(() => {});
 };
 const speakAi = async (text: string) => {
-    stopTts();
+    ttsLoading = true;
+    App.render();
+    ttsAudio.pause();
     try {
         const r = await window.fetch(App.apiurl("tts"), {
             method: "POST",
@@ -80,8 +92,13 @@ const speakAi = async (text: string) => {
     }
     catch (err) {
         console.error("TTS:", err);
+        ttsLoading = false;
+        App.render();
         speakBrowser(text);   // fallback to browser speech synthesis
+        return;
     }
+    ttsLoading = false;
+    App.render();
 };
 const speakBrowser = (text: string) => {
     if (!voiceOn || !text || !("speechSynthesis" in window)) return;
@@ -117,21 +134,29 @@ const speak = (text: string) => {
 };
 // Header buttons: play/pause toggle + replay, current page only.
 export const ttsToggle = () => {
+    if (ttsLoading) return;
     if (!ttsAudio.paused) { ttsAudio.pause(); }
     else if (ttsAudio.src && ttsPage === pageno && !ttsAudio.ended) {
         if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); }
         void ttsAudio.play().catch(err => console.error("TTS play:", err));
     }
-    else if (assistant_text) speak(assistant_text);
+    else if (assistant_text) {
+        if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); }
+        speak(assistant_text);
+    }
     App.render();
 };
 export const ttsReplay = () => {
+    if (ttsLoading) return;
     if (ttsAudio.src && ttsPage === pageno) {
         if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); ttsUnlock(); }
         ttsAudio.currentTime = 0;
         void ttsAudio.play().catch(err => console.error("TTS replay:", err));
     }
-    else if (assistant_text) speak(assistant_text);
+    else if (assistant_text) {
+        if (!voiceOn) { voiceOn = true; localStorage.setItem("gstory_voice", "1"); }
+        speak(assistant_text);
+    }
     App.render();
 };
 export const toggleVoice = () => {
@@ -158,12 +183,12 @@ export const listen = () => {
 const ensureMusic = (file: string | null) => {
     if (!file) { stopMusic(); return; }
     const src = App.url(`assets_app/music/${encodeURIComponent(file)}`);
-    if (audio && audio.dataset.src === src) { if (audio.paused) void audio.play().catch(() => {}); return; }
+    if (audio && audio.dataset.src === src) return;
     stopMusic();
     audio = new Audio(src);
     audio.loop = true;
     audio.dataset.src = src;
-    void audio.play().catch(() => {});
+    if (musicPlaying) void audio.play().catch(() => {});
 };
 
 
@@ -228,18 +253,27 @@ const pageTemplate = (form: string) => {
     <a class="js-waitable-2" href="#/menu/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
+    ${mystate.music && !mystate.disable_music ? `
+    <a class="js-waitable-2" href="#" onclick="${NS}.musicToggle();return false;" title="Musique">
+        <i class="fa-thin ${audio?.paused ? "fa-music-slash" : "fa-music"}"></i>
+    </a>
+    ` : ""}
+    ${mystate.use_tts ? `
     <a class="js-waitable-2" href="#" onclick="${NS}.toggleVoice();return false;">
         <i class="fa-thin ${voiceOn ? "fa-volume" : "fa-volume-xmark"}"></i>
     </a>
-    <a class="js-waitable-2" href="#" onclick="${NS}.ttsToggle();return false;" title="Lire / pause">
-        <i class="fa-thin ${!ttsAudio.paused && !ttsAudio.ended ? "fa-pause" : "fa-play"}"></i>
+    <a class="js-waitable-2" href="#" onclick="${NS}.ttsToggle();return false;" title="${ttsLoading ? "Chargement..." : "Lire / pause"}">
+        <i class="${ttsLoading ? "fa-solid fa-spinner fa-spin" : `fa-thin ${!ttsAudio.paused && !ttsAudio.ended ? "fa-pause" : "fa-play"}`}"></i>
     </a>
     <a class="js-waitable-2" href="#" onclick="${NS}.ttsReplay();return false;" title="Rejouer">
         <i class="fa-thin fa-rotate-right"></i>
     </a>
+    ` : ""}
+    ${mystate.editable_by_player ? `
     <a class="js-waitable-2" href="#" onclick="${NS}.toggleEditable();return false;">
         <i class="fa-thin ${editable ? "fa-pen-slash" : "fa-pen-to-square"}"></i>
     </a>
+    ` : ""}
 </div>
 <div class="app-content js-waitable-2">
     ${form}
@@ -330,8 +364,8 @@ export const fetch = (args: string[] | undefined) => {
 }
 
 export const render = () => {
-    if (!App.inContext(NS)) { stopMusic(); stopTts(); speechSynthesis?.cancel(); return ""; }
-    ensureMusic(mystate?.music ?? null);
+    if (!App.inContext(NS)) { stopMusic(); musicPlaying = true; stopTts(); speechSynthesis?.cancel(); return ""; }
+    ensureMusic(mystate?.disable_music ? null : (mystate?.music ?? null));
 
     const form = formTemplate()
     return pageTemplate(form)

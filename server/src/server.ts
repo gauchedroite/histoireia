@@ -154,7 +154,9 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         kindid: data.kindid,
         use_tts: data.use_tts ?? false,
         tts_model: data.tts_model ?? null,
-        tts_voice: data.tts_voice ?? null
+        tts_voice: data.tts_voice ?? null,
+        editable_by_player: data.editable_by_player ?? false,
+        disable_music: data.disable_music ?? false
     };
 }
 
@@ -390,7 +392,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, music, prompt, llmid, kindid, update_users, use_tts, tts_model, tts_voice } = req.body as GameDefinition & { update_users?: boolean };
+    const { title, bg_image, music, prompt, llmid, kindid, update_users, use_tts, tts_model, tts_voice, editable_by_player, disable_music } = req.body as GameDefinition & { update_users?: boolean };
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -407,7 +409,7 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid, use_tts: !!use_tts, tts_model: tts_model || null, tts_voice: tts_voice || null };
+        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid, use_tts: !!use_tts, tts_model: tts_model || null, tts_voice: tts_voice || null, editable_by_player: !!editable_by_player, disable_music: !!disable_music };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
         if (kind?.code === "llm")
