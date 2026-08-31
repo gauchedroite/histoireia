@@ -162,8 +162,8 @@ const renderEdit = () => {
             <label>Musique<select name="music" ${g.enable_music === false ? "disabled" : ""}>${musicOptions(g.music)}</select></label>
             <label>Image de la page titre<input name="bg_image" value="${escapeHtml(g.bg_image ?? "")}" maxlength="32"></label>
             ${isNew ? `<div class="ed-hint">Enregistre d'abord l'histoire pour téléverser une image.</div>` : `<input type="file" name="bg_image_file" accept="image/*">`}
-            <label class="ed-check"><input type="checkbox" name="editable_by_player"${g.editable_by_player ? " checked" : ""}> Permettre au joueur de modifier le texte</label>
-            <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour les histoires des usagers</label>
+            <label class="ed-check"><input type="checkbox" name="editable_by_player"${g.editable_by_player ? " checked" : ""}> Permettre au joueur de modifier la réponse du LLM</label>
+            <label class="ed-check"><input type="checkbox" name="update_users"${g.update_users !== false ? " checked" : ""}> Mettre à jour le prompt des histoires en cours</label>
             <div class="ed-actions"><button type="submit">Enregistrer</button></div>
         </form>
     </div>`;
