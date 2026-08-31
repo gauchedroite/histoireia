@@ -1,1 +1,1 @@
-{"code":"iromokev","title":"D6 Test","bg_image":null,"music":null,"llmid":7,"kindid":1,"use_tts":false,"tts_model":"microsoft/mai-voice-2-flash","tts_voice":null,"editable_by_player":false,"enable_music":false}
+{"code":"iromokev","title":"D6 Test","bg_image":null,"music":null,"llmid":7,"kindid":1,"use_tts":true,"tts_model":"hexgrad/kokoro-82m","tts_voice":"ff_siwis","editable_by_player":false,"enable_music":false}
