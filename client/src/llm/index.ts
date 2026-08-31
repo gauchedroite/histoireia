@@ -5,6 +5,8 @@
 //   PUT    /editor/llm/:id    -> { id }   (id "new" creates)
 //   DELETE /editor/llm/:id    -> 204
 
+import { breadcrumb, escapeHtml } from "../common/admin.js";
+
 type LLM = {
     id: number; description: string; provider: string; model: string;
     hasTools: boolean; hasJsonSchema: boolean;
@@ -26,9 +28,6 @@ let editId = "";          // "" = list view, "new" = creating, number = editing 
 let error = "";
 let saved = "";
 
-const escapeHtml = (s: string): string =>
-    s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-
 const providerOptions = (selected: string) =>
     ["ollama", "openai"].map(p => `<option value="${p}"${p === selected ? " selected" : ""}>${p}</option>`).join("");
 
@@ -42,10 +41,8 @@ const renderList = () => {
         </tr>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <h1>LLM</h1>
+            ${breadcrumb([{ label: "Admin", href: "admin.html" }, { label: "LLM" }])}
             <span class="ed-spacer"></span>
-            <a href="admin.html">Admin</a>
-            <a href="index.html">Jeu</a>
             <button type="button" data-act="new">+</button>
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
@@ -83,9 +80,11 @@ const renderEdit = () => {
     const isNew = editId === "new";
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <button type="button" data-act="back">←</button>
-            <h2>${escapeHtml(g.description || "Nouveau LLM")}</h2>
-            ${isNew ? "" : `<code>${g.id}</code>`}
+            ${breadcrumb([
+                { label: "Admin", href: "admin.html" },
+                { label: "LLM", href: "llm.html" },
+                { label: g.description || "Nouveau LLM" },
+            ])}
             <span class="ed-spacer"></span>
             ${isNew ? "" : `<button type="button" data-act="delete">Effacer</button>`}
         </header>

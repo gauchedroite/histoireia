@@ -8,6 +8,8 @@
 //   GET    /data/lookup/kind.json    -> Kind[]
 //   GET    /data/lookup/llm.json     -> Llm[]
 
+import { breadcrumb, escapeHtml } from "../common/admin.js";
+
 type Kind = { id: number; code: string; description: string };
 type Llm = { id: number; description: string };
 type TTSModel = { id: number; description: string; model: string };
@@ -44,9 +46,6 @@ let gameid = "";
 let isNew = false;
 let error = "";
 let saved = "";
-
-const escapeHtml = (s: string): string =>
-    s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 
 const kindText = (id: number): string => kinds.find(k => k.id === id)?.description ?? "";
 const kindOptions = (selected: number) =>
@@ -91,10 +90,8 @@ const renderList = (games: Summary[]) => {
         </tr>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <h1>Éditeur</h1>
+            ${breadcrumb([{ label: "Admin", href: "admin.html" }, { label: "Éditeur" }])}
             <span class="ed-spacer"></span>
-            <a href="admin.html">Admin</a>
-            <a href="index.html">Jeu</a>
             <button type="button" data-act="new">+</button>
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
@@ -146,9 +143,11 @@ const renderEdit = () => {
 
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <button type="button" data-act="back">←</button>
-            <h2>${escapeHtml(g.title)}</h2>
-            ${isNew ? "" : `<code>${escapeHtml(g.code)}</code>`}
+            ${breadcrumb([
+                { label: "Admin", href: "admin.html" },
+                { label: "Éditeur", href: "editor.html" },
+                { label: isNew ? "Nouvelle histoire" : g.title },
+            ])}
             <span class="ed-spacer"></span>
             ${isNew ? "" : `<button type="button" data-act="delete">Effacer</button>`}
         </header>

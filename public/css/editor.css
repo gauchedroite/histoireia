@@ -10,6 +10,11 @@ body { font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; margin: 0;
 .ed-spacer { flex: 1; }
 .ed-header code { opacity: 0.5; font-size: 0.8em; }
 
+.ed-breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 1.1rem; font-weight: 600; }
+.ed-breadcrumb a { text-decoration: none; }
+.ed-breadcrumb a:hover { text-decoration: underline; }
+.ed-breadcrumb-sep { opacity: 0.5; font-weight: 400; }
+
 .ed-table { width: 100%; border-collapse: collapse; }
 .ed-table th, .ed-table td { text-align: left; padding: 0.4rem 0.3rem; border-bottom: 1px solid #ccc; vertical-align: top; }
 .ed-table th { border-bottom-width: 2px; font-weight: 600; }

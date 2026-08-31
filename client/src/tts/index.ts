@@ -9,6 +9,8 @@
 // Provider is always OpenRouter; the editor only stores description + model id.
 // Voices are edited as plain CSV (one voice per line).
 
+import { breadcrumb, escapeHtml } from "../common/admin.js";
+
 type TTSModel = {
     id: number;
     description: string;
@@ -33,9 +35,6 @@ let editId = "";
 let error = "";
 let saved = "";
 
-const escapeHtml = (s: string): string =>
-    s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-
 // ---------- list ----------
 const renderList = () => {
     const rows = list.map(m => `
@@ -45,10 +44,8 @@ const renderList = () => {
         </tr>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <h1>TTS</h1>
+            ${breadcrumb([{ label: "Admin", href: "admin.html" }, { label: "TTS" }])}
             <span class="ed-spacer"></span>
-            <a href="admin.html">Admin</a>
-            <a href="index.html">Jeu</a>
             <button type="button" data-act="new">+</button>
         </header>
         ${error ? `<div class="ed-error">${escapeHtml(error)}</div>` : ""}
@@ -84,9 +81,11 @@ const renderEdit = () => {
     const isNew = editId === "new";
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <button type="button" data-act="back">←</button>
-            <h2>${escapeHtml(g.description || "Nouveau modèle TTS")}</h2>
-            ${isNew ? "" : `<code>${g.id}</code>`}
+            ${breadcrumb([
+                { label: "Admin", href: "admin.html" },
+                { label: "TTS", href: "tts.html" },
+                { label: g.description || "Nouveau modèle TTS" },
+            ])}
             <span class="ed-spacer"></span>
             ${isNew ? "" : `<button type="button" data-act="delete">Effacer</button>`}
         </header>

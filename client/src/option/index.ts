@@ -4,6 +4,8 @@
 //   GET /editor/shaders   -> { current: string, shaders: string[] }
 //   PUT /editor/shaders   -> { name: string }   (body { name })
 
+import { breadcrumb } from "../common/admin.js";
+
 const root = document.getElementById("app_root") as HTMLElement;
 
 const api = {
@@ -25,10 +27,8 @@ const render = () => {
         `<option value="${s}"${s === selected ? " selected" : ""}>${s}</option>`).join("");
     root.innerHTML = `<div class="ed-wrap">
         <header class="ed-header">
-            <h1>Shader d'arrière-plan</h1>
+            ${breadcrumb([{ label: "Admin", href: "admin.html" }, { label: "Shaders" }])}
             <span class="ed-spacer"></span>
-            <a href="admin.html">Admin</a>
-            <a href="index.html">Jeu</a>
         </header>
         ${error ? `<div class="ed-error">${error}</div>` : ""}
         <div class="ed-form">
