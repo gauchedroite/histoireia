@@ -4,7 +4,7 @@ import fs from "fs-extra";
 import path from "path";
 import { app } from "./server";
 import { stopLookupWatcher } from "./lookup";
-import { usersPath } from "./path-names";
+import { assetsPath, usersPath } from "./path-names";
 import type { Server } from "http";
 
 const PORT = 9341;
@@ -94,6 +94,21 @@ describe("PUT /users/:username/:gameid", () => {
         assert.strictEqual(getRes.status, 200);
         const body = await getRes.json();
         assert.deepStrictEqual(body, state);
+    });
+});
+
+describe("POST /editor/stories/:gameid/image", () => {
+    it("sanitizes filenames with spaces and punctuation", async () => {
+        const res = await fetch(`${BASE}/editor/stories/billy/image?filename=my%20image%20(1).png`, {
+            method: "POST",
+            headers: { "Content-Type": "application/octet-stream" },
+            body: Buffer.from([0x89, 0x50, 0x4e, 0x47]),
+        });
+        assert.strictEqual(res.status, 200);
+        const body = await res.json();
+        assert.strictEqual(body.filename, "my_image_1.png");
+        assert.ok(fs.existsSync(path.join(assetsPath, "billy", "my_image_1.png")));
+        await fs.unlink(path.join(assetsPath, "billy", "my_image_1.png"));
     });
 });
 

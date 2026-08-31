@@ -458,7 +458,8 @@ app.delete("/editor/stories/:gameid", async (req: Request, res: Response) => {
 app.post("/editor/stories/:gameid/image", express.raw({ type: "*/*", limit: "10mb" }), async (req: Request, res: Response) => {
     const gameid = sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
-    const filename = (req.query.filename as string ?? "").toLowerCase();
+    let filename = path.basename(req.query.filename as string ?? "").toLowerCase();
+    filename = filename.replace(/[^a-z0-9._-]+/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "").replace(/_+\./g, ".");
     if (!/^[a-z0-9._-]+\.(jpg|jpeg|png|gif|webp)$/.test(filename)) { res.status(400).json({ hasError: true, message: "Invalid filename" }); return; }
     if (!Buffer.isBuffer(req.body) || req.body.length === 0) { res.status(400).json({ hasError: true, message: "No image data" }); return; }
     try {
