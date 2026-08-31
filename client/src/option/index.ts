@@ -55,7 +55,7 @@ const fetchList = async () => {
         current = data.current;
         selected = data.current;
         render();
-    } catch (e) {
+    } catch {
         error = "Impossible de charger les shaders.";
         render();
     }
