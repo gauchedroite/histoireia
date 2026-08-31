@@ -1,1 +1,13 @@
-{"code":"idisubog","title":"(A) Test","bg_image":"roller-drama-poster-header.jpg","music":"brent hugh - claire de lune (debussy).mp3","llmid":1,"kindid":1,"use_tts":true,"tts_model":"microsoft/mai-voice-2-flash","tts_voice":"fr-FR-Soleil:MAI-Voice-2","editable_by_player":false,"disable_music":true}
+{
+    "code": "idisubog",
+    "title": "(A) Test",
+    "bg_image": "roller-drama-poster-header.jpg",
+    "music": "brent hugh - claire de lune (debussy).mp3",
+    "llmid": 1,
+    "kindid": 1,
+    "use_tts": true,
+    "tts_model": "microsoft/mai-voice-2-flash",
+    "tts_voice": "fr-FR-Soleil:MAI-Voice-2",
+    "editable_by_player": false,
+    "enable_music": false
+}

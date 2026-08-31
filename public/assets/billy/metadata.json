@@ -1,1 +1,7 @@
-{"code":"billy","title":"Aventures à Tukuman","bg_image":"tukuman.png","llmid":1,"kindid":1}
+{
+    "code": "billy",
+    "title": "Aventures \u00e0 Tukuman",
+    "bg_image": "tukuman.png",
+    "llmid": 1,
+    "kindid": 1
+}

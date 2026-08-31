@@ -28,7 +28,7 @@ export interface GameDefinition {
     tts_model?: string | null
     tts_voice?: string | null
     editable_by_player?: boolean
-    disable_music?: boolean
+    enable_music?: boolean
 }
 
 

@@ -253,7 +253,7 @@ const pageTemplate = (form: string) => {
     <a class="js-waitable-2" href="#/menu/${gameid}">
         <i class="fa-regular fa-chevron-left"></i>&nbsp;<span>${mystate.title}</span>
     </a>
-    ${mystate.music && !mystate.disable_music ? `
+    ${mystate.music && mystate.enable_music !== false ? `
     <a class="js-waitable-2" href="#" onclick="${NS}.musicToggle();return false;" title="Musique">
         <i class="fa-thin ${audio?.paused ? "fa-music-slash" : "fa-music"}"></i>
     </a>
@@ -365,7 +365,7 @@ export const fetch = (args: string[] | undefined) => {
 
 export const render = () => {
     if (!App.inContext(NS)) { stopMusic(); musicPlaying = true; stopTts(); speechSynthesis?.cancel(); return ""; }
-    ensureMusic(mystate?.disable_music ? null : (mystate?.music ?? null));
+    ensureMusic(mystate?.enable_music === false ? null : (mystate?.music ?? null));
 
     const form = formTemplate()
     return pageTemplate(form)

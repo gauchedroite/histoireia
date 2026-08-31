@@ -5,7 +5,7 @@ import path from 'path';
 import { createFunName } from './funny-name';
 import { chat03, chatExtra } from './chat';
 import { assetsPath, lookupPath, publicPath, usersPath } from './path-names';
-import { GameDefinition, GameList, LLMConfig } from './chat-interfaces';
+import { GameDefinition, GameList, LLMConfig, TTSModel } from './chat-interfaces';
 import { getLlm, getKindList, getKind, resolveTemplateId } from './lookup';
 
 
@@ -156,7 +156,7 @@ async function readGameDefinition(gameid: string): Promise<GameDefinition> {
         tts_model: data.tts_model ?? null,
         tts_voice: data.tts_voice ?? null,
         editable_by_player: data.editable_by_player ?? false,
-        disable_music: data.disable_music ?? false
+        enable_music: data.enable_music ?? ((data as { disable_music?: boolean }).disable_music !== undefined ? !(data as { disable_music?: boolean }).disable_music : true),
     };
 }
 
@@ -392,7 +392,7 @@ app.get("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
 // Create / update a story (admin).
 app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
-    const { title, bg_image, music, prompt, llmid, kindid, update_users, use_tts, tts_model, tts_voice, editable_by_player, disable_music } = req.body as GameDefinition & { update_users?: boolean };
+    const { title, bg_image, music, prompt, llmid, kindid, update_users, use_tts, tts_model, tts_voice, editable_by_player, enable_music } = req.body as GameDefinition & { update_users?: boolean };
     let gameid = req.params.gameid === "new" ? "new" : sanitizeParam(req.params.gameid);
     if (!gameid) { res.status(400).json({ hasError: true, message: "Invalid gameid" }); return; }
 
@@ -409,7 +409,7 @@ app.put("/editor/stories/:gameid", async (req: Request, res: Response) => {
 
     try {
         const kind = getKind(kindid);
-        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid, use_tts: !!use_tts, tts_model: tts_model || null, tts_voice: tts_voice || null, editable_by_player: !!editable_by_player, disable_music: !!disable_music };
+        const game = { code: gameid, title, bg_image, music: music || null, llmid: llmid ?? 1, kindid, use_tts: !!use_tts, tts_model: tts_model || null, tts_voice: tts_voice || null, editable_by_player: !!editable_by_player, enable_music: !!enable_music };
         await fs.writeFile(path.join(gameid_Path, "metadata.json"), JSON.stringify(game));
 
         if (kind?.code === "llm")
@@ -542,6 +542,103 @@ app.delete("/editor/llm/:id", async (req: Request, res: Response) => {
 
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// TTS model editor API. Provider is always OpenRouter.
+// Models are stored in public/data/lookup/tts.json.
+// Voices for each model are stored as CSV in public/data/lookup/tts/{id}.csv.
+// Same no-Express-auth rule as /editor/stories — gated by Caddy.
+// ---------------------------------------------------------------------------
+const ttsPath = path.join(lookupPath, "tts.json");
+const ttsVoicesDir = path.join(lookupPath, "tts");
+
+async function readTtsList(): Promise<TTSModel[]> {
+    if (!fs.existsSync(ttsPath)) return [];
+    const list: TTSModel[] = JSON.parse(await fs.readFile(ttsPath, "utf8"));
+    list.sort((a, b) => a.id - b.id);
+    return list;
+}
+
+async function writeTtsList(list: TTSModel[]) {
+    await fs.ensureDir(path.dirname(ttsPath));
+    await fs.writeFile(ttsPath, JSON.stringify(list, null, 4));
+}
+
+app.get("/editor/tts", async (_req: Request, res: Response) => {
+    try {
+        res.json(await readTtsList());
+    }
+    catch (err) {
+        console.error("GET /editor/tts", err);
+        res.status(500).json({ hasError: true, message: "Impossible d'obtenir les modèles TTS!" });
+    }
+});
+
+app.get("/editor/tts/:id", async (req: Request, res: Response) => {
+    const idParam = sanitizeParam(req.params.id);
+    if (!idParam) { res.status(400).json({ hasError: true, message: "Invalid id" }); return; }
+    try {
+        const list = await readTtsList();
+        const entry = list.find(m => m.id === Number(idParam));
+        if (!entry) { res.status(404).json({ hasError: true, message: "Modèle TTS introuvable" }); return; }
+        const voicesPath = path.join(ttsVoicesDir, `${idParam}.csv`);
+        const voices = fs.existsSync(voicesPath) ? await fs.readFile(voicesPath, "utf8") : "";
+        res.json({ ...entry, voices });
+    }
+    catch (err) {
+        console.error(`GET /editor/tts/${req.params.id}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'ouvrir le modèle TTS!" });
+    }
+});
+
+app.put("/editor/tts/:id", async (req: Request, res: Response) => {
+    const idParam = req.params.id === "new" ? "new" : sanitizeParam(req.params.id);
+    if (!idParam) { res.status(400).json({ hasError: true, message: "Invalid id" }); return; }
+    const { description, model, voices } = req.body as { description?: string; model?: string; voices?: string };
+    if (!description || !model) { res.status(400).json({ hasError: true, message: "Description et modèle requis" }); return; }
+    try {
+        const list = await readTtsList();
+        let entry: TTSModel;
+        if (idParam === "new") {
+            entry = { id: list.reduce((m, t) => Math.max(m, t.id), 0) + 1, description, model };
+            list.push(entry);
+        }
+        else {
+            const i = list.findIndex(m => m.id === Number(idParam));
+            if (i < 0) { res.status(404).json({ hasError: true, message: "Modèle TTS introuvable" }); return; }
+            entry = { id: Number(idParam), description, model };
+            list[i] = entry;
+        }
+        await fs.ensureDir(ttsVoicesDir);
+        await fs.writeFile(path.join(ttsVoicesDir, `${entry.id}.csv`), voices ?? "");
+        await writeTtsList(list);
+        console.log(`PUT /editor/tts/${idParam} -> ${entry.id}`);
+        res.json({ id: entry.id });
+    }
+    catch (err) {
+        console.error(`PUT /editor/tts/${req.params.id}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible de mettre à jour le modèle TTS!" });
+    }
+});
+
+app.delete("/editor/tts/:id", async (req: Request, res: Response) => {
+    const idParam = sanitizeParam(req.params.id);
+    if (!idParam) { res.status(400).json({ hasError: true, message: "Invalid id" }); return; }
+    try {
+        const list = await readTtsList();
+        const i = list.findIndex(m => m.id === Number(idParam));
+        if (i < 0) { res.status(404).json({ hasError: true, message: "Modèle TTS introuvable" }); return; }
+        list.splice(i, 1);
+        await writeTtsList(list);
+        await fs.remove(path.join(ttsVoicesDir, `${idParam}.csv`));
+        console.log(`DELETE /editor/tts/${idParam}`);
+        res.status(204).end();
+    }
+    catch (err) {
+        console.error(`DELETE /editor/tts/${req.params.id}`, err);
+        res.status(500).json({ hasError: true, message: "Impossible d'effacer le modèle TTS!" });
+    }
+});
+
 // Background shader picker API. Same no-Express-auth rule as /editor/stories —
 // gated by Caddy on /histoireia/editor*. Selection is persisted in
 // public/data/lookup/shader.json as { "name": "<fragment-shader-stem>" }.

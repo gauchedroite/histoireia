@@ -1,1 +1,7 @@
-{"code":"ct02","title":"Samuel de Champlain","bg_image":"champlain.jpg","llmid":1,"kindid":1}
+{
+    "code": "ct02",
+    "title": "Samuel de Champlain",
+    "bg_image": "champlain.jpg",
+    "llmid": 1,
+    "kindid": 1
+}

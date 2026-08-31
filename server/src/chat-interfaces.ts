@@ -45,6 +45,12 @@ export type KindLookup = {
     fa: string
 };
 
+export type TTSModel = {
+    id: number;
+    description: string;
+    model: string; // OpenRouter model id, provider is always openrouter
+};
+
 export interface GameDefinition {
     code: string
     title: string
@@ -60,7 +66,7 @@ export interface GameDefinition {
     tts_model?: string | null
     tts_voice?: string | null
     editable_by_player?: boolean
-    disable_music?: boolean
+    enable_music?: boolean
 }
 
 export interface GameList {
